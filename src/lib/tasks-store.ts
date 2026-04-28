@@ -8,7 +8,12 @@ type TaskCreate = {
 
 type TaskUpdate = Partial<TaskCreate>;
 
-const tasks = new Map<string, Task>();
+declare global {
+  var __taskflowTasks: Map<string, Task> | undefined;
+}
+
+const tasks = globalThis.__taskflowTasks ?? new Map<string, Task>();
+globalThis.__taskflowTasks = tasks;
 
 function nowIso() {
   return new Date().toISOString();

@@ -4,11 +4,12 @@ import { deleteTask, getTaskById, updateTask } from "@/lib/tasks-store";
 import { updateTaskSchema } from "@/lib/validators/task";
 
 type Context = {
-  params: { id: string };
+  params: { id: string } | Promise<{ id: string }>;
 };
 
 export async function GET(_request: Request, { params }: Context) {
-  const task = getTaskById(params.id);
+  const { id } = await Promise.resolve(params);
+  const task = getTaskById(id);
   if (!task) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
@@ -16,6 +17,7 @@ export async function GET(_request: Request, { params }: Context) {
 }
 
 export async function PUT(request: Request, { params }: Context) {
+  const { id } = await Promise.resolve(params);
   let json: unknown;
   try {
     json = await request.json();
@@ -34,7 +36,7 @@ export async function PUT(request: Request, { params }: Context) {
     );
   }
 
-  const updated = updateTask(params.id, parsed.data);
+  const updated = updateTask(id, parsed.data);
   if (!updated) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
@@ -43,7 +45,8 @@ export async function PUT(request: Request, { params }: Context) {
 }
 
 export async function DELETE(_request: Request, { params }: Context) {
-  const deleted = deleteTask(params.id);
+  const { id } = await Promise.resolve(params);
+  const deleted = deleteTask(id);
   if (!deleted) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
