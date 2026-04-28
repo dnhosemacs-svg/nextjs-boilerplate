@@ -8,9 +8,8 @@ export default function Home() {
           Carpintería · TaskFlow
         </h1>
         <p className="mt-3 text-base text-zinc-600 dark:text-zinc-400">
-          Base mínima del proyecto. En la siguiente tarjeta crearemos las rutas
-          de <code className="font-mono">/tasks/new</code> y{" "}
-          <code className="font-mono">/tasks/[id]</code>.
+          Proyecto base con App Router. Desde aqui puedes ir al formulario de
+          creacion y a una vista de detalle dinamico.
         </p>
 
         <div className="mt-8 flex flex-col gap-3 sm:flex-row">
@@ -24,7 +23,13 @@ export default function Home() {
             className="inline-flex h-11 items-center justify-center rounded-full border border-black/10 px-5 text-sm font-medium hover:bg-black/[.04] dark:border-white/15 dark:hover:bg-white/10"
             href="/tasks/new"
           >
-            Crear pedido (próximo)
+            Crear pedido
+          </Link>
+          <Link
+            className="inline-flex h-11 items-center justify-center rounded-full border border-black/10 px-5 text-sm font-medium hover:bg-black/[.04] dark:border-white/15 dark:hover:bg-white/10"
+            href="/tasks/demo-001"
+          >
+            Ver detalle de ejemplo
           </Link>
         </div>
       </div>
