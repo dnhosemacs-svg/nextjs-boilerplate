@@ -1,6 +1,10 @@
 import { NextResponse } from "next/server";
 
-import { deleteTask, getTaskById, updateTask } from "@/lib/tasks-store";
+import {
+  deleteTaskInCookieStore,
+  getTaskByIdFromCookieStore,
+  updateTaskInCookieStore,
+} from "@/lib/tasks-cookie-store";
 import { updateTaskSchema } from "@/lib/validators/task";
 
 type Context = {
@@ -9,7 +13,7 @@ type Context = {
 
 export async function GET(_request: Request, { params }: Context) {
   const { id } = await Promise.resolve(params);
-  const task = getTaskById(id);
+  const task = await getTaskByIdFromCookieStore(id);
   if (!task) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
@@ -36,7 +40,7 @@ export async function PUT(request: Request, { params }: Context) {
     );
   }
 
-  const updated = updateTask(id, parsed.data);
+  const updated = await updateTaskInCookieStore(id, parsed.data);
   if (!updated) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
@@ -46,7 +50,7 @@ export async function PUT(request: Request, { params }: Context) {
 
 export async function DELETE(_request: Request, { params }: Context) {
   const { id } = await Promise.resolve(params);
-  const deleted = deleteTask(id);
+  const deleted = await deleteTaskInCookieStore(id);
   if (!deleted) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }

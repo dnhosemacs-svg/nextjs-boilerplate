@@ -1,10 +1,13 @@
 import { NextResponse } from "next/server";
 
-import { createTask, listTasks } from "@/lib/tasks-store";
+import {
+  createTaskInCookieStore,
+  listTasksFromCookieStore,
+} from "@/lib/tasks-cookie-store";
 import { createTaskSchema } from "@/lib/validators/task";
 
 export async function GET() {
-  const tasks = listTasks();
+  const tasks = await listTasksFromCookieStore();
   return NextResponse.json(tasks, { status: 200 });
 }
 
@@ -27,7 +30,7 @@ export async function POST(request: Request) {
     );
   }
 
-  const created = createTask(parsed.data);
+  const created = await createTaskInCookieStore(parsed.data);
   return NextResponse.json(created, { status: 201 });
 }
 

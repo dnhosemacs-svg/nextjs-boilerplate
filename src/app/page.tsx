@@ -1,9 +1,9 @@
 import Image from "next/image";
 import Link from "next/link";
-import { getTasksServer } from "@/lib/api-server";
+import { listTasksFromCookieStore } from "@/lib/tasks-cookie-store";
 
 export default async function Home() {
-  const tasks = await getTasksServer();
+  const tasks = await listTasksFromCookieStore();
 
   return (
     <main className="mx-auto flex w-full max-w-4xl flex-1 px-6 py-12">
