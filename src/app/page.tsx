@@ -1,9 +1,9 @@
 import Image from "next/image";
 import Link from "next/link";
-import { getTasks } from "@/lib/api";
+import { getTasksServer } from "@/lib/api-server";
 
 export default async function Home() {
-  const tasks = await getTasks();
+  const tasks = await getTasksServer();
 
   return (
     <main className="mx-auto flex w-full max-w-4xl flex-1 px-6 py-12">
