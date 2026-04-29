@@ -1,36 +1,147 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# TaskFlow Carpinteria
 
-## Getting Started
+Aplicacion web de gestion de pedidos de carpinteria construida con Next.js App Router.
+Incluye CRUD de pedidos con Route Handlers, autenticacion demo por cookie, rutas protegidas con middleware y pagina de estadisticas con ISR.
 
-First, run the development server:
+## Arquitectura
+
+- **Frontend**: App Router en `src/app` con Server Components para render inicial.
+- **Interactividad**: Client Components en `src/components` para formularios, acciones y navegacion de cliente.
+- **API**: Route Handlers en `src/app/api`.
+- **Validacion**: esquemas Zod en `src/lib/validators/task.ts`.
+- **Persistencia**: cookie por sesion (`src/lib/tasks-cookie-store.ts`).
+- **Proteccion de rutas**: `middleware.ts` para `/tasks/*`.
+
+## Requisitos
+
+- Node.js 20 o superior
+- npm 10 o superior
+
+## Configuracion
+
+Variable opcional recomendada:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+NEXT_PUBLIC_APP_URL=http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Uso:
+- local: `http://localhost:3000`
+- produccion: dominio publico de Vercel
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Ejecucion local
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm install
+npm run dev
+```
 
-## Learn More
+App disponible en [http://localhost:3000](http://localhost:3000).
 
-To learn more about Next.js, take a look at the following resources:
+## Scripts
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- `npm run dev`: servidor de desarrollo.
+- `npm run build`: build de produccion.
+- `npm run start`: ejecutar build de produccion.
+- `npm run lint`: analisis estatico con ESLint.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Rutas
 
-## Deploy on Vercel
+- `/`: listado de pedidos y acciones principales.
+- `/login`: autenticacion demo.
+- `/tasks/new`: alta de pedido (protegida).
+- `/tasks/[id]`: detalle, edicion y borrado (protegida).
+- `/stats`: metricas basicas con ISR (`revalidate = 60`).
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Rutas auxiliares:
+- `src/app/loading.tsx`
+- `src/app/not-found.tsx`
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## API
+
+### Tasks
+
+- `GET /api/tasks`
+  - **200**: devuelve `Task[]`.
+- `POST /api/tasks`
+  - **201**: devuelve `Task` creado.
+  - **400**: body invalido o error de validacion.
+- `GET /api/tasks/:id`
+  - **200**: devuelve `Task`.
+  - **404**: no encontrado.
+- `PUT /api/tasks/:id`
+  - **200**: devuelve `Task` actualizado.
+  - **400**: body invalido o error de validacion.
+  - **404**: no encontrado.
+- `DELETE /api/tasks/:id`
+  - **200**: devuelve `Task` eliminado.
+  - **404**: no encontrado.
+
+### Auth (demo)
+
+- `POST /api/auth/login`
+  - **200**: sesion creada.
+  - **400**: payload invalido.
+  - **401**: credenciales invalidas.
+- `POST /api/auth/logout`
+  - **200**: sesion eliminada.
+
+Credenciales demo:
+- `admin@carpinteria.local`
+- `123456`
+
+## Modelo de datos
+
+`Task` (`src/types/task.ts`):
+- `id: string`
+- `title: string`
+- `description?: string`
+- `status: "pending" | "in_progress" | "done"`
+- `createdAt: string` (ISO)
+- `updatedAt: string` (ISO)
+
+## Decisiones tecnicas
+
+- Server Components para carga inicial y SSR.
+- Client Components solo donde hay estado/eventos (`useState`, `useRouter`, `useSearchParams`).
+- Validacion centralizada con Zod para entrada de API.
+- Persistencia en cookie para reducir complejidad en fase de aprendizaje.
+- ISR en `/stats` para demostrar regeneracion incremental.
+
+## Optimizaciones Next.js
+
+- `next/image` en la home.
+- `generateMetadata` dinamico en `src/app/tasks/[id]/page.tsx`.
+- `next/font/google` (Geist) en `src/app/layout.tsx`.
+- ISR con `revalidate = 60` en `src/app/stats/page.tsx`.
+
+## Middleware
+
+`middleware.ts`:
+- protege `/tasks/:path*` si no hay cookie de auth.
+- redirige a `/login?next=<ruta_original>`.
+- evita acceso a `/login` cuando la sesion ya esta activa.
+
+## Despliegue
+
+- Plataforma: Vercel
+- URL: `<PEGA_AQUI_TU_URL_DE_VERCEL>`
+
+Validacion post-deploy:
+- rutas publicas y protegidas operativas.
+- CRUD funcional en `/api/tasks`.
+- login/logout operativos.
+- pagina `/stats` regenerando por intervalo.
+
+## Verificacion SSR
+
+1. Abrir DevTools > Network.
+2. Recargar la pagina.
+3. Inspeccionar la respuesta del documento HTML inicial.
+4. Verificar que el contenido principal se entrega renderizado desde servidor.
+
+## Limitaciones conocidas
+
+- Persistencia en cookie por sesion; no hay base de datos.
+- Autenticacion demo sin proveedor real.
+- No apto para produccion sin capa de datos persistente y auth robusta.
