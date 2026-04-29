@@ -38,6 +38,12 @@ export default async function Home() {
           >
             Crear pedido
           </Link>
+          <Link
+            className="inline-flex h-11 items-center justify-center rounded-full border border-black/10 px-5 text-sm font-medium hover:bg-black/[.04] dark:border-white/15 dark:hover:bg-white/10"
+            href="/stats"
+          >
+            Ver estadisticas (ISR)
+          </Link>
         </div>
 
         <section className="mt-8">
