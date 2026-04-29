@@ -1,9 +1,14 @@
 import Image from "next/image";
 import Link from "next/link";
+import { cookies } from "next/headers";
+import AuthSessionControls from "@/components/auth-session-controls";
+import { AUTH_COOKIE_NAME } from "@/lib/auth";
 import { listTasksFromCookieStore } from "@/lib/tasks-cookie-store";
 
 export default async function Home() {
+  const cookieStore = await cookies();
   const tasks = await listTasksFromCookieStore();
+  const isAuthenticated = cookieStore.get(AUTH_COOKIE_NAME)?.value === "1";
 
   return (
     <main className="mx-auto flex w-full max-w-4xl flex-1 px-6 py-12">
@@ -14,6 +19,7 @@ export default async function Home() {
         <p className="mt-3 text-base text-zinc-600 dark:text-zinc-400">
           Gestiona pedidos desde una UI conectada a Route Handlers con App Router.
         </p>
+        <AuthSessionControls isAuthenticated={isAuthenticated} />
         <div className="mt-6 overflow-hidden rounded-2xl border border-black/10 dark:border-white/15">
           <Image
             src="/carpentry-hero.svg"
