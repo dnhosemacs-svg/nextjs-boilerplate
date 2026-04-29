@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import DeleteTaskButton from "@/components/tasks/delete-task-button";
@@ -7,6 +8,27 @@ import { getTaskById } from "@/lib/api";
 type TaskDetailPageProps = {
   params: Promise<{ id: string }>;
 };
+
+export async function generateMetadata({
+  params,
+}: TaskDetailPageProps): Promise<Metadata> {
+  const { id } = await params;
+  const task = await getTaskById(id).catch(() => null);
+
+  if (!task) {
+    return {
+      title: "Pedido no encontrado | Carpinteria TaskFlow",
+      description: "El pedido solicitado no existe o ha sido eliminado.",
+    };
+  }
+
+  return {
+    title: `${task.title} | Carpinteria TaskFlow`,
+    description:
+      task.description?.slice(0, 140) ??
+      `Detalle del pedido ${task.id} en el gestor de carpinteria.`,
+  };
+}
 
 export default async function TaskDetailPage({ params }: TaskDetailPageProps) {
   const { id } = await params;

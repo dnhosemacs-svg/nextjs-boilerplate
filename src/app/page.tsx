@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { getTasks } from "@/lib/api";
 
@@ -13,6 +14,16 @@ export default async function Home() {
         <p className="mt-3 text-base text-zinc-600 dark:text-zinc-400">
           Gestiona pedidos desde una UI conectada a Route Handlers con App Router.
         </p>
+        <div className="mt-6 overflow-hidden rounded-2xl border border-black/10 dark:border-white/15">
+          <Image
+            src="/carpentry-hero.svg"
+            alt="Banco de trabajo de carpinteria con herramientas"
+            width={1200}
+            height={630}
+            priority
+            className="h-auto w-full"
+          />
+        </div>
 
         <div className="mt-8 flex flex-wrap gap-3">
           <Link
