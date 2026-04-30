@@ -1,14 +1,21 @@
 import { NextResponse } from "next/server";
 
 import {
-  createTaskInCookieStore,
-  listTasksFromCookieStore,
-} from "@/lib/tasks-cookie-store";
+  createTask,
+  listTasks,
+} from "@/lib/tasks-repository";
 import { createTaskSchema } from "@/lib/validators/task";
 
 export async function GET() {
-  const tasks = await listTasksFromCookieStore();
-  return NextResponse.json(tasks, { status: 200 });
+  try {
+    const tasks = await listTasks();
+    return NextResponse.json(tasks, { status: 200 });
+  } catch {
+    return NextResponse.json(
+      { error: "No se pudieron cargar los pedidos" },
+      { status: 500 },
+    );
+  }
 }
 
 export async function POST(request: Request) {
@@ -30,7 +37,14 @@ export async function POST(request: Request) {
     );
   }
 
-  const created = await createTaskInCookieStore(parsed.data);
-  return NextResponse.json(created, { status: 201 });
+  try {
+    const created = await createTask(parsed.data);
+    return NextResponse.json(created, { status: 201 });
+  } catch {
+    return NextResponse.json(
+      { error: "No se pudo crear el pedido" },
+      { status: 500 },
+    );
+  }
 }
 

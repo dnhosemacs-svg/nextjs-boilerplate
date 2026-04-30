@@ -3,11 +3,11 @@ import Link from "next/link";
 import { cookies } from "next/headers";
 import AuthSessionControls from "@/components/auth-session-controls";
 import { AUTH_COOKIE_NAME } from "@/lib/auth";
-import { listTasksFromCookieStore } from "@/lib/tasks-cookie-store";
+import { listTasks } from "@/lib/tasks-repository";
 
 export default async function Home() {
   const cookieStore = await cookies();
-  const tasks = await listTasksFromCookieStore();
+  const tasks = await listTasks();
   const isAuthenticated = cookieStore.get(AUTH_COOKIE_NAME)?.value === "1";
 
   return (

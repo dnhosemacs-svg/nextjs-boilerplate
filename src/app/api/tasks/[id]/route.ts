@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
 
 import {
-  deleteTaskInCookieStore,
-  getTaskByIdFromCookieStore,
-  updateTaskInCookieStore,
-} from "@/lib/tasks-cookie-store";
+  deleteTask,
+  getTaskById,
+  updateTask,
+} from "@/lib/tasks-repository";
 import { updateTaskSchema } from "@/lib/validators/task";
 
 type Context = {
@@ -13,7 +13,7 @@ type Context = {
 
 export async function GET(_request: Request, { params }: Context) {
   const { id } = await Promise.resolve(params);
-  const task = await getTaskByIdFromCookieStore(id);
+  const task = await getTaskById(id);
   if (!task) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
@@ -40,7 +40,16 @@ export async function PUT(request: Request, { params }: Context) {
     );
   }
 
-  const updated = await updateTaskInCookieStore(id, parsed.data);
+  let updated = null;
+  try {
+    updated = await updateTask(id, parsed.data);
+  } catch {
+    return NextResponse.json(
+      { error: "No se pudo actualizar el pedido" },
+      { status: 500 },
+    );
+  }
+
   if (!updated) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
@@ -50,7 +59,16 @@ export async function PUT(request: Request, { params }: Context) {
 
 export async function DELETE(_request: Request, { params }: Context) {
   const { id } = await Promise.resolve(params);
-  const deleted = await deleteTaskInCookieStore(id);
+  let deleted = null;
+  try {
+    deleted = await deleteTask(id);
+  } catch {
+    return NextResponse.json(
+      { error: "No se pudo eliminar el pedido" },
+      { status: 500 },
+    );
+  }
+
   if (!deleted) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }

@@ -3,7 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import DeleteTaskButton from "@/components/tasks/delete-task-button";
 import TaskForm from "@/components/tasks/task-form";
-import { getTaskByIdFromCookieStore } from "@/lib/tasks-cookie-store";
+import { getTaskById } from "@/lib/tasks-repository";
 
 type TaskDetailPageProps = {
   params: Promise<{ id: string }>;
@@ -13,7 +13,7 @@ export async function generateMetadata({
   params,
 }: TaskDetailPageProps): Promise<Metadata> {
   const { id } = await params;
-  const task = await getTaskByIdFromCookieStore(id).catch(() => null);
+  const task = await getTaskById(id).catch(() => null);
 
   if (!task) {
     return {
@@ -32,7 +32,7 @@ export async function generateMetadata({
 
 export default async function TaskDetailPage({ params }: TaskDetailPageProps) {
   const { id } = await params;
-  const task = await getTaskByIdFromCookieStore(id).catch(() => null);
+  const task = await getTaskById(id).catch(() => null);
   if (!task) {
     notFound();
   }

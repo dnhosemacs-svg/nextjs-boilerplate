@@ -1,34 +1,18 @@
 import Link from "next/link";
+import { listTasks } from "@/lib/tasks-repository";
 import type { Task } from "@/types/task";
 
 export const revalidate = 60;
 
-function getBaseUrl() {
-  if (process.env.NEXT_PUBLIC_APP_URL) {
-    return process.env.NEXT_PUBLIC_APP_URL;
-  }
-
-  if (process.env.VERCEL_URL) {
-    return `https://${process.env.VERCEL_URL}`;
-  }
-
-  return "http://localhost:3000";
-}
-
-async function getTasksForStats(): Promise<Task[]> {
-  const response = await fetch(`${getBaseUrl()}/api/tasks`, {
-    next: { revalidate },
-  });
-
-  if (!response.ok) {
-    throw new Error("No se pudieron cargar las estadisticas");
-  }
-
-  return (await response.json()) as Task[];
-}
-
 export default async function StatsPage() {
-  const tasks = await getTasksForStats();
+  let tasks: Task[] = [];
+  let dbUnavailable = false;
+  try {
+    tasks = await listTasks();
+  } catch {
+    dbUnavailable = true;
+  }
+
   const total = tasks.length;
   const pending = tasks.filter((task) => task.status === "pending").length;
   const inProgress = tasks.filter((task) => task.status === "in_progress").length;
@@ -44,6 +28,12 @@ export default async function StatsPage() {
           Esta pagina usa Incremental Static Regeneration con revalidacion cada{" "}
           <strong>{revalidate}s</strong>.
         </p>
+        {dbUnavailable ? (
+          <p className="mt-3 rounded-lg border border-amber-500/40 bg-amber-500/10 px-3 py-2 text-sm text-amber-800 dark:text-amber-200">
+            No fue posible conectar con MongoDB en este momento. Se muestran
+            estadisticas vacias hasta la siguiente revalidacion.
+          </p>
+        ) : null}
 
         <div className="mt-6 grid gap-3 sm:grid-cols-2">
           <article className="rounded-xl border border-black/10 p-4 dark:border-white/15">

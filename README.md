@@ -9,7 +9,7 @@ Incluye CRUD de pedidos con Route Handlers, autenticacion demo por cookie, rutas
 - **Interactividad**: Client Components en `src/components` para formularios, acciones y navegacion de cliente.
 - **API**: Route Handlers en `src/app/api`.
 - **Validacion**: esquemas Zod en `src/lib/validators/task.ts`.
-- **Persistencia**: cookie por sesion (`src/lib/tasks-cookie-store.ts`).
+- **Persistencia**: MongoDB Atlas con Mongoose (`src/lib/mongodb.ts`, `src/models/task.ts`).
 - **Proteccion de rutas**: `middleware.ts` para `/tasks/*`.
 
 ## Requisitos
@@ -19,15 +19,18 @@ Incluye CRUD de pedidos con Route Handlers, autenticacion demo por cookie, rutas
 
 ## Configuracion
 
+Variables necesarias:
+
+```bash
+MONGODB_URI=mongodb+srv://<usuario>:<password>@<cluster>.mongodb.net/?retryWrites=true&w=majority
+MONGODB_DB=taskflow
+```
+
 Variable opcional recomendada:
 
 ```bash
 NEXT_PUBLIC_APP_URL=http://localhost:3000
 ```
-
-Uso:
-- local: `http://localhost:3000`
-- produccion: dominio publico de Vercel
 
 ## Ejecucion local
 
@@ -105,7 +108,7 @@ Credenciales demo:
 - Server Components para carga inicial y SSR.
 - Client Components solo donde hay estado/eventos (`useState`, `useRouter`, `useSearchParams`).
 - Validacion centralizada con Zod para entrada de API.
-- Persistencia en cookie para reducir complejidad en fase de aprendizaje.
+- Persistencia en MongoDB para consistencia entre sesiones y despliegues.
 - ISR en `/stats` para demostrar regeneracion incremental.
 
 ## Optimizaciones Next.js
@@ -142,6 +145,6 @@ Validacion post-deploy:
 
 ## Limitaciones conocidas
 
-- Persistencia en cookie por sesion; no hay base de datos.
+- Sin ownership por usuario: los pedidos son compartidos por todos los usuarios.
 - Autenticacion demo sin proveedor real.
 - No apto para produccion sin capa de datos persistente y auth robusta.
