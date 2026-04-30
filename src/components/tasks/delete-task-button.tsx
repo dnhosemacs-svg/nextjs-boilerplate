@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { Button } from "@carbon/react";
 
 import { deleteTask } from "@/lib/api";
 
@@ -15,7 +16,7 @@ export default function DeleteTaskButton({ taskId }: DeleteTaskButtonProps) {
   const [error, setError] = useState<string | null>(null);
 
   async function onDelete() {
-    if (!window.confirm("Estas seguro de que quieres eliminar este pedido?")) {
+    if (!window.confirm("¿Estás seguro de que quieres eliminar este pedido?")) {
       return;
     }
 
@@ -36,15 +37,16 @@ export default function DeleteTaskButton({ taskId }: DeleteTaskButtonProps) {
   }
 
   return (
-    <div className="space-y-2">
-      <button
+    <div className="space-y-2 carbon-shell">
+      <Button
         type="button"
         onClick={onDelete}
         disabled={isDeleting}
-        className="inline-flex h-10 items-center justify-center rounded-full border border-red-500/50 px-4 text-sm font-medium text-red-700 hover:bg-red-500/10 disabled:cursor-not-allowed disabled:opacity-60 dark:text-red-300"
+        kind="danger--tertiary"
+        className="carbon-btn-danger"
       >
         {isDeleting ? "Eliminando..." : "Eliminar pedido"}
-      </button>
+      </Button>
       {error ? <p className="text-sm text-red-600 dark:text-red-300">{error}</p> : null}
     </div>
   );

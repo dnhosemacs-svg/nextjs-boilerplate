@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { Button, PasswordInput, TextInput } from "@carbon/react";
 
 export default function AuthLoginForm() {
   const router = useRouter();
@@ -25,7 +26,7 @@ export default function AuthLoginForm() {
 
       if (!response.ok) {
         const body = (await response.json().catch(() => ({}))) as { error?: string };
-        throw new Error(body.error ?? "No se pudo iniciar sesion.");
+        throw new Error(body.error ?? "No se pudo iniciar sesión.");
       }
 
       const nextPath = searchParams.get("next");
@@ -41,32 +42,29 @@ export default function AuthLoginForm() {
   }
 
   return (
-    <form className="mt-6 space-y-4" onSubmit={onSubmit}>
+    <form className="mt-6 space-y-4 carbon-shell" onSubmit={onSubmit}>
       <div className="space-y-2">
-        <label className="text-sm font-medium" htmlFor="email">
-          Email
-        </label>
-        <input
+        <TextInput
+          labelText="Email"
           id="email"
           type="email"
           required
           value={email}
           onChange={(event) => setEmail(event.target.value)}
-          className="h-11 w-full rounded-lg border border-black/10 bg-transparent px-3 text-sm outline-none placeholder:text-zinc-400 focus:border-zinc-500 dark:border-white/15"
+          size="md"
+          className="carbon-input"
         />
       </div>
 
       <div className="space-y-2">
-        <label className="text-sm font-medium" htmlFor="password">
-          Password
-        </label>
-        <input
+        <PasswordInput
+          labelText="Password"
           id="password"
-          type="password"
           required
           value={password}
           onChange={(event) => setPassword(event.target.value)}
-          className="h-11 w-full rounded-lg border border-black/10 bg-transparent px-3 text-sm outline-none placeholder:text-zinc-400 focus:border-zinc-500 dark:border-white/15"
+          size="md"
+          className="carbon-input"
         />
       </div>
 
@@ -76,13 +74,9 @@ export default function AuthLoginForm() {
         </p>
       ) : null}
 
-      <button
-        type="submit"
-        disabled={isSubmitting}
-        className="inline-flex h-10 items-center justify-center rounded-full bg-black px-4 text-sm font-medium text-white hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-white dark:text-black dark:hover:bg-zinc-200"
-      >
-        {isSubmitting ? "Entrando..." : "Iniciar sesion"}
-      </button>
+      <Button type="submit" disabled={isSubmitting} kind="primary" className="carbon-btn-primary">
+        {isSubmitting ? "Entrando..." : "Iniciar sesión"}
+      </Button>
     </form>
   );
 }

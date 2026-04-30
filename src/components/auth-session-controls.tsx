@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { Button } from "@carbon/react";
 
 type AuthSessionControlsProps = {
   isAuthenticated: boolean;
@@ -22,7 +23,7 @@ export default function AuthSessionControls({
     try {
       const response = await fetch("/api/auth/logout", { method: "POST" });
       if (!response.ok) {
-        throw new Error("No se pudo cerrar la sesion.");
+        throw new Error("No se pudo cerrar la sesión.");
       }
       router.push("/");
       router.refresh();
@@ -36,27 +37,27 @@ export default function AuthSessionControls({
   }
 
   return (
-    <div className="mt-4 space-y-2 rounded-xl border border-dashed border-black/15 p-4 dark:border-white/20">
+    <div className="mt-4 space-y-2 rounded-xl border border-dashed border-black/15 p-4 dark:border-white/20 carbon-shell">
       <p className="text-sm text-zinc-600 dark:text-zinc-400">
-        Estado de sesion:{" "}
+        Estado de sesión:{" "}
         <strong>{isAuthenticated ? "autenticado" : "no autenticado"}</strong>
       </p>
       <div className="flex flex-wrap gap-3">
         {isAuthenticated ? (
-          <button
+          <Button
             type="button"
             disabled={isLoading}
             onClick={onLogout}
-            className="inline-flex h-9 items-center justify-center rounded-full border border-black/10 px-4 text-sm font-medium hover:bg-black/[.04] disabled:cursor-not-allowed disabled:opacity-60 dark:border-white/15 dark:hover:bg-white/10"
+            kind="tertiary"
+            className="carbon-btn-secondary carbon-btn-compact"
           >
-            {isLoading ? "Saliendo..." : "Cerrar sesion"}
-          </button>
+            {isLoading ? "Saliendo..." : "Cerrar sesión"}
+          </Button>
         ) : (
-          <Link
-            href="/login"
-            className="inline-flex h-9 items-center justify-center rounded-full bg-black px-4 text-sm font-medium text-white hover:bg-zinc-800 dark:bg-white dark:text-black dark:hover:bg-zinc-200"
-          >
-            Ir a login
+          <Link href="/login" className="inline-flex">
+            <Button kind="primary" className="carbon-btn-primary carbon-btn-compact">
+              Ir a login
+            </Button>
           </Link>
         )}
       </div>

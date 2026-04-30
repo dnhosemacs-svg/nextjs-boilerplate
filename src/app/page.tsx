@@ -33,13 +33,13 @@ export default async function Home() {
 
         <div className="mt-8 flex flex-wrap gap-3">
           <Link
-            className="inline-flex h-11 items-center justify-center rounded-full bg-black px-5 text-sm font-medium text-white hover:bg-zinc-800 dark:bg-white dark:text-black dark:hover:bg-zinc-200"
+            className="ui-pill ui-pill-primary px-5"
             href="/tasks/new"
           >
             Crear pedido
           </Link>
           <Link
-            className="inline-flex h-11 items-center justify-center rounded-full border border-black/10 px-5 text-sm font-medium hover:bg-black/[.04] dark:border-white/15 dark:hover:bg-white/10"
+            className="ui-pill ui-pill-secondary px-5"
             href="/stats"
           >
             Ver estadisticas (ISR)
@@ -70,7 +70,7 @@ export default async function Home() {
                   ) : null}
                   <Link
                     href={`/tasks/${task.id}`}
-                    className="mt-3 inline-flex text-sm font-medium underline underline-offset-4"
+                    className="ui-link-underline mt-3 inline-flex"
                   >
                     Ver detalle
                   </Link>

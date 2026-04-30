@@ -15,7 +15,7 @@ export default function NewTaskPage() {
         <div className="mt-8 flex flex-wrap gap-3">
           <Link
             href="/"
-            className="inline-flex h-10 items-center justify-center rounded-full border border-black/10 px-4 text-sm font-medium hover:bg-black/[.04] dark:border-white/15 dark:hover:bg-white/10"
+            className="ui-pill ui-pill-secondary"
           >
             Volver al listado
           </Link>

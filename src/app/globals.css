@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "@carbon/styles/css/styles.css";
 
 :root {
   --background: #ffffff;
@@ -23,4 +24,175 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+a {
+  color: inherit;
+}
+
+.ui-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.5rem;
+  border-radius: 9999px;
+  padding-inline: 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.ui-pill-primary {
+  background: #000;
+  color: #fff;
+}
+
+.ui-pill-primary:hover {
+  background: #27272a;
+}
+
+.ui-pill-secondary {
+  border: 1px solid color-mix(in srgb, var(--foreground) 15%, transparent);
+  background: transparent;
+  color: var(--foreground);
+}
+
+.ui-pill-secondary:hover {
+  background: color-mix(in srgb, var(--foreground) 4%, transparent);
+}
+
+.ui-link-underline {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--foreground);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+@media (prefers-color-scheme: dark) {
+  .ui-pill-primary {
+    background: #fff;
+    color: #000;
+  }
+
+  .ui-pill-primary:hover {
+    background: #e4e4e7;
+  }
+}
+
+.carbon-shell .cds--form-item {
+  margin-block-end: 0;
+}
+
+.carbon-shell {
+  --cds-text-primary: var(--foreground);
+  --cds-text-secondary: color-mix(in srgb, var(--foreground) 72%, transparent);
+  --cds-link-primary: var(--foreground);
+  --cds-focus: color-mix(in srgb, var(--foreground) 35%, transparent);
+  --cds-border-strong-01: color-mix(in srgb, var(--foreground) 10%, transparent);
+}
+
+.carbon-shell .cds--label {
+  margin-block-end: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--foreground);
+}
+
+.carbon-shell .cds--text-input,
+.carbon-shell .cds--text-area,
+.carbon-shell .cds--select-input,
+.carbon-shell .cds--password-input {
+  min-height: 2.75rem;
+  border-radius: 0.5rem;
+  border: 1px solid color-mix(in srgb, var(--foreground) 10%, transparent);
+  background: transparent;
+  color: var(--foreground);
+}
+
+.carbon-shell .cds--text-input::placeholder,
+.carbon-shell .cds--text-area::placeholder {
+  color: color-mix(in srgb, var(--foreground) 55%, transparent);
+}
+
+.carbon-shell .cds--text-input:focus,
+.carbon-shell .cds--text-area:focus,
+.carbon-shell .cds--select-input:focus,
+.carbon-shell .cds--password-input:focus {
+  outline: none;
+  box-shadow: none;
+  border-color: color-mix(in srgb, var(--foreground) 35%, transparent);
+}
+
+.carbon-shell .cds--text-input:-webkit-autofill,
+.carbon-shell .cds--text-input:-webkit-autofill:hover,
+.carbon-shell .cds--text-input:-webkit-autofill:focus,
+.carbon-shell .cds--password-input:-webkit-autofill,
+.carbon-shell .cds--password-input:-webkit-autofill:hover,
+.carbon-shell .cds--password-input:-webkit-autofill:focus {
+  -webkit-text-fill-color: var(--foreground);
+  box-shadow: inset 0 0 0 1000px var(--background);
+  transition: background-color 9999s ease-in-out 0s;
+}
+
+.carbon-shell .cds--select__arrow,
+.carbon-shell .cds--password-visibility__toggle svg {
+  fill: var(--foreground);
+}
+
+.carbon-shell .cds--btn {
+  border-radius: 9999px;
+  min-height: 2.5rem;
+  padding-inline: 1rem;
+  min-inline-size: 0;
+  width: auto;
+}
+
+.carbon-shell .carbon-btn-primary {
+  background: #000;
+  color: #fff;
+  border: 0;
+}
+
+.carbon-shell .carbon-btn-primary:hover {
+  background: #27272a;
+}
+
+.carbon-shell .carbon-btn-secondary {
+  border-color: color-mix(in srgb, var(--foreground) 15%, transparent);
+  color: var(--foreground);
+  background: transparent;
+}
+
+.carbon-shell .carbon-btn-secondary:hover {
+  background: color-mix(in srgb, var(--foreground) 4%, transparent);
+}
+
+.carbon-shell .carbon-btn-danger {
+  border-color: color-mix(in srgb, #ef4444 50%, transparent);
+  color: color-mix(in srgb, #b91c1c 90%, #fff 10%);
+  background: transparent;
+}
+
+.carbon-shell .carbon-btn-danger:hover {
+  background: color-mix(in srgb, #ef4444 10%, transparent);
+}
+
+.carbon-shell .carbon-btn-compact {
+  min-height: 2.25rem;
+}
+
+@media (prefers-color-scheme: dark) {
+  .carbon-shell .carbon-btn-primary {
+    background: #fff;
+    color: #000;
+  }
+
+  .carbon-shell .carbon-btn-primary:hover {
+    background: #e4e4e7;
+  }
 }

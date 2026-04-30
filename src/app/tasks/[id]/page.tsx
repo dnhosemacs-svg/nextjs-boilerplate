@@ -69,13 +69,13 @@ export default async function TaskDetailPage({ params }: TaskDetailPageProps) {
         <div className="mt-8 flex flex-wrap gap-3">
           <Link
             href="/"
-            className="inline-flex h-10 items-center justify-center rounded-full border border-black/10 px-4 text-sm font-medium hover:bg-black/[.04] dark:border-white/15 dark:hover:bg-white/10"
+            className="ui-pill ui-pill-secondary"
           >
             Volver al inicio
           </Link>
           <Link
             href="/tasks/new"
-            className="inline-flex h-10 items-center justify-center rounded-full bg-black px-4 text-sm font-medium text-white hover:bg-zinc-800 dark:bg-white dark:text-black dark:hover:bg-zinc-200"
+            className="ui-pill ui-pill-primary"
           >
             Crear nuevo pedido
           </Link>

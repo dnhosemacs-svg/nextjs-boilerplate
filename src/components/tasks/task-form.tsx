@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import { Button, Select, SelectItem, TextArea, TextInput } from "@carbon/react";
 
 import { createTask, updateTask } from "@/lib/api";
 import type { CreateTaskInput, UpdateTaskInput } from "@/lib/validators/task";
@@ -71,57 +72,49 @@ export default function TaskForm({ mode, initialData }: TaskFormProps) {
   }
 
   return (
-    <form className="mt-8 space-y-5" onSubmit={onSubmit}>
+    <form className="mt-8 space-y-5 carbon-shell" onSubmit={onSubmit}>
       <h2 className="text-lg font-medium">{heading}</h2>
 
       <div className="space-y-2">
-        <label className="text-sm font-medium" htmlFor="title">
-          Titulo del pedido
-        </label>
-        <input
+        <TextInput
+          labelText="Título del pedido"
           id="title"
           name="title"
           type="text"
           value={title}
           onChange={(event) => setTitle(event.target.value)}
           required
-          className="h-11 w-full rounded-lg border border-black/10 bg-transparent px-3 text-sm outline-none ring-0 placeholder:text-zinc-400 focus:border-zinc-500 dark:border-white/15"
+          className="carbon-input"
           placeholder="Ej: Mesa de comedor en roble"
         />
       </div>
 
       <div className="space-y-2">
-        <label className="text-sm font-medium" htmlFor="description">
-          Descripcion
-        </label>
-        <textarea
+        <TextArea
+          labelText="Descripción"
           id="description"
           name="description"
           rows={4}
           value={description}
           onChange={(event) => setDescription(event.target.value)}
-          className="w-full rounded-lg border border-black/10 bg-transparent px-3 py-2 text-sm outline-none ring-0 placeholder:text-zinc-400 focus:border-zinc-500 dark:border-white/15"
+          className="carbon-input"
           placeholder="Medidas, acabado y notas del cliente"
         />
       </div>
 
       <div className="space-y-2">
-        <label className="text-sm font-medium" htmlFor="status">
-          Estado
-        </label>
-        <select
+        <Select
+          labelText="Estado"
           id="status"
           name="status"
           value={status}
           onChange={(event) => setStatus(event.target.value as TaskStatus)}
-          className="h-11 w-full rounded-lg border border-black/10 bg-transparent px-3 text-sm outline-none ring-0 focus:border-zinc-500 dark:border-white/15"
+          className="carbon-input"
         >
           {statusOptions.map((option) => (
-            <option key={option.value} value={option.value}>
-              {option.label}
-            </option>
+            <SelectItem key={option.value} value={option.value} text={option.label} />
           ))}
-        </select>
+        </Select>
       </div>
 
       {error ? (
@@ -130,17 +123,13 @@ export default function TaskForm({ mode, initialData }: TaskFormProps) {
         </p>
       ) : null}
 
-      <button
-        type="submit"
-        disabled={isSubmitting}
-        className="inline-flex h-10 items-center justify-center rounded-full bg-black px-4 text-sm font-medium text-white hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-white dark:text-black dark:hover:bg-zinc-200"
-      >
+      <Button type="submit" disabled={isSubmitting} kind="primary" className="carbon-btn-primary">
         {isSubmitting
           ? "Guardando..."
           : mode === "create"
             ? "Crear pedido"
             : "Guardar cambios"}
-      </button>
+      </Button>
     </form>
   );
 }
