@@ -22,7 +22,7 @@ export default async function Home() {
         <AuthSessionControls isAuthenticated={isAuthenticated} />
         <div className="mt-6 overflow-hidden rounded-2xl border border-black/10 dark:border-white/15">
           <Image
-            src="/carpentry-hero.svg"
+            src="/Portada.webp"
             alt="Banco de trabajo de carpinteria con herramientas"
             width={1200}
             height={630}
