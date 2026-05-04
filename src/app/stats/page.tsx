@@ -1,34 +1,9 @@
 import Link from "next/link";
-import type { Task } from "@/types/task";
 
-export const revalidate = 60;
-
-function getBaseUrl() {
-  if (process.env.NEXT_PUBLIC_APP_URL) {
-    return process.env.NEXT_PUBLIC_APP_URL;
-  }
-
-  if (process.env.VERCEL_URL) {
-    return `https://${process.env.VERCEL_URL}`;
-  }
-
-  return "http://localhost:3000";
-}
-
-async function getTasksForStats(): Promise<Task[]> {
-  const response = await fetch(`${getBaseUrl()}/api/tasks`, {
-    next: { revalidate },
-  });
-
-  if (!response.ok) {
-    throw new Error("No se pudieron cargar las estadisticas");
-  }
-
-  return (await response.json()) as Task[];
-}
+import { listTasksFromCookieStore } from "@/lib/tasks-cookie-store";
 
 export default async function StatsPage() {
-  const tasks = await getTasksForStats();
+  const tasks = await listTasksFromCookieStore();
   const total = tasks.length;
   const pending = tasks.filter((task) => task.status === "pending").length;
   const inProgress = tasks.filter((task) => task.status === "in_progress").length;
@@ -41,8 +16,8 @@ export default async function StatsPage() {
           Estadisticas (ISR)
         </h1>
         <p className="mt-3 text-sm text-zinc-600 dark:text-zinc-400">
-          Esta pagina usa Incremental Static Regeneration con revalidacion cada{" "}
-          <strong>{revalidate}s</strong>.
+          Los datos coinciden con la API (<code className="rounded bg-black/5 px-1 dark:bg-white/10">GET /api/tasks</code>
+          ), leyendo la misma fuente en el servidor. Así el build en Vercel no depende de una URL HTTP interna.
         </p>
 
         <div className="mt-6 grid gap-3 sm:grid-cols-2">
