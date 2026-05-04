@@ -13,12 +13,8 @@ export default async function StatsPage() {
     <main className="mx-auto flex w-full max-w-3xl flex-1 px-6 py-12">
       <section className="w-full rounded-2xl border border-black/10 bg-white p-8 shadow-sm dark:border-white/15 dark:bg-black">
         <h1 className="text-2xl font-semibold tracking-tight">
-          Estadisticas (ISR)
+          Estadisticas
         </h1>
-        <p className="mt-3 text-sm text-zinc-600 dark:text-zinc-400">
-          Los datos coinciden con la API (<code className="rounded bg-black/5 px-1 dark:bg-white/10">GET /api/tasks</code>
-          ), leyendo la misma fuente en el servidor. Así el build en Vercel no depende de una URL HTTP interna.
-        </p>
 
         <div className="mt-6 grid gap-3 sm:grid-cols-2">
           <article className="rounded-xl border border-black/10 p-4 dark:border-white/15">
@@ -48,8 +44,7 @@ export default async function StatsPage() {
         </div>
 
         <p className="mt-6 text-xs text-zinc-500 dark:text-zinc-400">
-          Nota: en este proyecto las tareas viven en cookie por sesion, asi que esta
-          demo de ISR esta orientada a aprendizaje de cache y regeneracion.
+          Nota: en este proyecto las tareas viven en cookie por sesion.
         </p>
 
         <div className="mt-6">
