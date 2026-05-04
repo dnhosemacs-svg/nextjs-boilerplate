@@ -15,10 +15,10 @@ export default async function Home() {
       <div className="flex w-full flex-col gap-10 rounded-2xl border border-black/10 bg-white p-8 shadow-sm md:gap-12 md:p-10 dark:border-white/15 dark:bg-black">
         <header className="flex flex-col gap-3">
           <h1 className="text-3xl font-semibold tracking-tight">
-            Carpintería · TaskFlow
+            Carpintería Tablas y serrín
           </h1>
           <p className="max-w-2xl text-base leading-relaxed text-zinc-600 dark:text-zinc-400">
-            Gestiona pedidos desde una UI conectada a Route Handlers con App Router.
+            Gestiona pedidos desde tu UI de confianza.
           </p>
         </header>
 
