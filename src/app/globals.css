@@ -145,6 +145,7 @@ a {
 }
 
 .carbon-shell .cds--btn {
+  margin: 0;
   border-radius: 9999px;
   min-height: 2.5rem;
   padding-inline: 1rem;

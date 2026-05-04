@@ -37,7 +37,7 @@ export default function DeleteTaskButton({ taskId }: DeleteTaskButtonProps) {
   }
 
   return (
-    <div className="space-y-2 carbon-shell">
+    <div className="carbon-shell flex flex-col gap-2 self-start">
       <Button
         type="button"
         onClick={onDelete}

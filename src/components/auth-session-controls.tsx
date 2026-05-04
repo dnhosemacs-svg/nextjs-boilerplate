@@ -37,8 +37,8 @@ export default function AuthSessionControls({
   }
 
   return (
-    <div className="mt-4 space-y-2 rounded-xl border border-dashed border-black/15 p-4 dark:border-white/20 carbon-shell">
-      <p className="text-sm text-zinc-600 dark:text-zinc-400">
+    <div className="flex flex-col gap-4 rounded-xl border border-dashed border-black/15 p-5 dark:border-white/20 carbon-shell md:p-6">
+      <p className="text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">
         Estado de sesión:{" "}
         <strong>{isAuthenticated ? "autenticado" : "no autenticado"}</strong>
       </p>
@@ -54,7 +54,7 @@ export default function AuthSessionControls({
             {isLoading ? "Saliendo..." : "Cerrar sesión"}
           </Button>
         ) : (
-          <Link href="/login" className="inline-flex">
+          <Link href="/login" className="inline-flex leading-none">
             <Button kind="primary" className="carbon-btn-primary carbon-btn-compact">
               Ir a login
             </Button>

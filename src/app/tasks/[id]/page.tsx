@@ -38,45 +38,39 @@ export default async function TaskDetailPage({ params }: TaskDetailPageProps) {
   }
 
   return (
-    <main className="mx-auto flex w-full max-w-3xl flex-1 px-6 py-12">
-      <article className="w-full rounded-2xl border border-black/10 bg-white p-8 shadow-sm dark:border-white/15 dark:bg-black">
-        <p className="text-xs uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
-          Pedido #{task.id}
-        </p>
-        <h1 className="mt-2 text-2xl font-semibold tracking-tight">
-          {task.title}
-        </h1>
-        <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
-          Estado actual: <strong>{task.status}</strong>
-        </p>
-        {task.description ? (
-          <p className="mt-3 text-sm text-zinc-600 dark:text-zinc-400">
-            {task.description}
+    <main className="mx-auto flex w-full max-w-3xl flex-1 px-6 py-14 md:py-16">
+      <article className="flex w-full flex-col gap-10 rounded-2xl border border-black/10 bg-white p-8 shadow-sm md:gap-12 md:p-10 dark:border-white/15 dark:bg-black">
+        <header className="flex flex-col gap-3">
+          <p className="text-xs uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
+            Pedido #{task.id}
           </p>
-        ) : (
-          <p className="mt-3 text-sm text-zinc-600 dark:text-zinc-400">
-            Sin descripcion.
+          <h1 className="text-2xl font-semibold tracking-tight">{task.title}</h1>
+          <p className="text-sm text-zinc-600 dark:text-zinc-400">
+            Estado actual: <strong>{task.status}</strong>
           </p>
-        )}
+          {task.description ? (
+            <p className="text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">
+              {task.description}
+            </p>
+          ) : (
+            <p className="text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">
+              Sin descripción.
+            </p>
+          )}
+        </header>
 
-        <div className="mt-8 rounded-xl border border-dashed border-black/15 p-4 text-sm dark:border-white/20">
+        <div className="rounded-xl border border-dashed border-black/15 p-4 text-sm leading-relaxed dark:border-white/20 md:p-5">
           Creado: {new Date(task.createdAt).toLocaleString()} · Actualizado:{" "}
           {new Date(task.updatedAt).toLocaleString()}
         </div>
 
         <TaskForm mode="edit" initialData={task} />
 
-        <div className="mt-8 flex flex-wrap gap-3">
-          <Link
-            href="/"
-            className="ui-pill ui-pill-secondary"
-          >
+        <div className="flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-center">
+          <Link href="/" className="ui-pill ui-pill-secondary self-start sm:self-auto">
             Volver al inicio
           </Link>
-          <Link
-            href="/tasks/new"
-            className="ui-pill ui-pill-primary"
-          >
+          <Link href="/tasks/new" className="ui-pill ui-pill-primary self-start sm:self-auto">
             Crear nuevo pedido
           </Link>
           <DeleteTaskButton taskId={task.id} />

@@ -72,10 +72,13 @@ export default function TaskForm({ mode, initialData }: TaskFormProps) {
   }
 
   return (
-    <form className="mt-8 space-y-5 carbon-shell" onSubmit={onSubmit}>
-      <h2 className="text-lg font-medium">{heading}</h2>
+    <form
+      className="flex flex-col gap-8 md:gap-10 carbon-shell"
+      onSubmit={onSubmit}
+    >
+      <h2 className="text-lg font-medium leading-snug">{heading}</h2>
 
-      <div className="space-y-2">
+      <div className="flex flex-col gap-6 md:gap-8">
         <TextInput
           labelText="Título del pedido"
           id="title"
@@ -87,9 +90,7 @@ export default function TaskForm({ mode, initialData }: TaskFormProps) {
           className="carbon-input"
           placeholder="Ej: Mesa de comedor en roble"
         />
-      </div>
 
-      <div className="space-y-2">
         <TextArea
           labelText="Descripción"
           id="description"
@@ -100,9 +101,7 @@ export default function TaskForm({ mode, initialData }: TaskFormProps) {
           className="carbon-input"
           placeholder="Medidas, acabado y notas del cliente"
         />
-      </div>
 
-      <div className="space-y-2">
         <Select
           labelText="Estado"
           id="status"
@@ -123,7 +122,12 @@ export default function TaskForm({ mode, initialData }: TaskFormProps) {
         </p>
       ) : null}
 
-      <Button type="submit" disabled={isSubmitting} kind="primary" className="carbon-btn-primary">
+      <Button
+        type="submit"
+        disabled={isSubmitting}
+        kind="primary"
+        className="carbon-btn-primary self-start"
+      >
         {isSubmitting
           ? "Guardando..."
           : mode === "create"

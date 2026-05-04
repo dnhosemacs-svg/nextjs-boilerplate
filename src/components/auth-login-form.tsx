@@ -42,8 +42,11 @@ export default function AuthLoginForm() {
   }
 
   return (
-    <form className="mt-6 space-y-4 carbon-shell" onSubmit={onSubmit}>
-      <div className="space-y-2">
+    <form
+      className="flex flex-col gap-8 md:gap-10 carbon-shell"
+      onSubmit={onSubmit}
+    >
+      <div className="flex flex-col gap-6 md:gap-8">
         <TextInput
           labelText="Email"
           id="email"
@@ -54,9 +57,7 @@ export default function AuthLoginForm() {
           size="md"
           className="carbon-input"
         />
-      </div>
 
-      <div className="space-y-2">
         <PasswordInput
           labelText="Password"
           id="password"
@@ -74,7 +75,12 @@ export default function AuthLoginForm() {
         </p>
       ) : null}
 
-      <Button type="submit" disabled={isSubmitting} kind="primary" className="carbon-btn-primary">
+      <Button
+        type="submit"
+        disabled={isSubmitting}
+        kind="primary"
+        className="carbon-btn-primary self-start"
+      >
         {isSubmitting ? "Entrando..." : "Iniciar sesión"}
       </Button>
     </form>

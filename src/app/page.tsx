@@ -11,16 +11,20 @@ export default async function Home() {
   const isAuthenticated = cookieStore.get(AUTH_COOKIE_NAME)?.value === "1";
 
   return (
-    <main className="mx-auto flex w-full max-w-4xl flex-1 px-6 py-12">
-      <div className="w-full rounded-2xl border border-black/10 bg-white p-8 shadow-sm dark:border-white/15 dark:bg-black">
-        <h1 className="text-3xl font-semibold tracking-tight">
-          Carpintería · TaskFlow
-        </h1>
-        <p className="mt-3 text-base text-zinc-600 dark:text-zinc-400">
-          Gestiona pedidos desde una UI conectada a Route Handlers con App Router.
-        </p>
+    <main className="mx-auto flex w-full max-w-4xl flex-1 px-6 py-14 md:py-16">
+      <div className="flex w-full flex-col gap-10 rounded-2xl border border-black/10 bg-white p-8 shadow-sm md:gap-12 md:p-10 dark:border-white/15 dark:bg-black">
+        <header className="flex flex-col gap-3">
+          <h1 className="text-3xl font-semibold tracking-tight">
+            Carpintería · TaskFlow
+          </h1>
+          <p className="max-w-2xl text-base leading-relaxed text-zinc-600 dark:text-zinc-400">
+            Gestiona pedidos desde una UI conectada a Route Handlers con App Router.
+          </p>
+        </header>
+
         <AuthSessionControls isAuthenticated={isAuthenticated} />
-        <div className="mt-6 overflow-hidden rounded-2xl border border-black/10 dark:border-white/15">
+
+        <div className="overflow-hidden rounded-2xl border border-black/10 dark:border-white/15">
           <Image
             src="/Portada.webp"
             alt="Banco de trabajo de carpinteria con herramientas"
@@ -31,7 +35,7 @@ export default async function Home() {
           />
         </div>
 
-        <div className="mt-8 flex flex-wrap gap-3">
+        <div className="flex flex-wrap gap-x-4 gap-y-3">
           <Link
             className="ui-pill ui-pill-primary px-5"
             href="/tasks/new"
@@ -46,31 +50,31 @@ export default async function Home() {
           </Link>
         </div>
 
-        <section className="mt-8">
+        <section className="flex flex-col gap-6 md:gap-8">
           <h2 className="text-lg font-medium">Pedidos</h2>
           {tasks.length === 0 ? (
-            <p className="mt-3 text-sm text-zinc-600 dark:text-zinc-400">
+            <p className="text-sm text-zinc-600 dark:text-zinc-400">
               No hay pedidos todavia.
             </p>
           ) : (
-            <ul className="mt-4 space-y-3">
+            <ul className="flex flex-col gap-6 md:gap-8">
               {tasks.map((task) => (
                 <li
                   key={task.id}
-                  className="rounded-xl border border-black/10 p-4 dark:border-white/15"
+                  className="flex flex-col gap-3 rounded-xl border border-black/10 p-6 dark:border-white/15 md:gap-4 md:p-7"
                 >
                   <p className="text-xs uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
                     {task.status}
                   </p>
-                  <h3 className="mt-1 text-base font-medium">{task.title}</h3>
+                  <h3 className="text-base font-medium leading-snug">{task.title}</h3>
                   {task.description ? (
-                    <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
+                    <p className="text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">
                       {task.description}
                     </p>
                   ) : null}
                   <Link
                     href={`/tasks/${task.id}`}
-                    className="ui-link-underline mt-3 inline-flex"
+                    className="ui-link-underline inline-flex pt-1"
                   >
                     Ver detalle
                   </Link>
