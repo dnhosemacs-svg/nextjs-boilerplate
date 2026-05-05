@@ -10,32 +10,30 @@ export default async function StatsPage() {
   const done = tasks.filter((task) => task.status === "done").length;
 
   return (
-    <main className="mx-auto flex w-full max-w-3xl flex-1 px-6 py-12">
-      <section className="w-full rounded-2xl border border-black/10 bg-white p-8 shadow-sm dark:border-white/15 dark:bg-black">
-        <h1 className="text-2xl font-semibold tracking-tight">
-          Estadisticas
-        </h1>
+    <main className="page-shell max-w-4xl">
+      <section className="surface-card">
+        <h1 className="section-heading">Estadísticas</h1>
 
-        <div className="mt-6 grid gap-3 sm:grid-cols-2">
-          <article className="rounded-xl border border-black/10 p-4 dark:border-white/15">
+        <div className="mt-6 grid gap-4 sm:grid-cols-2">
+          <article className="rounded-xl border border-black/10 bg-white/40 p-5 dark:border-white/15 dark:bg-white/5">
             <p className="text-xs uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
               Total pedidos
             </p>
             <p className="mt-1 text-3xl font-semibold">{total}</p>
           </article>
-          <article className="rounded-xl border border-black/10 p-4 dark:border-white/15">
+          <article className="rounded-xl border border-black/10 bg-white/40 p-5 dark:border-white/15 dark:bg-white/5">
             <p className="text-xs uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
               Pendientes
             </p>
             <p className="mt-1 text-3xl font-semibold">{pending}</p>
           </article>
-          <article className="rounded-xl border border-black/10 p-4 dark:border-white/15">
+          <article className="rounded-xl border border-black/10 bg-white/40 p-5 dark:border-white/15 dark:bg-white/5">
             <p className="text-xs uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
               En proceso
             </p>
             <p className="mt-1 text-3xl font-semibold">{inProgress}</p>
           </article>
-          <article className="rounded-xl border border-black/10 p-4 dark:border-white/15">
+          <article className="rounded-xl border border-black/10 bg-white/40 p-5 dark:border-white/15 dark:bg-white/5">
             <p className="text-xs uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
               Terminados
             </p>

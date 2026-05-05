@@ -38,13 +38,13 @@ export default async function TaskDetailPage({ params }: TaskDetailPageProps) {
   }
 
   return (
-    <main className="mx-auto flex w-full max-w-3xl flex-1 px-6 py-14 md:py-16">
-      <article className="flex w-full flex-col gap-10 rounded-2xl border border-black/10 bg-white p-8 shadow-sm md:gap-12 md:p-10 dark:border-white/15 dark:bg-black">
+    <main className="page-shell max-w-4xl">
+      <article className="surface-card flex flex-col gap-10 md:gap-12">
         <header className="flex flex-col gap-3">
           <p className="text-xs uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
             Pedido #{task.id}
           </p>
-          <h1 className="text-2xl font-semibold tracking-tight">{task.title}</h1>
+          <h1 className="section-heading">{task.title}</h1>
           <p className="text-sm text-zinc-600 dark:text-zinc-400">
             Estado actual: <strong>{task.status}</strong>
           </p>

@@ -6,10 +6,10 @@ export default async function Home() {
   const tasks = await listTasksFromCookieStore();
 
   return (
-    <main className="mx-auto flex w-full max-w-4xl flex-1 px-6 py-14 md:py-16">
-      <div className="flex w-full flex-col gap-10 rounded-2xl border border-black/10 bg-white p-8 shadow-sm md:gap-12 md:p-10 dark:border-white/15 dark:bg-black">
+    <main className="page-shell max-w-5xl">
+      <div className="surface-card flex flex-col gap-10 md:gap-12">
         <header className="flex flex-col gap-3">
-          <h1 className="text-3xl font-semibold tracking-tight">
+          <h1 className="section-heading text-3xl">
             Carpintería Tablas y serrín
           </h1>
           <p className="max-w-2xl text-base leading-relaxed text-zinc-600 dark:text-zinc-400">
@@ -37,10 +37,7 @@ export default async function Home() {
           ) : (
             <ul className="flex flex-col gap-6 md:gap-8">
               {tasks.map((task) => (
-                <li
-                  key={task.id}
-                  className="flex flex-col gap-3 rounded-xl border border-black/10 p-6 dark:border-white/15 md:gap-4 md:p-7"
-                >
+                <li key={task.id} className="surface-card flex flex-col gap-3 p-6 md:gap-4">
                   <p className="text-xs uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
                     {task.status}
                   </p>
