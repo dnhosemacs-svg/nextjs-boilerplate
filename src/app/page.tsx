@@ -1,14 +1,9 @@
 import Image from "next/image";
 import Link from "next/link";
-import { cookies } from "next/headers";
-import AuthSessionControls from "@/components/auth-session-controls";
-import { AUTH_COOKIE_NAME } from "@/lib/auth";
 import { listTasksFromCookieStore } from "@/lib/tasks-cookie-store";
 
 export default async function Home() {
-  const cookieStore = await cookies();
   const tasks = await listTasksFromCookieStore();
-  const isAuthenticated = cookieStore.get(AUTH_COOKIE_NAME)?.value === "1";
 
   return (
     <main className="mx-auto flex w-full max-w-4xl flex-1 px-6 py-14 md:py-16">
@@ -22,8 +17,6 @@ export default async function Home() {
           </p>
         </header>
 
-        <AuthSessionControls isAuthenticated={isAuthenticated} />
-
         <div className="overflow-hidden rounded-2xl border border-black/10 dark:border-white/15">
           <Image
             src="/Portada.webp"
@@ -33,21 +26,6 @@ export default async function Home() {
             priority
             className="h-auto w-full"
           />
-        </div>
-
-        <div className="flex flex-wrap gap-x-4 gap-y-3">
-          <Link
-            className="ui-pill ui-pill-primary px-5"
-            href="/tasks/new"
-          >
-            Crear pedido
-          </Link>
-          <Link
-            className="ui-pill ui-pill-secondary px-5"
-            href="/stats"
-          >
-            Ver estadisticas (ISR)
-          </Link>
         </div>
 
         <section className="flex flex-col gap-6 md:gap-8">
