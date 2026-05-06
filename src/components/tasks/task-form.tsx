@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button, Select, SelectItem, TextArea, TextInput } from "@carbon/react";
@@ -122,18 +123,26 @@ export default function TaskForm({ mode, initialData }: TaskFormProps) {
         </p>
       ) : null}
 
-      <Button
-        type="submit"
-        disabled={isSubmitting}
-        kind="primary"
-        className="carbon-btn-primary self-start"
-      >
-        {isSubmitting
-          ? "Guardando..."
-          : mode === "create"
-            ? "Crear pedido"
-            : "Guardar cambios"}
-      </Button>
+      <div className="flex flex-wrap items-center gap-3">
+        <Button
+          type="submit"
+          disabled={isSubmitting}
+          kind="primary"
+          className="carbon-btn-primary"
+        >
+          {isSubmitting
+            ? "Guardando..."
+            : mode === "create"
+              ? "Crear pedido"
+              : "Guardar cambios"}
+        </Button>
+
+        {mode === "create" ? (
+          <Link href="/" className="ui-pill ui-pill-secondary">
+            Volver al listado
+          </Link>
+        ) : null}
+      </div>
     </form>
   );
 }

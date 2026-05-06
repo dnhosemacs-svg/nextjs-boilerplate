@@ -188,6 +188,16 @@ button:focus-visible,
   color: var(--foreground);
 }
 
+.carbon-shell .cds--select-input option {
+  background: var(--surface);
+  color: var(--foreground);
+}
+
+.carbon-shell .cds--select-input option:checked {
+  background: color-mix(in srgb, var(--brand) 22%, var(--surface));
+  color: var(--foreground);
+}
+
 .carbon-shell .cds--text-input::placeholder,
 .carbon-shell .cds--text-area::placeholder {
   color: color-mix(in srgb, var(--muted) 75%, transparent);
@@ -259,4 +269,10 @@ button:focus-visible,
 
 .carbon-shell .carbon-btn-compact {
   min-height: 2.25rem;
+}
+
+.task-detail-secondary-actions {
+  margin-top: 2rem;
+  border-top: 0 !important;
+  padding-top: 0;
 }

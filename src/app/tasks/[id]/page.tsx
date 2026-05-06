@@ -66,7 +66,7 @@ export default async function TaskDetailPage({ params }: TaskDetailPageProps) {
 
         <TaskForm mode="edit" initialData={task} />
 
-        <div className="flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-center">
+        <div className="task-detail-secondary-actions flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-center">
           <Link href="/" className="ui-pill ui-pill-secondary self-start sm:self-auto">
             Volver al inicio
           </Link>
