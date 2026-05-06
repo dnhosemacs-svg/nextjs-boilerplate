@@ -8,6 +8,8 @@ type LoginPayload = {
   password?: string;
 };
 
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 export async function POST(request: Request) {
   let body: LoginPayload;
 
@@ -17,12 +19,19 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Body JSON invalido." }, { status: 400 });
   }
 
-  const email = body.email?.trim().toLowerCase();
-  const password = body.password;
+  const email = body.email?.trim().toLowerCase() ?? "";
+  const password = body.password?.trim() ?? "";
 
   if (!email || !password) {
     return NextResponse.json(
       { error: "Email y password son obligatorios." },
+      { status: 400 },
+    );
+  }
+
+  if (!EMAIL_REGEX.test(email)) {
+    return NextResponse.json(
+      { error: "El email no tiene un formato valido." },
       { status: 400 },
     );
   }
@@ -36,6 +45,7 @@ export async function POST(request: Request) {
     path: "/",
     sameSite: "lax",
     httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
     maxAge: 60 * 60 * 8,
   });
 
