@@ -57,7 +57,7 @@ export default async function Home() {
               </Link>
               <Link
                 href="/stats"
-                className="ui-pill border border-white/45 bg-white/10 text-white hover:bg-white/20"
+                className="ui-pill border border-white/70 bg-black/20 !text-white/95 shadow-sm backdrop-blur-md hover:border-white/85 hover:bg-black/30"
               >
                 Estadísticas
               </Link>
@@ -65,7 +65,7 @@ export default async function Home() {
           </div>
         </section>
 
-        <section className="grid gap-6 md:grid-cols-[1.1fr_1fr]">
+        <section>
           <article className="surface-card flex flex-col gap-4">
             <p className="eyebrow">Flujo en el taller</p>
             <h2 className="section-heading max-w-xl">
@@ -88,52 +88,6 @@ export default async function Home() {
               </li>
             </ul>
           </article>
-
-          <article className="surface-card overflow-hidden p-0">
-            <Image
-              src="https://images.pexels.com/photos/4346894/pexels-photo-4346894.jpeg?auto=compress&cs=tinysrgb&w=1400"
-              alt="Herramientas de carpintería organizadas sobre una mesa de trabajo"
-              width={1400}
-              height={933}
-              sizes="(max-width: 768px) 100vw, 45vw"
-              className="h-full min-h-[280px] w-full object-cover"
-            />
-          </article>
-        </section>
-
-        <section className="surface-card">
-          <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
-            <div>
-              <p className="eyebrow">Referencia visual</p>
-              <h2 className="section-heading">Inspiración y acabados</h2>
-            </div>
-            <p className="max-w-md text-sm text-[var(--muted)]">
-              Imágenes de apoyo para alinear criterios en el taller; no sustituyen los datos del
-              pedido.
-            </p>
-          </div>
-
-          <div className="grid gap-4 md:grid-cols-3">
-            {galleryItems.map((item) => (
-              <article
-                key={item.title}
-                className="group overflow-hidden rounded-2xl border border-[var(--line)] bg-[var(--surface)]"
-              >
-                <Image
-                  src={item.src}
-                  alt={item.alt}
-                  width={1200}
-                  height={900}
-                  sizes="(max-width: 768px) 100vw, 33vw"
-                  className="h-56 w-full object-cover transition duration-500 group-hover:scale-[1.03]"
-                />
-                <div className="p-4">
-                  <h3 className="text-base font-semibold">{item.title}</h3>
-                  <p className="mt-1 text-sm text-[var(--muted)]">{item.place}</p>
-                </div>
-              </article>
-            ))}
-          </div>
         </section>
 
         <section className="surface-card">
@@ -181,6 +135,37 @@ export default async function Home() {
               ))}
             </ul>
           )}
+        </section>
+
+        <section className="surface-card">
+          <div className="mb-6">
+            <div>
+              <p className="eyebrow">Referencia visual</p>
+              <h2 className="section-heading">Inspiración y acabados</h2>
+            </div>
+          </div>
+
+          <div className="grid gap-4 md:grid-cols-3">
+            {galleryItems.map((item) => (
+              <article
+                key={item.title}
+                className="group overflow-hidden rounded-2xl border border-[var(--line)] bg-[var(--surface)]"
+              >
+                <Image
+                  src={item.src}
+                  alt={item.alt}
+                  width={1200}
+                  height={900}
+                  sizes="(max-width: 768px) 100vw, 33vw"
+                  className="h-56 w-full object-cover transition duration-500 group-hover:scale-[1.03]"
+                />
+                <div className="p-4">
+                  <h3 className="text-base font-semibold">{item.title}</h3>
+                  <p className="mt-1 text-sm text-[var(--muted)]">{item.place}</p>
+                </div>
+              </article>
+            ))}
+          </div>
         </section>
 
         <section className="surface-card warm-gradient relative overflow-hidden">
