@@ -8,44 +8,48 @@ export default async function StatsPage() {
   const pending = tasks.filter((task) => task.status === "pending").length;
   const inProgress = tasks.filter((task) => task.status === "in_progress").length;
   const done = tasks.filter((task) => task.status === "done").length;
+  const completionRate = total > 0 ? Math.round((done / total) * 100) : 0;
+  const statCards = [
+    { label: "Total pedidos", value: total },
+    { label: "Pendientes", value: pending },
+    { label: "En proceso", value: inProgress },
+    { label: "Terminados", value: done },
+  ];
 
   return (
-    <main className="page-shell max-w-4xl">
-      <section className="surface-card">
-        <h1 className="section-heading">Estadísticas</h1>
+    <main className="page-shell max-w-4xl items-start">
+      <section className="surface-card stats-layout">
+        <header className="stats-block flex flex-col gap-3">
+          <p className="eyebrow">Resumen operativo</p>
+          <h1 className="section-heading">Estadísticas del taller</h1>
+          <p className="stats-description">
+            Estado actual de los pedidos para planificar carga de trabajo y prioridades del equipo.
+          </p>
+        </header>
 
-        <div className="mt-6 grid gap-4 sm:grid-cols-2">
-          <article className="rounded-xl border border-black/10 bg-white/40 p-5 dark:border-white/15 dark:bg-white/5">
-            <p className="text-xs uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
-              Total pedidos
-            </p>
-            <p className="mt-1 text-3xl font-semibold">{total}</p>
-          </article>
-          <article className="rounded-xl border border-black/10 bg-white/40 p-5 dark:border-white/15 dark:bg-white/5">
-            <p className="text-xs uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
-              Pendientes
-            </p>
-            <p className="mt-1 text-3xl font-semibold">{pending}</p>
-          </article>
-          <article className="rounded-xl border border-black/10 bg-white/40 p-5 dark:border-white/15 dark:bg-white/5">
-            <p className="text-xs uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
-              En proceso
-            </p>
-            <p className="mt-1 text-3xl font-semibold">{inProgress}</p>
-          </article>
-          <article className="rounded-xl border border-black/10 bg-white/40 p-5 dark:border-white/15 dark:bg-white/5">
-            <p className="text-xs uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
-              Terminados
-            </p>
-            <p className="mt-1 text-3xl font-semibold">{done}</p>
-          </article>
+        <div className="stats-grid stats-block">
+          {statCards.map((card) => (
+            <article
+              key={card.label}
+              className="stats-card"
+            >
+              <p className="eyebrow">{card.label}</p>
+              <p className="stats-value">
+                {card.value}
+              </p>
+            </article>
+          ))}
         </div>
 
-        <p className="mt-6 text-xs text-zinc-500 dark:text-zinc-400">
-          Nota: en este proyecto las tareas viven en cookie por sesion.
-        </p>
+        <article className="stats-highlight stats-block">
+          <p className="eyebrow">Rendimiento</p>
+          <p className="stats-highlight-label">
+            Tasa de finalización actual:
+          </p>
+          <p className="stats-highlight-value">{completionRate}%</p>
+        </article>
 
-        <div className="mt-6">
+        <div>
           <Link
             href="/"
             className="ui-pill ui-pill-secondary"
