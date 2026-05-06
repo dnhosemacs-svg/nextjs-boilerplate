@@ -40,8 +40,10 @@ export default async function Home() {
             sizes="(max-width: 768px) 100vw, 1100px"
             className="h-[66svh] min-h-[460px] w-full object-cover object-center"
           />
-          <div className="absolute inset-x-0 bottom-0 z-20 p-6 sm:p-8 md:p-12">
-            <p className="eyebrow mb-3 text-[var(--surface)]">Uso interno del taller</p>
+          <div className="absolute inset-x-3 bottom-3 z-20 p-6 sm:inset-x-5 sm:bottom-5 sm:p-8 md:inset-x-6 md:bottom-6 md:p-12">
+            <p className="eyebrow mb-3 !text-white/90 drop-shadow-sm">
+              Uso interno del taller
+            </p>
             <h1 className="display-heading max-w-3xl text-4xl text-[var(--surface)] sm:text-5xl md:text-6xl">
               Panel del taller: pedidos, seguimiento y trabajo del día.
             </h1>
