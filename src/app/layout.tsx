@@ -36,7 +36,12 @@ export default function RootLayout({
       className={`${manrope.variable} ${geistMono.variable} ${cormorant.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
-        <SiteNavbar />
+        <div className="w-full">
+          <div className="mx-auto w-full max-w-[72rem] px-4 md:px-6">
+            <SiteNavbar />
+          </div>
+        </div>
+        <div aria-hidden className="h-20 md:h-24" />
         {children}
       </body>
     </html>

@@ -20,18 +20,11 @@ export default function SiteNavbar() {
   const pathname = usePathname();
 
   return (
-    <header className="sticky top-0 z-40 border-b border-[var(--line)] bg-[rgb(246_240_231/92%)] backdrop-blur supports-[backdrop-filter]:bg-[rgb(246_240_231/80%)]">
-      <div className="mx-auto flex w-full max-w-6xl flex-wrap items-center justify-between gap-4 px-4 py-4 md:px-6">
-        <Link
-          href="/"
-          className="shrink-0 whitespace-nowrap pr-4 font-[var(--font-cormorant)] text-2xl font-semibold tracking-tight text-[var(--foreground)] md:text-4xl"
-        >
-          Carpintería Tablas y serrín
-        </Link>
-
-        <div className="flex w-full items-center justify-between gap-3 md:w-auto md:flex-1 md:justify-end md:gap-5">
-          <nav aria-label="Principal" className="overflow-x-auto">
-            <ul className="flex items-center gap-2 pb-1">
+    <header className="fixed top-3 left-1/2 z-50 w-fit max-w-[calc(100vw-1rem)] -translate-x-1/2 rounded-2xl border border-[rgb(207_190_167/0.45)] bg-[rgb(246_240_231/90%)] shadow-[0_10px_26px_-22px_rgb(45_34_25/0.7),0_2px_10px_-8px_rgb(45_34_25/0.45)] backdrop-blur-md supports-[backdrop-filter]:bg-[rgb(246_240_231/80%)] transform-gpu">
+      <div className="flex items-center justify-center px-4 py-3.5 md:px-5 md:py-4">
+        <div className="flex items-center gap-4 overflow-x-auto pb-1 md:gap-4">
+          <nav aria-label="Principal">
+            <ul className="flex items-center gap-2.5 md:gap-2.5">
               {navItems.map((item) => {
                 const isActive = isActivePath(pathname, item.href);
                 return (
@@ -39,11 +32,7 @@ export default function SiteNavbar() {
                     <Link
                       href={item.href}
                       aria-current={isActive ? "page" : undefined}
-                      className={`inline-flex min-h-10 items-center justify-center rounded-full border px-4 py-2 text-sm font-semibold transition md:px-5 ${
-                        isActive
-                          ? "border-[var(--brand)] bg-[var(--brand)] text-[var(--surface)] shadow-sm"
-                          : "border-[var(--line)] bg-[var(--surface)] text-[var(--foreground)] hover:border-[var(--brand)] hover:bg-[var(--surface-strong)]"
-                      }`}
+                      className={`ui-pill px-6 md:px-7 ${isActive ? "ui-pill-primary" : "ui-pill-secondary"}`}
                     >
                       {item.label}
                     </Link>
