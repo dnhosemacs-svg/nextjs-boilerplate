@@ -7,8 +7,8 @@ const navItems = [
   { href: "/", label: "Inicio" },
   { href: "/tasks/new", label: "Nuevo pedido" },
   { href: "/stats", label: "Estadísticas" },
-  { href: "/about", label: "About" },
-  { href: "/info", label: "Info" },
+  { href: "/about", label: "Sobre" },
+  { href: "/info", label: "Guía" },
 ];
 
 function isActivePath(currentPath: string, href: string) {

@@ -367,3 +367,50 @@ button:focus-visible,
 .login-actions {
   margin-top: 0.5rem;
 }
+
+.content-layout {
+  display: flex;
+  flex-direction: column;
+}
+
+.content-block {
+  margin-bottom: 1.25rem;
+}
+
+.content-grid {
+  display: grid;
+  gap: 1rem;
+}
+
+.content-card {
+  border-radius: 1rem;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  padding: 1.5rem;
+}
+
+.content-highlight {
+  border-radius: 1rem;
+  border: 1px solid var(--line);
+  background: var(--surface-strong);
+  padding: 1.5rem;
+}
+
+.content-description {
+  max-width: 42rem;
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  color: var(--muted);
+}
+
+@media (min-width: 768px) {
+  .content-block {
+    margin-bottom: 1.5rem;
+  }
+}
+
+@media (min-width: 900px) {
+  .content-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
