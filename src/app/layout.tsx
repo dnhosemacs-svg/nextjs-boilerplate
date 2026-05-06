@@ -20,8 +20,9 @@ const cormorant = Cormorant_Garamond({
 });
 
 export const metadata: Metadata = {
-  title: "Carpintería | TaskFlow",
-  description: "Gestor simple de pedidos/tareas de carpintería (demo).",
+  title: "Carpintería | Panel del taller",
+  description:
+    "Herramienta interna para registrar y administrar pedidos del taller (equipo).",
 };
 
 export default function RootLayout({

@@ -99,7 +99,7 @@ export default function TaskForm({ mode, initialData }: TaskFormProps) {
           value={description}
           onChange={(event) => setDescription(event.target.value)}
           className="carbon-input"
-          placeholder="Medidas, acabado y notas del cliente"
+          placeholder="Medidas, acabado, plazo y notas para el taller (contacto si aplica)"
         />
 
         <Select

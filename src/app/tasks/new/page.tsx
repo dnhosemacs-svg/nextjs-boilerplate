@@ -7,8 +7,8 @@ export default function NewTaskPage() {
       <section className="surface-card flex flex-col gap-10 md:gap-12">
         <header className="flex flex-col gap-3">
           <h1 className="section-heading">Nuevo pedido</h1>
-          <p className="max-w-2xl text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">
-            Completa los datos para crear un nuevo pedido de carpintería.
+          <p className="max-w-2xl text-sm leading-relaxed text-[var(--muted)]">
+            Registra un trabajo entrante para que el equipo lo vea en la lista y en estadísticas.
           </p>
         </header>
 

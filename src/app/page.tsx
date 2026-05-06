@@ -4,22 +4,22 @@ import { listTasksFromCookieStore } from "@/lib/tasks-cookie-store";
 
 const galleryItems = [
   {
-    title: "Mesa de roble a medida",
-    place: "Proyecto residencial",
+    title: "Mesa roble — referencia de acabado",
+    place: "Catálogo interno / muestra",
     src: "https://images.pexels.com/photos/4985341/pexels-photo-4985341.jpeg?auto=compress&cs=tinysrgb&w=1200",
-    alt: "Mesa de madera sólida en interior moderno",
+    alt: "Mesa de madera sólida, referencia visual para pedidos del taller",
   },
   {
-    title: "Mobiliario artesanal",
-    place: "Espacio comercial",
+    title: "Mobiliario en almacén",
+    place: "Piezas terminadas o en espera",
     src: "https://images.pexels.com/photos/5825540/pexels-photo-5825540.jpeg?auto=compress&cs=tinysrgb&w=1200",
-    alt: "Cómoda de madera con acabados premium",
+    alt: "Cómoda de madera en espacio de taller o almacén",
   },
   {
-    title: "Pieza de autor",
-    place: "Colección limitada",
+    title: "Prototipo / pieza tipo",
+    place: "Banco de ideas del equipo",
     src: "https://images.pexels.com/photos/963486/pexels-photo-963486.jpeg?auto=compress&cs=tinysrgb&w=1200",
-    alt: "Silla de madera minimalista sobre fondo neutro",
+    alt: "Silla de madera minimalista como referencia de diseño",
   },
 ];
 
@@ -41,23 +41,23 @@ export default async function Home() {
             className="h-[66svh] min-h-[460px] w-full object-cover object-center"
           />
           <div className="absolute inset-x-0 bottom-0 z-20 p-6 sm:p-8 md:p-12">
-            <p className="eyebrow mb-3 text-[var(--surface)]">Taller artesanal</p>
+            <p className="eyebrow mb-3 text-[var(--surface)]">Uso interno del taller</p>
             <h1 className="display-heading max-w-3xl text-4xl text-[var(--surface)] sm:text-5xl md:text-6xl">
-              Diseñamos y fabricamos piezas de madera con alma contemporánea.
+              Panel del taller: pedidos, seguimiento y trabajo del día.
             </h1>
             <p className="mt-4 max-w-2xl text-sm leading-relaxed text-[rgb(251_247_241/0.88)] sm:text-base">
-              Muebles a medida, acabados premium y procesos transparentes para hogares y
-              negocios que valoran el detalle.
+              Herramienta para el equipo: registrar trabajos, ver el estado de cada pedido y
+              consultar el resumen desde un solo sitio. No es una tienda para clientes finales.
             </p>
             <div className="mt-7 flex flex-wrap items-center gap-3">
               <Link href="/tasks/new" className="ui-pill ui-pill-primary">
-                Solicitar pedido
+                Nuevo pedido
               </Link>
               <Link
                 href="/stats"
                 className="ui-pill border border-white/45 bg-white/10 text-white hover:bg-white/20"
               >
-                Ver procesos
+                Estadísticas
               </Link>
             </div>
           </div>
@@ -65,23 +65,24 @@ export default async function Home() {
 
         <section className="grid gap-6 md:grid-cols-[1.1fr_1fr]">
           <article className="surface-card flex flex-col gap-4">
-            <p className="eyebrow">Servicios y proceso</p>
+            <p className="eyebrow">Flujo en el taller</p>
             <h2 className="section-heading max-w-xl">
-              Del boceto inicial al acabado final, todo pasa por manos expertas.
+              Cómo encaja esta app en el día a día del equipo.
             </h2>
             <p className="text-sm leading-relaxed text-[var(--muted)] sm:text-base">
-              Acompañamos cada proyecto con asesoría en materiales, diseño funcional y control
-              de calidad para que cada entrega mantenga una estética cálida y duradera.
+              Cada pedido lo crea alguien del taller cuando entra un trabajo nuevo. Así todos
+              ven el mismo estado, las notas y el detalle sin depender de papel suelto o grupos
+              de mensajes.
             </p>
             <ul className="mt-2 grid gap-3 text-sm text-[var(--foreground)] sm:grid-cols-3">
               <li className="rounded-2xl border border-[var(--line)] bg-[var(--surface-strong)] p-4">
-                Medición y diseño
+                Registrar pedido y prioridad
               </li>
               <li className="rounded-2xl border border-[var(--line)] bg-[var(--surface-strong)] p-4">
-                Fabricación en taller
+                Seguimiento en fabricación
               </li>
               <li className="rounded-2xl border border-[var(--line)] bg-[var(--surface-strong)] p-4">
-                Instalación final
+                Cierre y revisión en lista
               </li>
             </ul>
           </article>
@@ -101,12 +102,13 @@ export default async function Home() {
         <section className="surface-card">
           <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
             <div>
-              <p className="eyebrow">Galería de proyectos</p>
-              <h2 className="section-heading">Trabajos recientes</h2>
+              <p className="eyebrow">Referencia visual</p>
+              <h2 className="section-heading">Inspiración y acabados</h2>
             </div>
-            <Link href="/tasks/new" className="ui-link-underline">
-              Iniciar un proyecto
-            </Link>
+            <p className="max-w-md text-sm text-[var(--muted)]">
+              Imágenes de apoyo para alinear criterios en el taller; no sustituyen los datos del
+              pedido.
+            </p>
           </div>
 
           <div className="grid gap-4 md:grid-cols-3">
@@ -133,15 +135,18 @@ export default async function Home() {
         </section>
 
         <section className="surface-card">
-          <div className="mb-6 flex items-end justify-between gap-4">
+          <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
             <div>
-              <p className="eyebrow">Gestión activa</p>
-              <h2 className="section-heading text-3xl">Pedidos</h2>
+              <p className="eyebrow">Pedidos del taller</p>
+              <h2 className="section-heading text-3xl">Lista activa</h2>
             </div>
+            <Link href="/tasks/new" className="ui-pill ui-pill-primary shrink-0">
+              Registrar pedido
+            </Link>
           </div>
           <p className="mb-6 max-w-2xl text-sm leading-relaxed text-[var(--muted)] sm:text-base">
-            Gestiona tus pedidos desde una experiencia visual más clara, manteniendo la lógica
-            actual de la aplicación.
+            Trabajos registrados por el equipo. Consulta el detalle para actualizar estado o notas.
+            Más adelante el acceso quedará restringido con inicio de sesión.
           </p>
 
           {tasks.length === 0 ? (
@@ -180,20 +185,20 @@ export default async function Home() {
           <div className="soft-grid pointer-events-none absolute inset-0 opacity-50" />
           <div className="relative z-10 grid gap-6 md:grid-cols-[1.15fr_1fr] md:items-center">
             <div>
-              <p className="eyebrow">Reserva tu asesoría</p>
+              <p className="eyebrow">Acciones rápidas</p>
               <h2 className="section-heading mt-2 max-w-xl">
-                Llevemos tu próximo mueble de idea a pieza terminada.
+                ¿Entró un trabajo nuevo? Dejalo cargado antes de que pase a la mesa.
               </h2>
               <p className="mt-3 max-w-xl text-sm leading-relaxed text-[var(--muted)] sm:text-base">
-                Cuéntanos dimensiones, uso y estilo. Te proponemos materiales, presupuesto y
-                calendario de entrega.
+                Un pedido bien cargado al inicio evita reprocesos: cliente interno o externo,
+                pieza, medidas y plazo en un solo lugar para todo el equipo.
               </p>
               <div className="mt-6 flex flex-wrap gap-3">
                 <Link href="/tasks/new" className="ui-pill ui-pill-primary">
-                  Agendar proyecto
+                  Cargar pedido
                 </Link>
-                <Link href="/info" className="ui-pill ui-pill-secondary">
-                  Ver más información
+                <Link href="/stats" className="ui-pill ui-pill-secondary">
+                  Ver resumen
                 </Link>
               </div>
             </div>
