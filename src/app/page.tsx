@@ -66,7 +66,7 @@ export default async function Home() {
         </section>
 
         <section>
-          <article className="surface-card flex flex-col gap-4">
+          <article className="surface-card presentation-card">
             <p className="eyebrow">Flujo en el taller</p>
             <h2 className="section-heading max-w-xl">
               Cómo encaja esta app en el día a día del equipo.
@@ -76,7 +76,7 @@ export default async function Home() {
               ven el mismo estado, las notas y el detalle sin depender de papel suelto o grupos
               de mensajes.
             </p>
-            <ul className="mt-2 grid gap-3 text-sm text-[var(--foreground)] sm:grid-cols-3">
+            <ul className="mt-1 grid gap-3 text-sm text-[var(--foreground)] sm:grid-cols-3">
               <li className="rounded-2xl border border-[var(--line)] bg-[var(--surface-strong)] p-4">
                 Registrar pedido y prioridad
               </li>
