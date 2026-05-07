@@ -174,6 +174,7 @@ export default async function Home({ searchParams }: HomePageProps) {
                       <Link
                         key={filter.value}
                         href={href}
+                        scroll={false}
                         aria-current={isActive ? "page" : undefined}
                         className={`status-filter-pill ${isActive ? "status-filter-pill--active" : ""}`}
                       >
