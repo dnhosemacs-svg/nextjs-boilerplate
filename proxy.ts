@@ -17,26 +17,20 @@ function isProtectedApi(pathname: string) {
   );
 }
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const { pathname, search } = request.nextUrl;
   const isAuthenticated = request.cookies.get(AUTH_COOKIE_NAME)?.value === "1";
 
-  // API protegida => responde 401 JSON (no redirect HTML)
   if (isProtectedApi(pathname) && !isAuthenticated) {
-    return NextResponse.json(
-      { error: "No autenticado" },
-      { status: 401 },
-    );
+    return NextResponse.json({ error: "No autenticado" }, { status: 401 });
   }
 
-  // Paginas protegidas => redirect a login con next
   if (isProtectedPage(pathname) && !isAuthenticated) {
     const redirectUrl = new URL("/login", request.url);
     redirectUrl.searchParams.set("next", `${pathname}${search}`);
     return NextResponse.redirect(redirectUrl);
   }
 
-  // Si ya hay sesion, evitar /login
   if (pathname === "/login" && isAuthenticated) {
     return NextResponse.redirect(new URL("/", request.url));
   }
