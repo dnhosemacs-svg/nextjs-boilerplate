@@ -46,7 +46,6 @@ export default async function RootLayout({
             <SiteNavbar isAuthenticated={isAuthenticated} />
           </div>
         </div>
-        <div aria-hidden className="h-20 md:h-24" />
         {children}
       </body>
     </html>
