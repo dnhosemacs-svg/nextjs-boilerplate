@@ -5,6 +5,7 @@ import { AUTH_COOKIE_NAME } from "@/lib/auth";
 import { formatTaskStatus } from "@/lib/task-status";
 import { listTasksFromCookieStore } from "@/lib/tasks-cookie-store";
 import StatusBadge from "@/components/tasks/status-badge";
+import QuickCompleteButton from "@/components/tasks/quick-complete-button";
 import type { TaskStatus } from "@/types/task";
 
 const galleryItems = [
@@ -218,9 +219,15 @@ export default async function Home({ searchParams }: HomePageProps) {
                               {formatRelativeDate(task.updatedAt)}
                             </td>
                             <td>
-                              <Link href={`/tasks/${task.id}`} className="ui-link-underline">
-                                Ver detalle
-                              </Link>
+                              <div className="flex flex-col items-start gap-2">
+                                <Link href={`/tasks/${task.id}`} className="ui-link-underline">
+                                  Ver detalle
+                                </Link>
+                                <QuickCompleteButton
+                                  taskId={task.id}
+                                  isDone={task.status === "done"}
+                                />
+                              </div>
                             </td>
                           </tr>
                         ))}

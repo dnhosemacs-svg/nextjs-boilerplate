@@ -151,6 +151,29 @@ a {
   text-underline-offset: 4px;
 }
 
+.ui-link-button {
+  border: 0;
+  background: transparent;
+  padding: 0;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--foreground);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  cursor: pointer;
+}
+
+.ui-link-button:disabled {
+  opacity: 0.7;
+  cursor: wait;
+}
+
+.quick-complete-done {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: #166534;
+}
+
 a:focus-visible,
 button:focus-visible,
 [role="button"]:focus-visible {
