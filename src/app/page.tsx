@@ -1,5 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
+import { cookies } from "next/headers";
+import { AUTH_COOKIE_NAME } from "@/lib/auth";
 import { listTasksFromCookieStore } from "@/lib/tasks-cookie-store";
 
 const galleryItems = [
@@ -24,7 +26,9 @@ const galleryItems = [
 ];
 
 export default async function Home() {
-  const tasks = await listTasksFromCookieStore();
+  const cookieStore = await cookies();
+  const isAuthenticated = cookieStore.get(AUTH_COOKIE_NAME)?.value === "1";
+  const tasks = isAuthenticated ? await listTasksFromCookieStore() : [];
 
   return (
     <main className="page-shell">
@@ -102,13 +106,21 @@ export default async function Home() {
           </div>
           <p className="mb-6 max-w-2xl text-sm leading-relaxed text-[var(--muted)] sm:text-base">
             Trabajos registrados por el equipo. Consulta el detalle para actualizar estado o notas.
-            Más adelante el acceso quedará restringido con inicio de sesión.
           </p>
 
-          {tasks.length === 0 ? (
-            <p className="text-sm text-[var(--muted)]">
-              No hay pedidos todavia.
-            </p>
+          {!isAuthenticated ? (
+            <div className="rounded-2xl border border-[var(--line)] bg-[var(--surface-strong)] p-5 md:p-6">
+              <p className="text-sm text-[var(--muted)]">
+                Inicia sesión para ver la lista activa de pedidos del taller.
+              </p>
+              <div className="mt-4">
+                <Link href="/login?next=/" className="ui-pill ui-pill-secondary">
+                  Ir a login
+                </Link>
+              </div>
+            </div>
+          ) : tasks.length === 0 ? (
+            <p className="text-sm text-[var(--muted)]">No hay pedidos todavia.</p>
           ) : (
             <ul className="flex flex-col gap-6 md:gap-8">
               {tasks.map((task) => (
