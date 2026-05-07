@@ -1,36 +1,55 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button, PasswordInput, TextInput } from "@carbon/react";
+
+function isSafeInternalPath(value: string | null): value is string {
+  return !!value && value.startsWith("/") && !value.startsWith("//");
+}
 
 export default function AuthLoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
+
   const [email, setEmail] = useState("admin@carpinteria.local");
   const [password, setPassword] = useState("123456");
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const isSubmitDisabled = useMemo(() => {
+    return isSubmitting || email.trim().length === 0 || password.trim().length === 0;
+  }, [email, password, isSubmitting]);
+
   async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError(null);
+
+    const normalizedEmail = email.trim().toLowerCase();
+    const normalizedPassword = password.trim();
+
+    if (!normalizedEmail || !normalizedPassword) {
+      setError("Email y password son obligatorios.");
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
       const response = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ email: normalizedEmail, password: normalizedPassword }),
       });
 
       if (!response.ok) {
         const body = (await response.json().catch(() => ({}))) as { error?: string };
-        throw new Error(body.error ?? "No se pudo iniciar sesión.");
+        throw new Error(body.error ?? "No se pudo iniciar sesion.");
       }
 
       const nextPath = searchParams.get("next");
-      router.push(nextPath && nextPath.startsWith("/") ? nextPath : "/");
+      const destination = isSafeInternalPath(nextPath) ? nextPath : "/";
+      router.push(destination);
       router.refresh();
     } catch (submitError) {
       const message =
@@ -42,10 +61,7 @@ export default function AuthLoginForm() {
   }
 
   return (
-    <form
-      className="flex flex-col gap-8 md:gap-10 carbon-shell"
-      onSubmit={onSubmit}
-    >
+    <form className="flex flex-col gap-8 md:gap-10 carbon-shell" onSubmit={onSubmit}>
       <div className="flex flex-col gap-6 md:gap-8">
         <TextInput
           labelText="Email"
@@ -77,11 +93,11 @@ export default function AuthLoginForm() {
 
       <Button
         type="submit"
-        disabled={isSubmitting}
+        disabled={isSubmitDisabled}
         kind="primary"
         className="carbon-btn-primary self-start"
       >
-        {isSubmitting ? "Entrando..." : "Iniciar sesión"}
+        {isSubmitting ? "Entrando..." : "Iniciar sesion"}
       </Button>
     </form>
   );
