@@ -44,7 +44,7 @@ export default function SiteNavbar({ isAuthenticated }: SiteNavbarProps) {
   }
 
   return (
-    <div className="mt-3 flex w-full justify-center">
+    <div className="flex w-full justify-center">
       <header className="z-50 w-fit max-w-[calc(100vw-1rem)] rounded-2xl border border-[rgb(207_190_167/0.45)] bg-[rgb(246_240_231/90%)] shadow-[0_10px_26px_-22px_rgb(45_34_25/0.7),0_2px_10px_-8px_rgb(45_34_25/0.45)] backdrop-blur-md supports-[backdrop-filter]:bg-[rgb(246_240_231/80%)]">
         <div className="flex items-center justify-center px-4 py-3.5 md:px-5 md:py-4">
           <div className="flex items-center gap-4 overflow-x-auto pb-1 md:gap-4">
