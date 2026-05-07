@@ -94,60 +94,51 @@ export default async function Home() {
           </article>
         </section>
 
-        <section className="surface-card">
-          <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
-            <div>
-              <p className="eyebrow">Pedidos del taller</p>
-              <h2 className="section-heading text-3xl">Lista activa</h2>
-            </div>
-            <Link href="/tasks/new" className="ui-pill ui-pill-primary shrink-0">
-              Registrar pedido
-            </Link>
-          </div>
-          <p className="mb-6 max-w-2xl text-sm leading-relaxed text-[var(--muted)] sm:text-base">
-            Trabajos registrados por el equipo. Consulta el detalle para actualizar estado o notas.
-          </p>
-
-          {!isAuthenticated ? (
-            <div className="rounded-2xl border border-[var(--line)] bg-[var(--surface-strong)] p-5 md:p-6">
-              <p className="text-sm text-[var(--muted)]">
-                Inicia sesión para ver la lista activa de pedidos del taller.
-              </p>
-              <div className="mt-4">
-                <Link href="/login?next=/" className="ui-pill ui-pill-secondary">
-                  Ir a login
-                </Link>
+        {isAuthenticated ? (
+          <section className="surface-card">
+            <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
+              <div>
+                <p className="eyebrow">Pedidos del taller</p>
+                <h2 className="section-heading text-3xl">Lista activa</h2>
               </div>
+              <Link href="/tasks/new" className="ui-pill ui-pill-primary shrink-0">
+                Registrar pedido
+              </Link>
             </div>
-          ) : tasks.length === 0 ? (
-            <p className="text-sm text-[var(--muted)]">No hay pedidos todavia.</p>
-          ) : (
-            <ul className="flex flex-col gap-6 md:gap-8">
-              {tasks.map((task) => (
-                <li
-                  key={task.id}
-                  className="flex flex-col gap-3 rounded-2xl border border-[var(--line)] bg-[var(--surface)] p-5 md:gap-4"
-                >
-                  <p className="eyebrow">
-                    {task.status}
-                  </p>
-                  <h3 className="text-base font-medium leading-snug">{task.title}</h3>
-                  {task.description ? (
-                    <p className="text-sm leading-relaxed text-[var(--muted)]">
-                      {task.description}
-                    </p>
-                  ) : null}
-                  <Link
-                    href={`/tasks/${task.id}`}
-                    className="ui-link-underline inline-flex pt-1"
+            <p className="mb-6 max-w-2xl text-sm leading-relaxed text-[var(--muted)] sm:text-base">
+              Trabajos registrados por el equipo. Consulta el detalle para actualizar estado o notas.
+            </p>
+
+            {tasks.length === 0 ? (
+              <p className="text-sm text-[var(--muted)]">No hay pedidos todavia.</p>
+            ) : (
+              <ul className="flex flex-col gap-6 md:gap-8">
+                {tasks.map((task) => (
+                  <li
+                    key={task.id}
+                    className="flex flex-col gap-3 rounded-2xl border border-[var(--line)] bg-[var(--surface)] p-5 md:gap-4"
                   >
-                    Ver detalle
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          )}
-        </section>
+                    <p className="eyebrow">
+                      {task.status}
+                    </p>
+                    <h3 className="text-base font-medium leading-snug">{task.title}</h3>
+                    {task.description ? (
+                      <p className="text-sm leading-relaxed text-[var(--muted)]">
+                        {task.description}
+                      </p>
+                    ) : null}
+                    <Link
+                      href={`/tasks/${task.id}`}
+                      className="ui-link-underline inline-flex pt-1"
+                    >
+                      Ver detalle
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </section>
+        ) : null}
 
         <section className="surface-card">
           <div className="mb-6">
