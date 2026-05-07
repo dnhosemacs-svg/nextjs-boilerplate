@@ -42,7 +42,7 @@ export default async function RootLayout({
     >
       <body className="min-h-full flex flex-col">
         <div className="w-full">
-          <div className="mx-auto w-full max-w-[72rem] px-4 md:px-6">
+          <div className="w-full px-4 md:px-6">
             <SiteNavbar isAuthenticated={isAuthenticated} />
           </div>
         </div>
