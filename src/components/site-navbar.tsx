@@ -1,14 +1,15 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { useState } from "react";
 
 const navItems = [
   { href: "/", label: "Inicio" },
   { href: "/tasks/new", label: "Nuevo pedido" },
-  { href: "/stats", label: "Estadísticas" },
+  { href: "/stats", label: "Estadisticas" },
   { href: "/about", label: "Sobre" },
-  { href: "/info", label: "Guía" },
+  { href: "/info", label: "Guia" },
 ];
 
 function isActivePath(currentPath: string, href: string) {
@@ -16,8 +17,25 @@ function isActivePath(currentPath: string, href: string) {
   return currentPath === href || currentPath.startsWith(`${href}/`);
 }
 
-export default function SiteNavbar() {
+type SiteNavbarProps = {
+  isAuthenticated: boolean;
+};
+
+export default function SiteNavbar({ isAuthenticated }: SiteNavbarProps) {
   const pathname = usePathname();
+  const router = useRouter();
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+
+  async function onLogout() {
+    setIsLoggingOut(true);
+    try {
+      await fetch("/api/auth/logout", { method: "POST" });
+      router.push("/login");
+      router.refresh();
+    } finally {
+      setIsLoggingOut(false);
+    }
+  }
 
   return (
     <header className="fixed top-3 left-1/2 z-50 w-fit max-w-[calc(100vw-1rem)] -translate-x-1/2 rounded-2xl border border-[rgb(207_190_167/0.45)] bg-[rgb(246_240_231/90%)] shadow-[0_10px_26px_-22px_rgb(45_34_25/0.7),0_2px_10px_-8px_rgb(45_34_25/0.45)] backdrop-blur-md supports-[backdrop-filter]:bg-[rgb(246_240_231/80%)] transform-gpu">
@@ -42,9 +60,20 @@ export default function SiteNavbar() {
             </ul>
           </nav>
 
-          <Link href="/login" className="ui-pill ui-pill-secondary shrink-0">
-            Login
-          </Link>
+          {isAuthenticated ? (
+            <button
+              type="button"
+              onClick={onLogout}
+              disabled={isLoggingOut}
+              className="ui-pill ui-pill-secondary shrink-0"
+            >
+              {isLoggingOut ? "Saliendo..." : "Cerrar sesion"}
+            </button>
+          ) : (
+            <Link href="/login" className="ui-pill ui-pill-secondary shrink-0">
+              Login
+            </Link>
+          )}
         </div>
       </div>
     </header>

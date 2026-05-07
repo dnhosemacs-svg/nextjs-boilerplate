@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
+import { cookies } from "next/headers";
 import { Cormorant_Garamond, Geist_Mono, Manrope } from "next/font/google";
 import "./globals.css";
 import SiteNavbar from "@/components/site-navbar";
+import { AUTH_COOKIE_NAME } from "@/lib/auth";
 
 const manrope = Manrope({
   variable: "--font-manrope",
@@ -25,11 +27,14 @@ export const metadata: Metadata = {
     "Herramienta interna para registrar y administrar pedidos del taller (equipo).",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const cookieStore = await cookies();
+  const isAuthenticated = cookieStore.get(AUTH_COOKIE_NAME)?.value === "1";
+
   return (
     <html
       lang="es"
@@ -38,7 +43,7 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col">
         <div className="w-full">
           <div className="mx-auto w-full max-w-[72rem] px-4 md:px-6">
-            <SiteNavbar />
+            <SiteNavbar isAuthenticated={isAuthenticated} />
           </div>
         </div>
         <div aria-hidden className="h-20 md:h-24" />
