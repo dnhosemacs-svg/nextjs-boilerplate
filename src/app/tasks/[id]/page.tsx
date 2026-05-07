@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { cookies } from "next/headers";
+import { notFound, redirect } from "next/navigation";
 import DeleteTaskButton from "@/components/tasks/delete-task-button";
 import TaskForm from "@/components/tasks/task-form";
+import { AUTH_COOKIE_NAME } from "@/lib/auth";
 import { getTaskByIdFromCookieStore } from "@/lib/tasks-cookie-store";
 
 type TaskDetailPageProps = {
@@ -32,6 +34,12 @@ export async function generateMetadata({
 
 export default async function TaskDetailPage({ params }: TaskDetailPageProps) {
   const { id } = await params;
+  const cookieStore = await cookies();
+  const isAuthenticated = cookieStore.get(AUTH_COOKIE_NAME)?.value === "1";
+  if (!isAuthenticated) {
+    redirect(`/login?next=/tasks/${encodeURIComponent(id)}`);
+  }
+
   const task = await getTaskByIdFromCookieStore(id).catch(() => null);
   if (!task) {
     notFound();

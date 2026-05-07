@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
+import { cookies } from "next/headers";
 
+import { AUTH_COOKIE_NAME } from "@/lib/auth";
 import {
   deleteTaskInCookieStore,
   getTaskByIdFromCookieStore,
@@ -11,7 +13,16 @@ type Context = {
   params: { id: string } | Promise<{ id: string }>;
 };
 
+async function isAuthenticatedRequest() {
+  const cookieStore = await cookies();
+  return cookieStore.get(AUTH_COOKIE_NAME)?.value === "1";
+}
+
 export async function GET(_request: Request, { params }: Context) {
+  if (!(await isAuthenticatedRequest())) {
+    return NextResponse.json({ error: "No autenticado" }, { status: 401 });
+  }
+
   const { id } = await Promise.resolve(params);
   const task = await getTaskByIdFromCookieStore(id);
   if (!task) {
@@ -21,6 +32,10 @@ export async function GET(_request: Request, { params }: Context) {
 }
 
 export async function PUT(request: Request, { params }: Context) {
+  if (!(await isAuthenticatedRequest())) {
+    return NextResponse.json({ error: "No autenticado" }, { status: 401 });
+  }
+
   const { id } = await Promise.resolve(params);
   let json: unknown;
   try {
@@ -49,6 +64,10 @@ export async function PUT(request: Request, { params }: Context) {
 }
 
 export async function DELETE(_request: Request, { params }: Context) {
+  if (!(await isAuthenticatedRequest())) {
+    return NextResponse.json({ error: "No autenticado" }, { status: 401 });
+  }
+
   const { id } = await Promise.resolve(params);
   const deleted = await deleteTaskInCookieStore(id);
   if (!deleted) {
