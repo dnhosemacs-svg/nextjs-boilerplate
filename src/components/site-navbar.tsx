@@ -4,12 +4,15 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 
-const navItems = [
+const baseNavItems = [
   { href: "/", label: "Inicio" },
-  { href: "/tasks/new", label: "Nuevo pedido" },
-  { href: "/stats", label: "Estadísticas" },
   { href: "/about", label: "Sobre" },
   { href: "/info", label: "Guía" },
+];
+
+const authOnlyNavItems = [
+  { href: "/tasks/new", label: "Nuevo pedido" },
+  { href: "/stats", label: "Estadísticas" },
 ];
 
 function isActivePath(currentPath: string, href: string) {
@@ -25,6 +28,9 @@ export default function SiteNavbar({ isAuthenticated }: SiteNavbarProps) {
   const pathname = usePathname();
   const router = useRouter();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const navItems = isAuthenticated
+    ? [baseNavItems[0], ...authOnlyNavItems, ...baseNavItems.slice(1)]
+    : baseNavItems;
 
   async function onLogout() {
     setIsLoggingOut(true);
