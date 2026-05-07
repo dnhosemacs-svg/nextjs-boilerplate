@@ -7,9 +7,9 @@ import { useState } from "react";
 const navItems = [
   { href: "/", label: "Inicio" },
   { href: "/tasks/new", label: "Nuevo pedido" },
-  { href: "/stats", label: "Estadisticas" },
+  { href: "/stats", label: "Estadísticas" },
   { href: "/about", label: "Sobre" },
-  { href: "/info", label: "Guia" },
+  { href: "/info", label: "Guía" },
 ];
 
 function isActivePath(currentPath: string, href: string) {
@@ -67,7 +67,7 @@ export default function SiteNavbar({ isAuthenticated }: SiteNavbarProps) {
               disabled={isLoggingOut}
               className="ui-pill ui-pill-secondary shrink-0"
             >
-              {isLoggingOut ? "Saliendo..." : "Cerrar sesion"}
+              {isLoggingOut ? "Saliendo..." : "Cerrar sesión"}
             </button>
           ) : (
             <Link href="/login" className="ui-pill ui-pill-secondary shrink-0">

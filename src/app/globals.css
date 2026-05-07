@@ -428,3 +428,96 @@ button:focus-visible,
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  padding: 0.25rem 0.7rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+}
+
+.status-badge--pending {
+  border-color: color-mix(in srgb, #d97706 30%, transparent);
+  background: color-mix(in srgb, #d97706 12%, transparent);
+  color: #8a4300;
+}
+
+.status-badge--in_progress {
+  border-color: color-mix(in srgb, #2563eb 30%, transparent);
+  background: color-mix(in srgb, #2563eb 10%, transparent);
+  color: #1d4ed8;
+}
+
+.status-badge--done {
+  border-color: color-mix(in srgb, #15803d 30%, transparent);
+  background: color-mix(in srgb, #15803d 12%, transparent);
+  color: #166534;
+}
+
+.status-filter-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 0.5rem 0.9rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  background: var(--surface);
+  color: var(--foreground);
+  transition: background-color 0.15s ease;
+}
+
+.status-filter-pill:hover {
+  background: color-mix(in srgb, var(--brand) 10%, var(--surface));
+}
+
+.status-filter-pill--active {
+  background: color-mix(in srgb, var(--brand) 18%, var(--surface));
+  border-color: color-mix(in srgb, var(--brand) 35%, var(--line));
+}
+
+.status-filter-count {
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  padding: 0.05rem 0.45rem;
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+
+.task-table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--line);
+  border-radius: 1rem;
+  background: var(--surface);
+}
+
+.task-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 680px;
+}
+
+.task-table th,
+.task-table td {
+  text-align: left;
+  border-bottom: 1px solid color-mix(in srgb, var(--line) 80%, transparent);
+  padding: 1rem;
+  vertical-align: top;
+}
+
+.task-table th {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+  font-weight: 700;
+}
+
+.task-table tbody tr:last-child td {
+  border-bottom: 0;
+}

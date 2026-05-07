@@ -3,6 +3,7 @@ import Link from "next/link";
 import { cookies } from "next/headers";
 import { notFound, redirect } from "next/navigation";
 import DeleteTaskButton from "@/components/tasks/delete-task-button";
+import StatusBadge from "@/components/tasks/status-badge";
 import TaskForm from "@/components/tasks/task-form";
 import { AUTH_COOKIE_NAME } from "@/lib/auth";
 import { getTaskByIdFromCookieStore } from "@/lib/tasks-cookie-store";
@@ -49,25 +50,26 @@ export default async function TaskDetailPage({ params }: TaskDetailPageProps) {
     <main className="page-shell max-w-4xl">
       <article className="surface-card flex flex-col gap-10 md:gap-12">
         <header className="flex flex-col gap-3">
-          <p className="text-xs uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
+          <p className="eyebrow">
             Pedido #{task.id}
           </p>
           <h1 className="section-heading">{task.title}</h1>
-          <p className="text-sm text-zinc-600 dark:text-zinc-400">
-            Estado actual: <strong>{task.status}</strong>
+          <p className="flex items-center gap-2 text-sm text-[var(--muted)]">
+            Estado actual:
+            <StatusBadge status={task.status} />
           </p>
           {task.description ? (
-            <p className="text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">
+            <p className="text-sm leading-relaxed text-[var(--muted)]">
               {task.description}
             </p>
           ) : (
-            <p className="text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">
+            <p className="text-sm leading-relaxed text-[var(--muted)]">
               Sin descripción.
             </p>
           )}
         </header>
 
-        <div className="rounded-xl border border-dashed border-black/15 p-4 text-sm leading-relaxed dark:border-white/20 md:p-5">
+        <div className="rounded-xl border border-dashed border-[var(--line)] bg-[var(--surface-strong)] p-4 text-sm leading-relaxed text-[var(--muted)] md:p-5">
           Creado: {new Date(task.createdAt).toLocaleString()} · Actualizado:{" "}
           {new Date(task.updatedAt).toLocaleString()}
         </div>

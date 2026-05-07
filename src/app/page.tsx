@@ -2,7 +2,10 @@ import Image from "next/image";
 import Link from "next/link";
 import { cookies } from "next/headers";
 import { AUTH_COOKIE_NAME } from "@/lib/auth";
+import { formatTaskStatus } from "@/lib/task-status";
 import { listTasksFromCookieStore } from "@/lib/tasks-cookie-store";
+import StatusBadge from "@/components/tasks/status-badge";
+import type { TaskStatus } from "@/types/task";
 
 const galleryItems = [
   {
@@ -25,10 +28,55 @@ const galleryItems = [
   },
 ];
 
-export default async function Home() {
+type HomePageProps = {
+  searchParams: Promise<{ status?: string }>;
+};
+
+function formatRelativeDate(value: string) {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "Sin fecha";
+
+  const diffInMs = Date.now() - date.getTime();
+  const dayMs = 1000 * 60 * 60 * 24;
+  const diffInDays = Math.floor(diffInMs / dayMs);
+
+  if (diffInDays <= 0) return "Hoy";
+  if (diffInDays === 1) return "Ayer";
+  if (diffInDays < 7) return `Hace ${diffInDays} días`;
+  return date.toLocaleDateString("es-ES");
+}
+
+function isTaskStatus(value: string | undefined): value is TaskStatus {
+  return value === "pending" || value === "in_progress" || value === "done";
+}
+
+export default async function Home({ searchParams }: HomePageProps) {
+  const params = await searchParams;
+  const selectedStatus = isTaskStatus(params.status) ? params.status : "all";
   const cookieStore = await cookies();
   const isAuthenticated = cookieStore.get(AUTH_COOKIE_NAME)?.value === "1";
   const tasks = isAuthenticated ? await listTasksFromCookieStore() : [];
+  const filteredTasks =
+    selectedStatus === "all" ? tasks : tasks.filter((task) => task.status === selectedStatus);
+
+  const statusFilters: Array<{ value: "all" | TaskStatus; label: string; count: number }> = [
+    { value: "all", label: "Todos", count: tasks.length },
+    {
+      value: "pending",
+      label: formatTaskStatus("pending"),
+      count: tasks.filter((task) => task.status === "pending").length,
+    },
+    {
+      value: "in_progress",
+      label: formatTaskStatus("in_progress"),
+      count: tasks.filter((task) => task.status === "in_progress").length,
+    },
+    {
+      value: "done",
+      label: formatTaskStatus("done"),
+      count: tasks.filter((task) => task.status === "done").length,
+    },
+  ];
 
   return (
     <main className="page-shell">
@@ -110,32 +158,76 @@ export default async function Home() {
             </p>
 
             {tasks.length === 0 ? (
-              <p className="text-sm text-[var(--muted)]">No hay pedidos todavia.</p>
+              <div className="rounded-2xl border border-dashed border-[var(--line)] bg-[var(--surface-strong)] p-6">
+                <p className="text-sm text-[var(--muted)]">
+                  Todavía no hay pedidos registrados. Crea el primero para empezar a organizar la
+                  carga del taller.
+                </p>
+              </div>
             ) : (
-              <ul className="flex flex-col gap-6 md:gap-8">
-                {tasks.map((task) => (
-                  <li
-                    key={task.id}
-                    className="flex flex-col gap-3 rounded-2xl border border-[var(--line)] bg-[var(--surface)] p-5 md:gap-4"
-                  >
-                    <p className="eyebrow">
-                      {task.status}
+              <>
+                <div className="mb-5 flex flex-wrap gap-2.5">
+                  {statusFilters.map((filter) => {
+                    const isActive = selectedStatus === filter.value;
+                    const href = filter.value === "all" ? "/" : `/?status=${filter.value}`;
+                    return (
+                      <Link
+                        key={filter.value}
+                        href={href}
+                        aria-current={isActive ? "page" : undefined}
+                        className={`status-filter-pill ${isActive ? "status-filter-pill--active" : ""}`}
+                      >
+                        {filter.label}
+                        <span className="status-filter-count">{filter.count}</span>
+                      </Link>
+                    );
+                  })}
+                </div>
+
+                {filteredTasks.length === 0 ? (
+                  <div className="rounded-2xl border border-dashed border-[var(--line)] bg-[var(--surface-strong)] p-6">
+                    <p className="text-sm text-[var(--muted)]">
+                      No hay pedidos en este estado. Prueba otro filtro o crea uno nuevo.
                     </p>
-                    <h3 className="text-base font-medium leading-snug">{task.title}</h3>
-                    {task.description ? (
-                      <p className="text-sm leading-relaxed text-[var(--muted)]">
-                        {task.description}
-                      </p>
-                    ) : null}
-                    <Link
-                      href={`/tasks/${task.id}`}
-                      className="ui-link-underline inline-flex pt-1"
-                    >
-                      Ver detalle
-                    </Link>
-                  </li>
-                ))}
-              </ul>
+                  </div>
+                ) : (
+                  <div className="task-table-wrap">
+                    <table className="task-table">
+                      <thead>
+                        <tr>
+                          <th>Pedido</th>
+                          <th>Estado</th>
+                          <th>Actualizado</th>
+                          <th>Acción</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {filteredTasks.map((task) => (
+                          <tr key={task.id}>
+                            <td>
+                              <p className="text-sm font-semibold leading-snug">{task.title}</p>
+                              <p className="mt-1 text-xs text-[var(--muted)]">
+                                {task.description?.slice(0, 96) ?? "Sin descripción"}
+                              </p>
+                            </td>
+                            <td>
+                              <StatusBadge status={task.status} />
+                            </td>
+                            <td className="text-sm text-[var(--muted)]">
+                              {formatRelativeDate(task.updatedAt)}
+                            </td>
+                            <td>
+                              <Link href={`/tasks/${task.id}`} className="ui-link-underline">
+                                Ver detalle
+                              </Link>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </>
             )}
           </section>
         ) : null}
