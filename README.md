@@ -1,21 +1,89 @@
 # TaskFlow Carpinteria
 
-Aplicacion web de gestion de pedidos de carpinteria construida con Next.js App Router.
-Incluye CRUD de pedidos con Route Handlers, autenticacion demo por cookie, rutas protegidas con middleware y pagina de estadisticas con ISR.
+> Panel interno para gestionar pedidos del taller.
 
-## Arquitectura
+Aplicacion web de gestion de pedidos de carpinteria construida con Next.js App Router. Incluye CRUD de pedidos, autenticacion demo con cookie HTTP-only, proteccion de rutas con middleware y panel de estadisticas.
 
-- **Frontend**: App Router en `src/app` con Server Components para render inicial.
-- **Interactividad**: Client Components en `src/components` para formularios, acciones y navegacion de cliente.
-- **API**: Route Handlers en `src/app/api`.
-- **Validacion**: esquemas Zod en `src/lib/validators/task.ts`.
-- **Persistencia**: cookie por sesion (`src/lib/tasks-cookie-store.ts`).
-- **Proteccion de rutas**: `middleware.ts` para `/tasks/*`.
 
-## Requisitos
+| Despliegue | URL                                                     |
+| ---------- | ------------------------------------------------------- |
+| Vercel     | `https://nextjs-boilerplate-sigma-eosin-30.vercel.app/` |
 
-- Node.js 20 o superior
-- npm 10 o superior
+
+---
+
+## Caracteristicas
+
+- CRUD completo de pedidos (`/api/tasks` y `/api/tasks/:id`).
+- Login demo por email/password con cookie de sesion.
+- Rutas protegidas para trabajo interno (`/tasks/*`, `/stats`).
+- Redireccion post-login con `next` para mantener el flujo.
+- UI con Server Components + Client Components donde hay estado.
+
+---
+
+## Tecnologias
+
+
+| Capa                 | Uso                                                  |
+| -------------------- | ---------------------------------------------------- |
+| Next.js (App Router) | Rutas, renderizado servidor/cliente y Route Handlers |
+| TypeScript           | Tipado estatico                                      |
+| React                | Componentes y estado de UI                           |
+| Zod                  | Validacion de payloads en API                        |
+| CSS global           | Estilos de aplicacion                                |
+
+
+---
+
+## Estructura del proyecto
+
+```text
+nextjs-boilerplate/
+├── middleware.ts
+├── src/
+│   ├── app/
+│   │   ├── api/
+│   │   │   ├── auth/
+│   │   │   │   ├── login/route.ts
+│   │   │   │   └── logout/route.ts
+│   │   │   └── tasks/
+│   │   │       ├── route.ts
+│   │   │       └── [id]/route.ts
+│   │   ├── login/page.tsx
+│   │   ├── stats/page.tsx
+│   │   ├── tasks/
+│   │   │   ├── new/page.tsx
+│   │   │   └── [id]/page.tsx
+│   │   ├── layout.tsx
+│   │   └── page.tsx
+│   ├── components/
+│   │   ├── auth-login-form.tsx
+│   │   ├── auth-session-controls.tsx
+│   │   ├── site-navbar.tsx
+│   │   └── tasks/
+│   ├── lib/
+│   │   ├── auth.ts
+│   │   ├── tasks-cookie-store.ts
+│   │   └── validators/task.ts
+│   └── types/task.ts
+└── README.md
+```
+
+---
+
+## Descargar y ejecutar
+
+```bash
+git clone https://github.com/dnhosemacs-svg/nextjs-boilerplate
+cd nextjs-boilerplate
+npm install
+npm run dev
+```
+
+Aplicacion disponible en [http://localhost:3000](http://localhost:3000).
+
+---
 
 ## Configuracion
 
@@ -25,18 +93,7 @@ Variable opcional recomendada:
 NEXT_PUBLIC_APP_URL=http://localhost:3000
 ```
 
-Uso:
-- local: `http://localhost:3000`
-- produccion: dominio publico de Vercel
-
-## Ejecucion local
-
-```bash
-npm install
-npm run dev
-```
-
-App disponible en [http://localhost:3000](http://localhost:3000).
+---
 
 ## Scripts
 
@@ -45,17 +102,22 @@ App disponible en [http://localhost:3000](http://localhost:3000).
 - `npm run start`: ejecutar build de produccion.
 - `npm run lint`: analisis estatico con ESLint.
 
-## Rutas
+---
 
-- `/`: listado de pedidos y acciones principales.
-- `/login`: autenticacion demo.
-- `/tasks/new`: alta de pedido (protegida).
-- `/tasks/[id]`: detalle, edicion y borrado (protegida).
-- `/stats`: metricas basicas con ISR (`revalidate = 60`).
+## Rutas de la app
+
+- `/`: inicio con lista de pedidos y accesos rapidos.
+- `/login`: acceso por credenciales demo.
+- `/tasks/new`: crear pedido (protegida).
+- `/tasks/[id]`: ver/editar/eliminar pedido (protegida).
+- `/stats`: resumen operativo (protegida).
 
 Rutas auxiliares:
+
 - `src/app/loading.tsx`
 - `src/app/not-found.tsx`
+
+---
 
 ## API
 
@@ -63,19 +125,24 @@ Rutas auxiliares:
 
 - `GET /api/tasks`
   - **200**: devuelve `Task[]`.
+  - **401**: no autenticado.
 - `POST /api/tasks`
   - **201**: devuelve `Task` creado.
   - **400**: body invalido o error de validacion.
+  - **401**: no autenticado.
 - `GET /api/tasks/:id`
   - **200**: devuelve `Task`.
   - **404**: no encontrado.
+  - **401**: no autenticado.
 - `PUT /api/tasks/:id`
   - **200**: devuelve `Task` actualizado.
   - **400**: body invalido o error de validacion.
   - **404**: no encontrado.
+  - **401**: no autenticado.
 - `DELETE /api/tasks/:id`
   - **200**: devuelve `Task` eliminado.
   - **404**: no encontrado.
+  - **401**: no autenticado.
 
 ### Auth (demo)
 
@@ -87,12 +154,16 @@ Rutas auxiliares:
   - **200**: sesion eliminada.
 
 Credenciales demo:
+
 - `admin@carpinteria.local`
 - `123456`
+
+---
 
 ## Modelo de datos
 
 `Task` (`src/types/task.ts`):
+
 - `id: string`
 - `title: string`
 - `description?: string`
@@ -100,48 +171,30 @@ Credenciales demo:
 - `createdAt: string` (ISO)
 - `updatedAt: string` (ISO)
 
-## Decisiones tecnicas
+---
 
-- Server Components para carga inicial y SSR.
-- Client Components solo donde hay estado/eventos (`useState`, `useRouter`, `useSearchParams`).
-- Validacion centralizada con Zod para entrada de API.
-- Persistencia en cookie para reducir complejidad en fase de aprendizaje.
-- ISR en `/stats` para demostrar regeneracion incremental.
+## Flujo de autenticacion
 
-## Optimizaciones Next.js
+- Login exitoso crea cookie `taskflow_auth` (`httpOnly`, `sameSite: "lax"`).
+- Middleware protege paginas internas y API de tareas.
+- Si no hay sesion y entras a ruta protegida, redirige a `/login?next=<ruta>`.
+- Si ya hay sesion y visitas `/login`, redirige a `/`.
 
-- `next/image` en la home.
-- `generateMetadata` dinamico en `src/app/tasks/[id]/page.tsx`.
-- `next/font/google` (Geist) en `src/app/layout.tsx`.
-- ISR con `revalidate = 60` en `src/app/stats/page.tsx`.
+---
 
-## Middleware
+## Verificacion rapida
 
-`middleware.ts`:
-- protege `/tasks/:path*` si no hay cookie de auth.
-- redirige a `/login?next=<ruta_original>`.
-- evita acceso a `/login` cuando la sesion ya esta activa.
+1. Cerrar sesion.
+2. Intentar entrar a `/tasks/new` o `/stats` y verificar redireccion a `/login`.
+3. Iniciar sesion y confirmar retorno a la ruta indicada en `next`.
+4. Probar `GET /api/tasks` sin sesion y validar `401`.
+5. Volver a iniciar sesion y confirmar acceso normal.
 
-## Despliegue
-
-- Plataforma: Vercel
-- URL: `<PEGA_AQUI_TU_URL_DE_VERCEL>`
-
-Validacion post-deploy:
-- rutas publicas y protegidas operativas.
-- CRUD funcional en `/api/tasks`.
-- login/logout operativos.
-- pagina `/stats` regenerando por intervalo.
-
-## Verificacion SSR
-
-1. Abrir DevTools > Network.
-2. Recargar la pagina.
-3. Inspeccionar la respuesta del documento HTML inicial.
-4. Verificar que el contenido principal se entrega renderizado desde servidor.
+---
 
 ## Limitaciones conocidas
 
 - Persistencia en cookie por sesion; no hay base de datos.
 - Autenticacion demo sin proveedor real.
-- No apto para produccion sin capa de datos persistente y auth robusta.
+- No apto para produccion sin auth robusta y almacenamiento persistente.
+
