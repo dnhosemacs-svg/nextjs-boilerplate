@@ -4,13 +4,14 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 
-const baseNavItems = [
+const publicNavItems = [
   { href: "/", label: "Inicio" },
-  { href: "/about", label: "Sobre" },
-  { href: "/info", label: "Guía" },
+  { href: "/about", label: "Nosotros" },
+  { href: "/info", label: "Servicios" },
 ];
 
-const authOnlyNavItems = [
+const privateNavItems = [
+  { href: "/dashboard", label: "Dashboard" },
   { href: "/tasks/new", label: "Nuevo pedido" },
   { href: "/stats", label: "Estadísticas" },
 ];
@@ -29,8 +30,8 @@ export default function SiteNavbar({ isAuthenticated }: SiteNavbarProps) {
   const router = useRouter();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const navItems = isAuthenticated
-    ? [baseNavItems[0], ...authOnlyNavItems, ...baseNavItems.slice(1)]
-    : baseNavItems;
+    ? [privateNavItems[0], ...publicNavItems, ...privateNavItems.slice(1)]
+    : publicNavItems;
 
   async function onLogout() {
     setIsLoggingOut(true);

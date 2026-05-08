@@ -25,7 +25,7 @@ export default function AuthSessionControls({
       if (!response.ok) {
         throw new Error("No se pudo cerrar la sesión.");
       }
-      router.push("/login");
+      router.push("/");
       router.refresh();
     } catch (logoutError) {
       const message =
