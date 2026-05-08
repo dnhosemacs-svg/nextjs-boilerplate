@@ -1,15 +1,15 @@
 const quickGuide = [
   {
-    title: "1. Registrar pedido",
-    detail: "Usa “Nuevo pedido” para cargar título, descripción y estado inicial.",
+    title: "1. Cuentanos tu idea",
+    detail: "Definimos estilo, medidas y necesidades reales del espacio.",
   },
   {
-    title: "2. Actualizar progreso",
-    detail: "Desde cada detalle de pedido, modifica estado y datos relevantes.",
+    title: "2. Propuesta y planificacion",
+    detail: "Preparamos alcance, materiales recomendados y tiempos estimados.",
   },
   {
-    title: "3. Revisar métricas",
-    detail: "Consulta “Estadísticas” para visualizar carga actual y avance.",
+    title: "3. Fabricacion y entrega",
+    detail: "Ejecutamos el proyecto con seguimiento y control de calidad.",
   },
 ];
 
@@ -19,10 +19,10 @@ export default function InfoPage() {
       <section className="surface-card content-layout">
         <header className="content-block flex flex-col gap-3">
           <p className="eyebrow">Información útil</p>
-          <h1 className="section-heading">Guía rápida de uso</h1>
+          <h1 className="section-heading">Como trabajamos</h1>
           <p className="content-description">
-            Esta página resume cómo usar el sistema en el flujo diario del taller para mantener
-            consistencia en pedidos y seguimiento.
+            Este proceso nos permite traducir cada necesidad en una solucion clara, con tiempos
+            definidos y foco en acabados duraderos.
           </p>
         </header>
 
@@ -39,11 +39,11 @@ export default function InfoPage() {
         </div>
 
         <article className="content-highlight content-block">
-          <p className="eyebrow">Notas</p>
+          <p className="eyebrow">Compromisos</p>
           <ul className="mt-3 flex list-disc flex-col gap-2 pl-5 text-sm leading-relaxed text-[var(--muted)]">
-            <li>Los datos actuales se guardan por sesión en cookie.</li>
-            <li>Evita títulos ambiguos; describe pieza y prioridad.</li>
-            <li>Revisa periódicamente pedidos finalizados para mantener limpieza operativa.</li>
+            <li>Comunicacion directa durante todo el proyecto.</li>
+            <li>Materiales acordes al uso y presupuesto.</li>
+            <li>Prioridad en calidad de terminacion y funcionalidad.</li>
           </ul>
         </article>
       </section>
