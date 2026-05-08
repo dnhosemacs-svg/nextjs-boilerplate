@@ -19,37 +19,51 @@ function formatRelativeDate(value: string) {
 export default async function DashboardPage() {
   const tasks = await listTasksFromCookieStore();
   const recentTasks = tasks.slice(0, 5);
+  const total = tasks.length;
+  const pending = tasks.filter((task) => task.status === "pending").length;
+  const inProgress = tasks.filter((task) => task.status === "in_progress").length;
+  const done = tasks.filter((task) => task.status === "done").length;
 
   return (
-    <main className="page-shell max-w-5xl items-start">
-      <section className="surface-card content-layout">
-        <header className="content-block flex flex-col gap-3">
-          <p className="eyebrow">Área privada</p>
+    <main className="page-shell dashboard-shell items-start">
+      <header className="dashboard-hero">
+        <div>
+          <p className="eyebrow">Panel operativo</p>
           <h1 className="section-heading">Dashboard del taller</h1>
           <p className="content-description">
-            Punto de entrada para el equipo autenticado. Desde aquí podés crear pedidos, revisar
-            estados y consultar métricas.
+            Vista general para priorizar pedidos, monitorear la carga del equipo y actuar rápido.
           </p>
-        </header>
-
-        <div className="content-grid content-block">
-          <Link href="/tasks/new" className="content-card">
-            <h2 className="text-base font-semibold">Registrar pedido</h2>
-            <p className="mt-2 text-sm text-[var(--muted)]">
-              Cargar nuevos trabajos con título, descripción y estado inicial.
-            </p>
+        </div>
+        <div className="dashboard-hero-actions">
+          <Link href="/stats" className="ui-pill ui-pill-secondary">
+            Ver métricas
           </Link>
-
-          <Link href="/stats" className="content-card">
-            <h2 className="text-base font-semibold">Ver estadísticas</h2>
-            <p className="mt-2 text-sm text-[var(--muted)]">
-              Consultar la carga actual del taller y el progreso general.
-            </p>
+          <Link href="/tasks/new" className="ui-pill ui-pill-primary">
+            Crear pedido
           </Link>
         </div>
+      </header>
+
+      <section className="dashboard-kpi-grid">
+        <article className="dashboard-kpi-card">
+          <p className="eyebrow">Total pedidos</p>
+          <p className="dashboard-kpi-value">{total}</p>
+        </article>
+        <article className="dashboard-kpi-card">
+          <p className="eyebrow">Pendientes</p>
+          <p className="dashboard-kpi-value">{pending}</p>
+        </article>
+        <article className="dashboard-kpi-card">
+          <p className="eyebrow">En proceso</p>
+          <p className="dashboard-kpi-value">{inProgress}</p>
+        </article>
+        <article className="dashboard-kpi-card">
+          <p className="eyebrow">Completados</p>
+          <p className="dashboard-kpi-value">{done}</p>
+        </article>
       </section>
 
-      <section className="surface-card mt-6">
+      <section className="surface-card">
         <div className="mb-4 flex items-center justify-between gap-3">
           <h2 className="section-heading text-3xl">Actividad reciente</h2>
           <Link href="/tasks/new" className="ui-pill ui-pill-primary">
@@ -62,20 +76,18 @@ export default async function DashboardPage() {
             Aún no hay pedidos cargados. Registrá el primero para empezar.
           </p>
         ) : (
-          <ul className="flex flex-col gap-3">
+          <ul className="dashboard-recent-list">
             {recentTasks.map((task) => (
-              <li key={task.id} className="content-card">
-                <div className="flex flex-wrap items-center justify-between gap-3">
-                  <div>
-                    <p className="text-sm font-semibold">{task.title}</p>
-                    <p className="mt-1 text-xs text-[var(--muted)]">
-                      {formatTaskStatus(task.status)} · {formatRelativeDate(task.updatedAt)}
-                    </p>
-                  </div>
-                  <Link href={`/tasks/${task.id}`} className="ui-link-underline">
-                    Ver detalle
-                  </Link>
+              <li key={task.id} className="dashboard-recent-item">
+                <div>
+                  <p className="text-sm font-semibold">{task.title}</p>
+                  <p className="mt-1 text-xs text-[var(--muted)]">
+                    {formatTaskStatus(task.status)} · {formatRelativeDate(task.updatedAt)}
+                  </p>
                 </div>
+                <Link href={`/tasks/${task.id}`} className="ui-link-underline">
+                  Ver detalle
+                </Link>
               </li>
             ))}
           </ul>
