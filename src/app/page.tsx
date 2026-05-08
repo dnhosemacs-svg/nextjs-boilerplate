@@ -1,12 +1,5 @@
 import Image from "next/image";
 import Link from "next/link";
-import { cookies } from "next/headers";
-import { AUTH_COOKIE_NAME } from "@/lib/auth";
-import { formatTaskStatus } from "@/lib/task-status";
-import { listTasksFromCookieStore } from "@/lib/tasks-cookie-store";
-import StatusBadge from "@/components/tasks/status-badge";
-import QuickCompleteButton from "@/components/tasks/quick-complete-button";
-import type { TaskStatus } from "@/types/task";
 
 const galleryItems = [
   {
@@ -29,55 +22,7 @@ const galleryItems = [
   },
 ];
 
-type HomePageProps = {
-  searchParams: Promise<{ status?: string }>;
-};
-
-function formatRelativeDate(value: string) {
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return "Sin fecha";
-
-  const diffInMs = Date.now() - date.getTime();
-  const dayMs = 1000 * 60 * 60 * 24;
-  const diffInDays = Math.floor(diffInMs / dayMs);
-
-  if (diffInDays <= 0) return "Hoy";
-  if (diffInDays === 1) return "Ayer";
-  if (diffInDays < 7) return `Hace ${diffInDays} días`;
-  return date.toLocaleDateString("es-ES");
-}
-
-function isTaskStatus(value: string | undefined): value is TaskStatus {
-  return value === "pending" || value === "in_progress" || value === "done";
-}
-
-export default async function Home({ searchParams }: HomePageProps) {
-  const params = await searchParams;
-  const selectedStatus = isTaskStatus(params.status) ? params.status : "all";
-  const cookieStore = await cookies();
-  const isAuthenticated = cookieStore.get(AUTH_COOKIE_NAME)?.value === "1";
-  const tasks = isAuthenticated ? await listTasksFromCookieStore() : [];
-  const filteredTasks =
-    selectedStatus === "all" ? tasks : tasks.filter((task) => task.status === selectedStatus);
-
-  const statusFilters: Array<{ value: "all" | TaskStatus; label: string; count: number }> = [
-    { value: "all", label: "Todos", count: tasks.length },
-    {
-      value: "pending",
-      label: formatTaskStatus("pending"),
-      count: tasks.filter((task) => task.status === "pending").length,
-    },
-    {
-      value: "in_progress",
-      label: formatTaskStatus("in_progress"),
-      count: tasks.filter((task) => task.status === "in_progress").length,
-    },
-    {
-      value: "done",
-      label: formatTaskStatus("done"),
-      count: tasks.filter((task) => task.status === "done").length,
-    },
-  ];
+export default function Home() {
 
   return (
     <main className="page-shell">
@@ -105,14 +50,14 @@ export default async function Home({ searchParams }: HomePageProps) {
               consultar el resumen desde un solo sitio. No es una tienda para clientes finales.
             </p>
             <div className="mt-7 flex flex-wrap items-center gap-3">
-              <Link href="/tasks/new" className="ui-pill ui-pill-primary">
-                Nuevo pedido
+              <Link href="/login" className="ui-pill ui-pill-primary">
+                Iniciar sesión
               </Link>
               <Link
-                href="/stats"
+                href="/about"
                 className="ui-pill border border-white/70 bg-black/20 !text-white/95 shadow-sm backdrop-blur-md hover:border-white/85 hover:bg-black/30"
               >
-                Estadísticas
+                Sobre el proyecto
               </Link>
             </div>
           </div>
@@ -142,103 +87,6 @@ export default async function Home({ searchParams }: HomePageProps) {
             </ul>
           </article>
         </section>
-
-        {isAuthenticated ? (
-          <section className="surface-card">
-            <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
-              <div>
-                <p className="eyebrow">Pedidos del taller</p>
-                <h2 className="section-heading text-3xl">Lista activa</h2>
-              </div>
-              <Link href="/tasks/new" className="ui-pill ui-pill-primary shrink-0">
-                Registrar pedido
-              </Link>
-            </div>
-            <p className="mb-6 max-w-2xl text-sm leading-relaxed text-[var(--muted)] sm:text-base">
-              Trabajos registrados por el equipo. Consulta el detalle para actualizar estado o notas.
-            </p>
-
-            {tasks.length === 0 ? (
-              <div className="rounded-2xl border border-dashed border-[var(--line)] bg-[var(--surface-strong)] p-6">
-                <p className="text-sm text-[var(--muted)]">
-                  Todavía no hay pedidos registrados. Crea el primero para empezar a organizar la
-                  carga del taller.
-                </p>
-              </div>
-            ) : (
-              <>
-                <div className="mb-5 flex flex-wrap gap-2.5">
-                  {statusFilters.map((filter) => {
-                    const isActive = selectedStatus === filter.value;
-                    const href = filter.value === "all" ? "/" : `/?status=${filter.value}`;
-                    return (
-                      <Link
-                        key={filter.value}
-                        href={href}
-                        scroll={false}
-                        aria-current={isActive ? "page" : undefined}
-                        className={`status-filter-pill ${isActive ? "status-filter-pill--active" : ""}`}
-                      >
-                        {filter.label}
-                        <span className="status-filter-count">{filter.count}</span>
-                      </Link>
-                    );
-                  })}
-                </div>
-
-                {filteredTasks.length === 0 ? (
-                  <div className="rounded-2xl border border-dashed border-[var(--line)] bg-[var(--surface-strong)] p-6">
-                    <p className="text-sm text-[var(--muted)]">
-                      No hay pedidos en este estado. Prueba otro filtro o crea uno nuevo.
-                    </p>
-                  </div>
-                ) : (
-                  <div className="task-table-wrap">
-                    <table className="task-table">
-                      <thead>
-                        <tr>
-                          <th>Pedido</th>
-                          <th>Estado</th>
-                          <th>Actualizado</th>
-                          <th>Acción</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {filteredTasks.map((task) => (
-                          <tr key={task.id}>
-                            <td>
-                              <p className="text-sm font-semibold leading-snug">{task.title}</p>
-                              <p className="mt-1 text-xs text-[var(--muted)]">
-                                {task.description?.slice(0, 96) ?? "Sin descripción"}
-                              </p>
-                            </td>
-                            <td>
-                              <StatusBadge status={task.status} />
-                            </td>
-                            <td className="text-sm text-[var(--muted)]">
-                              {formatRelativeDate(task.updatedAt)}
-                            </td>
-                            <td>
-                              <div className="flex flex-col items-start gap-2">
-                                <Link href={`/tasks/${task.id}`} className="ui-link-underline">
-                                  Ver detalle
-                                </Link>
-                                <QuickCompleteButton
-                                  taskId={task.id}
-                                  isDone={task.status === "done"}
-                                />
-                              </div>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                )}
-              </>
-            )}
-          </section>
-        ) : null}
 
         <section className="surface-card">
           <div className="mb-6">

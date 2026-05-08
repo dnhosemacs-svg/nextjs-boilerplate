@@ -7,6 +7,7 @@ export function middleware(request: NextRequest) {
   const isAuthenticated = request.cookies.get(AUTH_COOKIE_NAME)?.value === "1";
 
   const isProtectedPage =
+    pathname === "/dashboard" ||
     pathname === "/stats" ||
     pathname.startsWith("/tasks");
   const isProtectedApi = pathname.startsWith("/api/tasks");
@@ -22,12 +23,18 @@ export function middleware(request: NextRequest) {
   }
 
   if (pathname === "/login" && isAuthenticated) {
-    return NextResponse.redirect(new URL("/", request.url));
+    return NextResponse.redirect(new URL("/dashboard", request.url));
   }
 
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ["/tasks/:path*", "/stats/:path*", "/api/tasks/:path*", "/login"],
+  matcher: [
+    "/dashboard/:path*",
+    "/tasks/:path*",
+    "/stats/:path*",
+    "/api/tasks/:path*",
+    "/login",
+  ],
 };
