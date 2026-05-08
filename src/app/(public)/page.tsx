@@ -40,14 +40,14 @@ export default function Home() {
           />
           <div className="absolute inset-x-3 bottom-3 z-20 p-6 sm:inset-x-5 sm:bottom-5 sm:p-8 md:inset-x-6 md:bottom-6 md:p-12">
             <p className="eyebrow mb-3 !text-white/90 drop-shadow-sm">
-              Uso interno del taller
+              Carpinteria a medida
             </p>
             <h1 className="display-heading max-w-3xl text-4xl text-[var(--surface)] sm:text-5xl md:text-6xl">
-              Panel del taller: pedidos, seguimiento y trabajo del día.
+              Diseno y fabricacion en madera para proyectos residenciales y comerciales.
             </h1>
             <p className="mt-4 max-w-2xl text-sm leading-relaxed text-[rgb(251_247_241/0.88)] sm:text-base">
-              Herramienta para el equipo: registrar trabajos, ver el estado de cada pedido y
-              consultar el resumen desde un solo sitio. No es una tienda para clientes finales.
+              Creamos mobiliario y soluciones en madera adaptadas a cada espacio, con enfoque en
+              calidad de materiales, detalle artesanal y cumplimiento de plazos.
             </p>
             <div className="mt-7 flex flex-wrap items-center gap-3">
               <Link href="/login" className="ui-pill ui-pill-primary">
@@ -123,20 +123,19 @@ export default function Home() {
           <div className="soft-grid pointer-events-none absolute inset-0 opacity-50" />
           <div className="relative z-10 grid gap-6 md:grid-cols-[1.15fr_1fr] md:items-center">
             <div>
-              <p className="eyebrow">Acciones rápidas</p>
+              <p className="eyebrow">¿Listo para avanzar?</p>
               <h2 className="section-heading mt-2 max-w-xl">
-                ¿Entró un trabajo nuevo? Dejalo cargado antes de que pase a la mesa.
+                Si ya trabajas con nosotros, entra a tu panel. Si no, contactanos.
               </h2>
               <p className="mt-3 max-w-xl text-sm leading-relaxed text-[var(--muted)] sm:text-base">
-                Un pedido bien cargado al inicio evita reprocesos: cliente interno o externo,
-                pieza, medidas y plazo en un solo lugar para todo el equipo.
+                Centralizamos pedidos y seguimiento para mantener cada proyecto claro y ordenado.
               </p>
               <div className="mt-6 flex flex-wrap gap-3">
-                <Link href="/tasks/new" className="ui-pill ui-pill-primary">
-                  Cargar pedido
+                <Link href="/login" className="ui-pill ui-pill-primary">
+                  Iniciar sesión
                 </Link>
-                <Link href="/stats" className="ui-pill ui-pill-secondary">
-                  Ver resumen
+                <Link href="/about" className="ui-pill ui-pill-secondary">
+                  Contactar
                 </Link>
               </div>
             </div>

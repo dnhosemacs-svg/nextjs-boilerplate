@@ -6,8 +6,8 @@ import { useState } from "react";
 
 const publicNavItems = [
   { href: "/", label: "Inicio" },
-  { href: "/about", label: "Sobre" },
-  { href: "/info", label: "Guía" },
+  { href: "/about", label: "Nosotros" },
+  { href: "/info", label: "Servicios" },
 ];
 
 const privateNavItems = [
