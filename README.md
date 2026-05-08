@@ -16,7 +16,7 @@ Aplicacion web de gestion de pedidos de carpinteria construida con Next.js App R
 
 - CRUD completo de pedidos (`/api/tasks` y `/api/tasks/:id`).
 - Login demo por email/password con cookie de sesion.
-- Rutas protegidas para trabajo interno (`/dashboard`, `/tasks/*`, `/stats`).
+- Rutas protegidas para trabajo interno (`/tasks/*`, `/stats`).
 - Redireccion post-login con `next` para mantener el flujo.
 - UI con Server Components + Client Components donde hay estado.
 
@@ -50,7 +50,6 @@ nextjs-boilerplate/
 │   │   │   └── tasks/
 │   │   │       ├── route.ts
 │   │   │       └── [id]/route.ts
-│   │   ├── dashboard/page.tsx
 │   │   ├── login/page.tsx
 │   │   ├── stats/page.tsx
 │   │   ├── tasks/
@@ -107,9 +106,8 @@ NEXT_PUBLIC_APP_URL=http://localhost:3000
 
 ## Rutas de la app
 
-- `/`: inicio publico del proyecto.
+- `/`: inicio con lista de pedidos y accesos rapidos.
 - `/login`: acceso por credenciales demo.
-- `/dashboard`: panel privado principal (protegida).
 - `/tasks/new`: crear pedido (protegida).
 - `/tasks/[id]`: ver/editar/eliminar pedido (protegida).
 - `/stats`: resumen operativo (protegida).
@@ -180,8 +178,7 @@ Credenciales demo:
 - Login exitoso crea cookie `taskflow_auth` (`httpOnly`, `sameSite: "lax"`).
 - Middleware protege paginas internas y API de tareas.
 - Si no hay sesion y entras a ruta protegida, redirige a `/login?next=<ruta>`.
-- Si login no tiene `next`, redirige a `/dashboard`.
-- Si ya hay sesion y visitas `/login`, redirige a `/dashboard`.
+- Si ya hay sesion y visitas `/login`, redirige a `/`.
 
 ---
 
