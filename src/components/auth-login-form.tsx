@@ -48,7 +48,7 @@ export default function AuthLoginForm() {
       }
 
       const nextPath = searchParams.get("next");
-      const destination = isSafeInternalPath(nextPath) ? nextPath : "/dashboard";
+      const destination = isSafeInternalPath(nextPath) ? nextPath : "/";
       router.push(destination);
       router.refresh();
     } catch (submitError) {
