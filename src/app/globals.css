@@ -552,10 +552,10 @@ button:focus-visible,
 }
 
 .private-sidebar {
-  width: 280px;
+  width: 300px;
   border-right: 1px solid var(--line);
   background: linear-gradient(180deg, #f8f3ea 0%, #f4ede1 100%);
-  padding: 1.25rem;
+  padding: 1.5rem 1.2rem;
   position: fixed;
   inset: 0 auto 0 0;
   transform: translateX(-100%);
@@ -575,8 +575,8 @@ button:focus-visible,
 }
 
 .private-sidebar-top {
-  margin-bottom: 1.2rem;
-  padding-bottom: 1rem;
+  margin-bottom: 1.45rem;
+  padding-bottom: 1.1rem;
   border-bottom: 1px solid color-mix(in srgb, var(--line) 75%, transparent);
 }
 
@@ -588,20 +588,24 @@ button:focus-visible,
 
 .private-nav-link {
   display: block;
-  border-radius: 0.65rem;
+  border-radius: 0.8rem;
   border: 1px solid var(--line);
-  padding: 0.68rem 0.9rem;
-  background: transparent;
+  padding: 0.82rem 1rem;
+  background: color-mix(in srgb, var(--surface) 92%, #fff);
   font-weight: 600;
-  font-size: 0.89rem;
+  font-size: 0.96rem;
+  line-height: 1.2;
   transition:
     background-color 0.15s ease,
     border-color 0.15s ease,
-    color 0.15s ease;
+    color 0.15s ease,
+    transform 0.15s ease;
 }
 
 .private-nav-link:hover {
-  background: color-mix(in srgb, var(--brand) 8%, var(--surface));
+  background: color-mix(in srgb, var(--brand) 12%, var(--surface));
+  border-color: color-mix(in srgb, var(--brand) 26%, var(--line));
+  transform: translateY(-1px);
 }
 
 .private-nav-link.is-active {
@@ -622,7 +626,7 @@ button:focus-visible,
   display: flex;
   justify-content: space-between;
   gap: 0.75rem;
-  padding: 1rem 1.25rem;
+  padding: 1.1rem 1.4rem;
   border-bottom: 1px solid var(--line);
   background: color-mix(in srgb, var(--background) 92%, #fff);
   backdrop-filter: blur(6px);
@@ -635,13 +639,13 @@ button:focus-visible,
 }
 
 .private-content {
-  padding: 1.25rem;
+  padding: 1.4rem;
 }
 
 .private-content .page-shell {
   max-width: none;
   padding-inline: 0;
-  padding-block: 0.8rem 2.5rem;
+  padding-block: 0.95rem 2.75rem;
 }
 
 .private-fab {
@@ -675,15 +679,15 @@ button:focus-visible,
   }
 
   .private-main {
-    width: calc(100% - 280px);
+    width: calc(100% - 300px);
   }
 
   .private-content {
-    padding: 1.6rem;
+    padding: 1.9rem;
   }
 
   .private-content .page-shell {
-    padding-block: 0.5rem 3rem;
+    padding-block: 0.85rem 3.2rem;
   }
 
   .private-fab {
@@ -694,17 +698,18 @@ button:focus-visible,
 
 .dashboard-shell {
   flex-direction: column;
-  gap: 1rem;
+  gap: 1.1rem;
 }
 
 .dashboard-hero {
   border: 1px solid var(--line);
   border-radius: 1rem;
   background: var(--surface);
-  padding: 1.25rem;
+  padding: 1.45rem;
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 1.15rem;
+  box-shadow: 0 14px 28px -24px rgb(45 34 25 / 0.6);
 }
 
 .dashboard-hero-actions {
@@ -715,19 +720,20 @@ button:focus-visible,
 
 .dashboard-kpi-grid {
   display: grid;
-  gap: 0.85rem;
+  gap: 1rem;
 }
 
 .dashboard-kpi-card {
   border: 1px solid var(--line);
   border-radius: 0.9rem;
   background: var(--surface);
-  padding: 1rem;
+  padding: 1.1rem;
+  box-shadow: 0 10px 22px -22px rgb(45 34 25 / 0.8);
 }
 
 .dashboard-kpi-value {
   margin-top: 0.55rem;
-  font-size: 1.9rem;
+  font-size: 2.15rem;
   line-height: 1;
   font-weight: 700;
   letter-spacing: -0.02em;
@@ -743,11 +749,15 @@ button:focus-visible,
   border: 1px solid var(--line);
   border-radius: 0.8rem;
   background: var(--surface);
-  padding: 0.9rem 1rem;
+  padding: 1rem 1.05rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
+}
+
+.dashboard-recent-item:hover {
+  background: color-mix(in srgb, var(--brand) 4%, var(--surface));
 }
 
 @media (min-width: 700px) {
