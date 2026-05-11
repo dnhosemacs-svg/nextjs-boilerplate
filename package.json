@@ -12,6 +12,7 @@
     "@carbon/react": "^1.106.0",
     "@carbon/styles": "^1.105.0",
     "next": "16.2.4",
+    "next-auth": "^4.24.14",
     "react": "19.2.4",
     "react-dom": "19.2.4",
     "zod": "^4.3.6"
