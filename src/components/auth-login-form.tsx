@@ -1,19 +1,19 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { Button, PasswordInput, TextInput } from "@carbon/react";
+import { signIn } from "next-auth/react";
 
 function isSafeInternalPath(value: string | null): value is string {
   return !!value && value.startsWith("/") && !value.startsWith("//");
 }
 
 export default function AuthLoginForm() {
-  const router = useRouter();
   const searchParams = useSearchParams();
 
-  const [email, setEmail] = useState("admin@carpinteria.local");
-  const [password, setPassword] = useState("123456");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -36,21 +36,21 @@ export default function AuthLoginForm() {
     setIsSubmitting(true);
 
     try {
-      const response = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: normalizedEmail, password: normalizedPassword }),
-      });
-
-      if (!response.ok) {
-        const body = (await response.json().catch(() => ({}))) as { error?: string };
-        throw new Error(body.error ?? "No se pudo iniciar sesion.");
-      }
-
       const nextPath = searchParams.get("next");
       const destination = isSafeInternalPath(nextPath) ? nextPath : "/dashboard";
-      router.push(destination);
-      router.refresh();
+
+      const result = await signIn("credentials", {
+        email: normalizedEmail,
+        password: normalizedPassword,
+        redirect: false,
+      });
+
+      if (result?.error) {
+        setError("Credenciales inválidas.");
+        return;
+      }
+
+      window.location.href = destination;
     } catch (submitError) {
       const message =
         submitError instanceof Error ? submitError.message : "Error inesperado";
