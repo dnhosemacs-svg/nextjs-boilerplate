@@ -1,12 +1,12 @@
-import { cookies } from "next/headers";
 import SiteNavbar from "@/components/site-navbar";
-import { AUTH_COOKIE_NAME } from "@/lib/auth";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 
 export default async function PublicLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
-  const cookieStore = await cookies();
-  const isAuthenticated = cookieStore.get(AUTH_COOKIE_NAME)?.value === "1";
+  const session = await getServerSession(authOptions);
+  const isAuthenticated = !!session?.user;
 
   return (
     <div className="min-h-full flex flex-col">
