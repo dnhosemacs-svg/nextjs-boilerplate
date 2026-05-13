@@ -1,10 +1,11 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
-import { AUTH_COOKIE_NAME } from "@/lib/auth";
+import { getToken } from "next-auth/jwt";
 
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const { pathname, search } = request.nextUrl;
-  const isAuthenticated = request.cookies.get(AUTH_COOKIE_NAME)?.value === "1";
+  const token = await getToken({ req: request });
+  const isLoggedIn = !!token;
 
   const isProtectedPage =
     pathname === "/dashboard" ||
@@ -12,17 +13,17 @@ export function middleware(request: NextRequest) {
     pathname.startsWith("/tasks");
   const isProtectedApi = pathname.startsWith("/api/tasks");
 
-  if (isProtectedApi && !isAuthenticated) {
+  if (isProtectedApi && !isLoggedIn) {
     return NextResponse.json({ error: "No autenticado" }, { status: 401 });
   }
 
-  if (isProtectedPage && !isAuthenticated) {
+  if (isProtectedPage && !isLoggedIn) {
     const redirectUrl = new URL("/login", request.url);
     redirectUrl.searchParams.set("next", `${pathname}${search}`);
     return NextResponse.redirect(redirectUrl);
   }
 
-  if (pathname === "/login" && isAuthenticated) {
+  if (pathname === "/login" && isLoggedIn) {
     return NextResponse.redirect(new URL("/dashboard", request.url));
   }
 
