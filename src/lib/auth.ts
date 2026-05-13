@@ -1,7 +1,13 @@
 import type { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 
+const authSecret =
+  process.env.NEXTAUTH_SECRET ??
+  process.env.AUTH_SECRET ??
+  "dev-only-secret-change-in-production";
+
 export const authOptions = {
+  secret: authSecret,
   pages: {
     signIn: "/login",
   },
