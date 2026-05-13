@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Cormorant_Garamond, Geist_Mono, Manrope } from "next/font/google";
+import SessionProvider from "@/components/session-provider";
 import "./globals.css";
 
 const manrope = Manrope({
@@ -34,7 +35,9 @@ export default function RootLayout({
       lang="es"
       className={`${manrope.variable} ${geistMono.variable} ${cormorant.variable} h-full antialiased`}
     >
-      <body className="min-h-full">{children}</body>
+      <body className="min-h-full">
+        <SessionProvider>{children}</SessionProvider>
+      </body>
     </html>
   );
 }
