@@ -1,20 +1,16 @@
 import { NextResponse } from "next/server";
-import { cookies } from "next/headers";
+import { getServerSession } from "next-auth";
 
-import { AUTH_COOKIE_NAME } from "@/lib/auth";
+import { authOptions } from "@/lib/auth";
 import {
   createTaskInCookieStore,
   listTasksFromCookieStore,
 } from "@/lib/tasks-cookie-store";
 import { createTaskSchema } from "@/lib/validators/task";
 
-async function isAuthenticatedRequest() {
-  const cookieStore = await cookies();
-  return cookieStore.get(AUTH_COOKIE_NAME)?.value === "1";
-}
-
 export async function GET() {
-  if (!(await isAuthenticatedRequest())) {
+  const session = await getServerSession(authOptions);
+  if (!session?.user) {
     return NextResponse.json({ error: "No autenticado" }, { status: 401 });
   }
 
@@ -23,7 +19,8 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
-  if (!(await isAuthenticatedRequest())) {
+  const session = await getServerSession(authOptions);
+  if (!session?.user) {
     return NextResponse.json({ error: "No autenticado" }, { status: 401 });
   }
 

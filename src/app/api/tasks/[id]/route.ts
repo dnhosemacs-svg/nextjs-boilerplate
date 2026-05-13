@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
-import { cookies } from "next/headers";
+import { getServerSession } from "next-auth";
 
-import { AUTH_COOKIE_NAME } from "@/lib/auth";
+import { authOptions } from "@/lib/auth";
 import {
   deleteTaskInCookieStore,
   getTaskByIdFromCookieStore,
@@ -13,13 +13,9 @@ type Context = {
   params: { id: string } | Promise<{ id: string }>;
 };
 
-async function isAuthenticatedRequest() {
-  const cookieStore = await cookies();
-  return cookieStore.get(AUTH_COOKIE_NAME)?.value === "1";
-}
-
 export async function GET(_request: Request, { params }: Context) {
-  if (!(await isAuthenticatedRequest())) {
+  const session = await getServerSession(authOptions);
+  if (!session?.user) {
     return NextResponse.json({ error: "No autenticado" }, { status: 401 });
   }
 
@@ -32,7 +28,8 @@ export async function GET(_request: Request, { params }: Context) {
 }
 
 export async function PUT(request: Request, { params }: Context) {
-  if (!(await isAuthenticatedRequest())) {
+  const session = await getServerSession(authOptions);
+  if (!session?.user) {
     return NextResponse.json({ error: "No autenticado" }, { status: 401 });
   }
 
@@ -64,7 +61,8 @@ export async function PUT(request: Request, { params }: Context) {
 }
 
 export async function DELETE(_request: Request, { params }: Context) {
-  if (!(await isAuthenticatedRequest())) {
+  const session = await getServerSession(authOptions);
+  if (!session?.user) {
     return NextResponse.json({ error: "No autenticado" }, { status: 401 });
   }
 
