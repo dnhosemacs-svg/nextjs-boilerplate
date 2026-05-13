@@ -1,4 +1,7 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 import { listTasksFromCookieStore } from "@/lib/tasks-cookie-store";
 import { formatTaskStatus } from "@/lib/task-status";
 
@@ -17,6 +20,12 @@ function formatRelativeDate(value: string) {
 }
 
 export default async function DashboardPage() {
+  const session = await getServerSession(authOptions);
+
+  if (!session?.user) {
+    redirect("/login?next=/dashboard");
+  }
+
   const tasks = await listTasksFromCookieStore();
   const recentTasks = tasks.slice(0, 5);
   const total = tasks.length;
