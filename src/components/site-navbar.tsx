@@ -1,8 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { useState } from "react";
+import { signOut } from "next-auth/react";
 
 const publicNavItems = [
   { href: "/", label: "Inicio" },
@@ -27,7 +28,6 @@ type SiteNavbarProps = {
 
 export default function SiteNavbar({ isAuthenticated }: SiteNavbarProps) {
   const pathname = usePathname();
-  const router = useRouter();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const navItems = isAuthenticated
     ? [privateNavItems[0], ...publicNavItems, ...privateNavItems.slice(1)]
@@ -36,9 +36,7 @@ export default function SiteNavbar({ isAuthenticated }: SiteNavbarProps) {
   async function onLogout() {
     setIsLoggingOut(true);
     try {
-      await fetch("/api/auth/logout", { method: "POST" });
-      router.push("/login");
-      router.refresh();
+      await signOut({ callbackUrl: "/login" });
     } finally {
       setIsLoggingOut(false);
     }
