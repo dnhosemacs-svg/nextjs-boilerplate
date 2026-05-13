@@ -1,7 +1,6 @@
 import Link from "next/link";
 
 import AuthLoginForm from "@/components/auth-login-form";
-import { DEMO_USER } from "@/lib/auth";
 
 export default function LoginPage() {
   return (
@@ -15,11 +14,6 @@ export default function LoginPage() {
               Accede para gestionar pedidos en las rutas protegidas.
             </p>
           </header>
-
-          <div className="login-demo-banner login-block">
-            Demo usuario: <strong>{DEMO_USER.email}</strong> · clave:{" "}
-            <strong>{DEMO_USER.password}</strong>
-          </div>
 
           <div className="login-block">
             <AuthLoginForm />
