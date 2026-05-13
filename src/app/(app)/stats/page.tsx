@@ -1,14 +1,13 @@
 import Link from "next/link";
-import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
-import { AUTH_COOKIE_NAME } from "@/lib/auth";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 import { listTasksFromCookieStore } from "@/lib/tasks-cookie-store";
 
 export default async function StatsPage() {
-  const cookieStore = await cookies();
-  const isAuthenticated = cookieStore.get(AUTH_COOKIE_NAME)?.value === "1";
-  if (!isAuthenticated) {
+  const session = await getServerSession(authOptions);
+  if (!session?.user) {
     redirect("/login?next=/stats");
   }
 

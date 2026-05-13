@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { cookies } from "next/headers";
 import { notFound, redirect } from "next/navigation";
 import DeleteTaskButton from "@/components/tasks/delete-task-button";
 import StatusBadge from "@/components/tasks/status-badge";
 import TaskForm from "@/components/tasks/task-form";
-import { AUTH_COOKIE_NAME } from "@/lib/auth";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 import { getTaskByIdFromCookieStore } from "@/lib/tasks-cookie-store";
 
 type TaskDetailPageProps = {
@@ -35,9 +35,8 @@ export async function generateMetadata({
 
 export default async function TaskDetailPage({ params }: TaskDetailPageProps) {
   const { id } = await params;
-  const cookieStore = await cookies();
-  const isAuthenticated = cookieStore.get(AUTH_COOKIE_NAME)?.value === "1";
-  if (!isAuthenticated) {
+  const session = await getServerSession(authOptions);
+  if (!session?.user) {
     redirect(`/login?next=/tasks/${encodeURIComponent(id)}`);
   }
 
