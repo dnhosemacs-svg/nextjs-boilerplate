@@ -2,8 +2,8 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { Button } from "@carbon/react";
+import { signOut } from "next-auth/react";
 
 type AuthSessionControlsProps = {
   isAuthenticated: boolean;
@@ -12,7 +12,6 @@ type AuthSessionControlsProps = {
 export default function AuthSessionControls({
   isAuthenticated,
 }: AuthSessionControlsProps) {
-  const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -21,12 +20,7 @@ export default function AuthSessionControls({
     setIsLoading(true);
 
     try {
-      const response = await fetch("/api/auth/logout", { method: "POST" });
-      if (!response.ok) {
-        throw new Error("No se pudo cerrar la sesión.");
-      }
-      router.push("/");
-      router.refresh();
+      await signOut({ callbackUrl: "/" });
     } catch (logoutError) {
       const message =
         logoutError instanceof Error ? logoutError.message : "Error inesperado";
