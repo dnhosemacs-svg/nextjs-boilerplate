@@ -146,19 +146,14 @@ Rutas auxiliares:
   - **404**: no encontrado.
   - **401**: no autenticado.
 
-### Auth (demo)
+### Auth (NextAuth)
 
-- `POST /api/auth/login`
-  - **200**: sesion creada.
-  - **400**: payload invalido.
-  - **401**: credenciales invalidas.
-- `POST /api/auth/logout`
-  - **200**: sesion eliminada.
-
-Credenciales demo:
-
-- `admin@carpinteria.local`
-- `123456`
+- `POST /api/auth/callback/credentials`
+  - Maneja el login del proveedor `credentials` (interno de NextAuth).
+- `POST /api/auth/signout`
+  - Cierra sesión (interno de NextAuth).
+- `GET /api/auth/session`
+  - Devuelve la sesión actual.
 
 ---
 
@@ -177,7 +172,7 @@ Credenciales demo:
 
 ## Flujo de autenticacion
 
-- Login exitoso crea cookie `taskflow_auth` (`httpOnly`, `sameSite: "lax"`).
+- Login exitoso crea la cookie de sesión de NextAuth (JWT firmado con `NEXTAUTH_SECRET`).
 - Middleware protege paginas internas y API de tareas.
 - Si no hay sesion y entras a ruta protegida, redirige a `/login?next=<ruta>`.
 - Si login no tiene `next`, redirige a `/dashboard`.
