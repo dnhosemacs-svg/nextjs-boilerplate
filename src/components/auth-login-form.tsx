@@ -16,10 +16,36 @@ export default function AuthLoginForm() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSocialSubmitting, setIsSocialSubmitting] = useState(false);
+
+  const postLoginDestination = useMemo(() => {
+    const nextPath = searchParams.get("next");
+    return isSafeInternalPath(nextPath) ? nextPath : "/dashboard";
+  }, [searchParams]);
 
   const isSubmitDisabled = useMemo(() => {
-    return isSubmitting || email.trim().length === 0 || password.trim().length === 0;
-  }, [email, password, isSubmitting]);
+    return (
+      isSubmitting ||
+      isSocialSubmitting ||
+      email.trim().length === 0 ||
+      password.trim().length === 0
+    );
+  }, [email, password, isSubmitting, isSocialSubmitting]);
+
+  async function onGitHubSignIn() {
+    setError(null);
+    setIsSocialSubmitting(true);
+    try {
+      await signIn("github", { callbackUrl: postLoginDestination });
+    } catch (githubError) {
+      const message =
+        githubError instanceof Error
+          ? githubError.message
+          : "Error al iniciar sesión con GitHub.";
+      setError(message);
+      setIsSocialSubmitting(false);
+    }
+  }
 
   async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -36,9 +62,6 @@ export default function AuthLoginForm() {
     setIsSubmitting(true);
 
     try {
-      const nextPath = searchParams.get("next");
-      const destination = isSafeInternalPath(nextPath) ? nextPath : "/dashboard";
-
       const result = await signIn("credentials", {
         email: normalizedEmail,
         password: normalizedPassword,
@@ -50,7 +73,7 @@ export default function AuthLoginForm() {
         return;
       }
 
-      window.location.href = destination;
+      window.location.href = postLoginDestination;
     } catch (submitError) {
       const message =
         submitError instanceof Error ? submitError.message : "Error inesperado";
@@ -62,6 +85,19 @@ export default function AuthLoginForm() {
 
   return (
     <form className="flex flex-col gap-8 md:gap-10 carbon-shell" onSubmit={onSubmit}>
+      <div className="flex flex-col gap-3">
+        <Button
+          type="button"
+          kind="secondary"
+          disabled={isSubmitting || isSocialSubmitting}
+          onClick={onGitHubSignIn}
+          className="carbon-btn-secondary self-stretch md:self-start"
+        >
+          {isSocialSubmitting ? "Redirigiendo a GitHub..." : "Continuar con GitHub"}
+        </Button>
+        <p className="text-sm text-[var(--muted)]">O inicia sesión con email y contraseña.</p>
+      </div>
+
       <div className="flex flex-col gap-6 md:gap-8">
         <TextInput
           labelText="Email"
