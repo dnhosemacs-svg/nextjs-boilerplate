@@ -1,5 +1,6 @@
 import type { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
+import GitHubProvider from "next-auth/providers/github";
 
 const authSecret =
   process.env.NEXTAUTH_SECRET ??
@@ -16,6 +17,10 @@ export const authOptions = {
     maxAge: 8 * 60 * 60,
   },
   providers: [
+    GitHubProvider({
+      clientId: process.env.GITHUB_ID ?? "",
+      clientSecret: process.env.GITHUB_SECRET ?? "",
+    }),
     CredentialsProvider({
       name: "Credentials",
       credentials: {
