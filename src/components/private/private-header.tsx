@@ -1,23 +1,20 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { signOut } from "next-auth/react";
 
 type PrivateHeaderProps = {
   onOpenSidebar: () => void;
 };
 
 export default function PrivateHeader({ onOpenSidebar }: PrivateHeaderProps) {
-  const router = useRouter();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   async function onLogout() {
     setIsLoggingOut(true);
     try {
-      await fetch("/api/auth/logout", { method: "POST" });
-      router.push("/login");
-      router.refresh();
+      await signOut({ callbackUrl: "/login" });
     } finally {
       setIsLoggingOut(false);
     }
