@@ -1,10 +1,14 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import { getToken } from "next-auth/jwt";
+import { getAuthSecret } from "@/lib/server-env";
 
 export async function middleware(request: NextRequest) {
   const { pathname, search } = request.nextUrl;
-  const token = await getToken({ req: request });
+  const token = await getToken({
+    req: request,
+    secret: getAuthSecret(),
+  });
   const isLoggedIn = !!token;
 
   const isProtectedPage =

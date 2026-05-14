@@ -1,14 +1,10 @@
 import type { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GitHubProvider from "next-auth/providers/github";
-
-const authSecret =
-  process.env.NEXTAUTH_SECRET ??
-  process.env.AUTH_SECRET ??
-  "dev-only-secret-change-in-production";
+import { getAuthSecret } from "@/lib/server-env";
 
 export const authOptions = {
-  secret: authSecret,
+  secret: getAuthSecret(),
   pages: {
     signIn: "/login",
   },

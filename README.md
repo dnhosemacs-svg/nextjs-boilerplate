@@ -88,11 +88,32 @@ Aplicacion disponible en [http://localhost:3000](http://localhost:3000).
 
 ## Configuracion
 
-Variable opcional recomendada:
+Crea `.env.local` en la raiz del proyecto (no se sube a git) y define las variables que necesites.
 
-```bash
-NEXT_PUBLIC_APP_URL=http://localhost:3000
-```
+| Variable | Entorno | Descripcion |
+| -------- | ------- | ----------- |
+| `NEXTAUTH_SECRET` | Produccion obligatoria | Firma de JWT de NextAuth. En local es opcional (hay aviso y valor solo-dev). |
+| `AUTH_SECRET` | Opcional | Alias; si ya usas solo `NEXTAUTH_SECRET`, no hace falta. |
+| `NEXTAUTH_URL` | Produccion recomendada | URL publica de la app (OAuth y sesion). Ejemplo local: `http://localhost:3000`. |
+| `VERCEL_URL` | Vercel (automatico) | La plataforma la inyecta; si existe, cuenta como URL canonica en validacion de build. |
+| `NEXT_PUBLIC_APP_URL` | Opcional | Base para enlaces desde el cliente si no quieres depender de `VERCEL_URL`. |
+| `GITHUB_ID` / `GITHUB_SECRET` | Opcional | OAuth GitHub; deben ir juntos o ninguno. |
+
+### Checklist: secretos y Vercel
+
+1. **Generar secreto** (en terminal, cualquier SO con OpenSSL instalado):
+
+   ```bash
+   openssl rand -base64 32
+   ```
+
+   Pega el resultado en `NEXTAUTH_SECRET` de `.env.local` y en el panel de Vercel.
+
+2. **Variables en local**: en `.env.local` define al menos `NEXTAUTH_SECRET` y `NEXTAUTH_URL=http://localhost:3000` antes de un `npm run build` local en modo produccion.
+
+3. **Fallos controlados**: en `NODE_ENV=production`, `next build` importa la validacion de [src/lib/server-env.ts](src/lib/server-env.ts). Si falta el secreto, o la URL canonica (`NEXTAUTH_URL`, `VERCEL_URL` o `NEXT_PUBLIC_APP_URL`), o solo uno de los pares GitHub, el build termina con un mensaje `[env] ...` explicando que falta.
+
+4. **Vercel (Preview y Production)**: Project Settings > Environment Variables. Define `NEXTAUTH_SECRET` en ambos entornos (mismo valor o distintos; distintos invalidan cookies entre entornos). Define `NEXTAUTH_URL` como la URL estable del despliegue (produccion: tu dominio; preview: puedes usar la URL de preview o confiar en `VERCEL_URL` que ya inyecta Vercel). Repite `GITHUB_ID` y `GITHUB_SECRET` si usas login con GitHub.
 
 ---
 
