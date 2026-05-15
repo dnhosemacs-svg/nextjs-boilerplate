@@ -22,12 +22,18 @@ function isActivePath(currentPath: string, href: string) {
   return currentPath === href || currentPath.startsWith(`${href}/`);
 }
 
+function sessionDisplayName(session: NonNullable<ReturnType<typeof useSession>["data"]>) {
+  const { name, email } = session.user;
+  return name?.trim() || email?.trim() || "Usuario";
+}
+
 export default function SiteNavbar() {
   const { data: session, status } = useSession();
   const pathname = usePathname();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   const isAuthenticated = status === "authenticated" && !!session?.user;
+  const userLabel = isAuthenticated && session ? sessionDisplayName(session) : null;
   const navItems = isAuthenticated
     ? [privateNavItems[0], ...publicNavItems, ...privateNavItems.slice(1)]
     : publicNavItems;
@@ -64,6 +70,15 @@ export default function SiteNavbar() {
                 })}
               </ul>
             </nav>
+
+            {userLabel ? (
+              <span
+                className="hidden max-w-[11rem] shrink-0 truncate text-sm text-[var(--muted)] sm:inline"
+                title={session?.user?.email ?? undefined}
+              >
+                {userLabel}
+              </span>
+            ) : null}
 
             {status === "loading" ? (
               <span
