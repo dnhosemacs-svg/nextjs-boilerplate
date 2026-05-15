@@ -1,9 +1,27 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
+import { getServerSession } from "next-auth";
 
 import AuthLoginForm from "@/components/auth-login-form";
+import { authOptions } from "@/lib/auth";
+import { getPostLoginDestination } from "@/lib/safe-redirect";
 import { isGithubOAuthConfigured } from "@/lib/server-env";
 
-export default function LoginPage() {
+type LoginPageProps = {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+};
+
+export default async function LoginPage({ searchParams }: LoginPageProps) {
+  const session = await getServerSession(authOptions);
+  if (session?.user) {
+    const query = await searchParams;
+    const params = new URLSearchParams();
+    for (const [key, value] of Object.entries(query)) {
+      if (typeof value === "string") params.set(key, value);
+    }
+    redirect(getPostLoginDestination(params));
+  }
+
   const githubOAuthEnabled = isGithubOAuthConfigured();
   return (
     <main className="page-shell max-w-4xl items-start justify-center">

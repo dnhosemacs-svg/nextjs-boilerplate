@@ -1,8 +1,16 @@
 ﻿import Link from "next/link";
+import { redirect } from "next/navigation";
+import { getServerSession } from "next-auth";
 
 import AuthRegisterForm from "@/components/auth-register-form";
+import { authOptions } from "@/lib/auth";
 
-export default function RegisterPage() {
+export default async function RegisterPage() {
+  const session = await getServerSession(authOptions);
+  if (session?.user) {
+    redirect("/dashboard");
+  }
+
   return (
     <main className="page-shell max-w-4xl items-start justify-center">
       <div className="w-full max-w-xl">

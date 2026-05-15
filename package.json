@@ -8,8 +8,9 @@
     "start": "next start",
     "lint": "eslint",
     "verify:auth": "node scripts/verify-auth.mjs",
+    "verify:middleware": "node scripts/verify-middleware.mjs",
     "verify:session": "node scripts/verify-session-hydration.mjs",
-    "verify:navigation": "npm run verify:session && npm run verify:auth"
+    "verify:navigation": "npm run verify:session && npm run verify:auth && npm run verify:middleware"
   },
   "dependencies": {
     "@carbon/react": "^1.106.0",
