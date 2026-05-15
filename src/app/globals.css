@@ -18,7 +18,7 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-manrope);
   --font-display: var(--font-cormorant);
-  --font-mono: var(--font-geist-mono);
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 }
 
 body {

@@ -57,13 +57,27 @@ assert(
   "site-navbar.tsx: debe manejar status loading sin cambiar estructura bruscamente",
 );
 
-try {
-  statSync(join(ROOT, "src/components/session-provider.tsx"));
-  failures.push(
-    "session-provider.tsx: archivo obsoleto (usar providers.tsx)",
+for (const obsolete of [
+  "src/components/session-provider.tsx",
+  "src/components/session-debug.tsx",
+]) {
+  try {
+    statSync(join(ROOT, obsolete));
+    failures.push(`${obsolete}: archivo de diagnóstico obsoleto`);
+  } catch {
+    // ok — ya eliminado
+  }
+}
+
+for (const page of [
+  "src/app/(public)/login/page.tsx",
+  "src/app/(app)/dashboard/page.tsx",
+]) {
+  const content = read(page);
+  assert(
+    !content.includes("SessionDebug") && !content.includes("session-debug"),
+    `${page}: no debe importar SessionDebug`,
   );
-} catch {
-  // ok — ya eliminado
 }
 
 if (failures.length > 0) {

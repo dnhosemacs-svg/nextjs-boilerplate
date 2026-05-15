@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getServerSession } from "next-auth";
-import SessionDebug from "@/components/session-debug";
 import { authOptions } from "@/lib/auth";
 import { listTasksFromCookieStore } from "@/lib/tasks-cookie-store";
 import { formatTaskStatus } from "@/lib/task-status";
@@ -103,12 +102,6 @@ export default async function DashboardPage() {
           </ul>
         )}
       </section>
-
-      {process.env.NODE_ENV === "development" ? (
-        <section aria-label="Diagnóstico de sesión (solo desarrollo)">
-          <SessionDebug />
-        </section>
-      ) : null}
     </main>
   );
 }
