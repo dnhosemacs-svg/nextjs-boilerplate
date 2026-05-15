@@ -2,6 +2,7 @@ import type { NextFetchEvent, NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import { getToken } from "next-auth/jwt";
 import { withAuth, type NextRequestWithAuth } from "next-auth/middleware";
+import { isProtectedApiPath } from "@/lib/protected-api-routes";
 import { getPostLoginDestination } from "@/lib/safe-redirect";
 import { getAuthSecret } from "@/lib/server-env";
 
@@ -13,7 +14,7 @@ const authSecret = getAuthSecret();
  */
 async function handleProtectedApi(request: NextRequest) {
   const { pathname } = request.nextUrl;
-  if (!pathname.startsWith("/api/tasks")) {
+  if (!isProtectedApiPath(pathname)) {
     return null;
   }
 

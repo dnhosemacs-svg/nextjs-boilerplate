@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
 
-import { authOptions } from "@/lib/auth";
+import { requireApiSession } from "@/lib/api-auth";
 import {
   deleteTaskInCookieStore,
   getTaskByIdFromCookieStore,
@@ -14,10 +13,8 @@ type Context = {
 };
 
 export async function GET(_request: Request, { params }: Context) {
-  const session = await getServerSession(authOptions);
-  if (!session?.user) {
-    return NextResponse.json({ error: "No autenticado" }, { status: 401 });
-  }
+  const auth = await requireApiSession();
+  if (!auth.ok) return auth.response;
 
   const { id } = await Promise.resolve(params);
   const task = await getTaskByIdFromCookieStore(id);
@@ -28,10 +25,8 @@ export async function GET(_request: Request, { params }: Context) {
 }
 
 export async function PUT(request: Request, { params }: Context) {
-  const session = await getServerSession(authOptions);
-  if (!session?.user) {
-    return NextResponse.json({ error: "No autenticado" }, { status: 401 });
-  }
+  const auth = await requireApiSession();
+  if (!auth.ok) return auth.response;
 
   const { id } = await Promise.resolve(params);
   let json: unknown;
@@ -61,10 +56,8 @@ export async function PUT(request: Request, { params }: Context) {
 }
 
 export async function DELETE(_request: Request, { params }: Context) {
-  const session = await getServerSession(authOptions);
-  if (!session?.user) {
-    return NextResponse.json({ error: "No autenticado" }, { status: 401 });
-  }
+  const auth = await requireApiSession();
+  if (!auth.ok) return auth.response;
 
   const { id } = await Promise.resolve(params);
   const deleted = await deleteTaskInCookieStore(id);
@@ -73,4 +66,3 @@ export async function DELETE(_request: Request, { params }: Context) {
   }
   return NextResponse.json(deleted, { status: 200 });
 }
-
