@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import HomeAuthCta from "@/components/home-auth-cta";
 
 const galleryItems = [
   {
@@ -50,9 +51,7 @@ export default function Home() {
               calidad de materiales, detalle artesanal y cumplimiento de plazos.
             </p>
             <div className="mt-7 flex flex-wrap items-center gap-3">
-              <Link href="/login" className="ui-pill ui-pill-primary">
-                Iniciar sesión
-              </Link>
+              <HomeAuthCta />
               <Link
                 href="/about"
                 className="ui-pill border border-white/70 bg-black/20 !text-white/95 shadow-sm backdrop-blur-md hover:border-white/85 hover:bg-black/30"
@@ -131,9 +130,7 @@ export default function Home() {
                 Centralizamos pedidos y seguimiento para mantener cada proyecto claro y ordenado.
               </p>
               <div className="mt-6 flex flex-wrap gap-3">
-                <Link href="/login" className="ui-pill ui-pill-primary">
-                  Iniciar sesión
-                </Link>
+                <HomeAuthCta />
                 <Link href="/about" className="ui-pill ui-pill-secondary">
                   Contactar
                 </Link>
