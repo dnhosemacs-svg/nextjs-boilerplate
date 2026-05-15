@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
+import { sessionUserLabel } from "@/lib/session-user-label";
 import { signOut, useSession } from "next-auth/react";
 
 const publicNavItems = [
@@ -22,18 +23,14 @@ function isActivePath(currentPath: string, href: string) {
   return currentPath === href || currentPath.startsWith(`${href}/`);
 }
 
-function sessionDisplayName(session: NonNullable<ReturnType<typeof useSession>["data"]>) {
-  const { name, email } = session.user;
-  return name?.trim() || email?.trim() || "Usuario";
-}
-
 export default function SiteNavbar() {
   const { data: session, status } = useSession();
   const pathname = usePathname();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   const isAuthenticated = status === "authenticated" && !!session?.user;
-  const userLabel = isAuthenticated && session ? sessionDisplayName(session) : null;
+  const userLabel =
+    isAuthenticated && session?.user ? sessionUserLabel(session.user) : null;
   const navItems = isAuthenticated
     ? [privateNavItems[0], ...publicNavItems, ...privateNavItems.slice(1)]
     : publicNavItems;
