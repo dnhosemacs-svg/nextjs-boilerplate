@@ -57,8 +57,15 @@ export const authOptions = {
             console.error(
               "[auth] CredentialsProvider: revisa FIREBASE_API_KEY en el entorno",
             );
+            throw new Error("CONFIG_ERROR");
           }
-          return null;
+          if (result.reason === "network") {
+            throw new Error("NETWORK_ERROR");
+          }
+          if (result.reason === "invalid_credentials") {
+            throw new Error("INVALID_CREDENTIALS");
+          }
+          throw new Error("UNKNOWN_ERROR");
         }
 
         const { user } = result;
