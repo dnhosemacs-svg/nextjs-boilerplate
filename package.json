@@ -12,6 +12,7 @@
     "verify:callback-url": "node scripts/verify-callback-url.mjs",
     "verify:api-auth": "node scripts/verify-api-auth.mjs",
     "verify:page-guards": "node scripts/verify-page-guards.mjs",
+    "verify:manual-flow": "node scripts/verify-manual-flow.mjs",
     "verify:session": "node scripts/verify-session-hydration.mjs",
     "verify:navigation": "npm run verify:session && npm run verify:auth && npm run verify:middleware && npm run verify:callback-url && npm run verify:api-auth && npm run verify:page-guards"
   },
