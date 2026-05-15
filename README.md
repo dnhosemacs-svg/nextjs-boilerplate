@@ -212,12 +212,25 @@ El login desde la UI usa `signIn()` del cliente (`redirect: false` para credenti
 
 ## Verificacion rapida
 
+### Automatica (paso 7 — sin restos del auth demo)
+
+```bash
+npm run verify:auth
+```
+
+Comprueba que no existan rutas `api/auth/login`, banner demo, credenciales hardcodeadas ni `document.cookie` manual en modulos de auth; y que el login use `signIn("credentials", { redirect: false })` con redirects y errores tipados.
+
+Tras eso, conviene `npm run lint` y `npm run build`.
+
+### Manual en el navegador
+
 1. Cerrar sesion.
 2. Entrar a `/tasks/new` sin sesion → redireccion a `/login` con `next` y `callbackUrl`.
 3. Iniciar sesion → volver a `/tasks/new`.
 4. `GET /api/tasks` sin sesion → `401`.
 5. Probar registro en `/register` y login con la cuenta creada.
 6. Si hay `GITHUB_ID`/`GITHUB_SECRET`, probar "Continuar con GitHub".
+7. Login con contraseña incorrecta → mensaje "Credenciales inválidas." (no error generico de red salvo fallo real).
 
 ---
 
