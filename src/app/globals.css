@@ -377,16 +377,6 @@ button:focus-visible,
   margin-bottom: 1.5rem;
 }
 
-.login-demo-banner {
-  border-radius: 1rem;
-  border: 1px dashed var(--line);
-  background: color-mix(in srgb, var(--surface-strong) 45%, transparent);
-  padding: 1rem;
-  font-size: 0.75rem;
-  line-height: 1.6;
-  color: var(--muted);
-}
-
 .login-actions {
   margin-top: 0.5rem;
 }

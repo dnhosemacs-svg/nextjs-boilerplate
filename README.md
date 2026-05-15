@@ -2,7 +2,7 @@
 
 > Panel interno para gestionar pedidos del taller.
 
-Aplicacion web de gestion de pedidos de carpinteria construida con Next.js App Router. Incluye CRUD de pedidos, autenticacion demo con cookie HTTP-only, proteccion de rutas con middleware y panel de estadisticas.
+Aplicacion web de gestion de pedidos de carpinteria construida con Next.js App Router. Incluye CRUD de pedidos, autenticacion con NextAuth (Firebase + GitHub OAuth opcional), proteccion de rutas con middleware y panel de estadisticas.
 
 
 | Despliegue | URL                                                     |
@@ -15,9 +15,10 @@ Aplicacion web de gestion de pedidos de carpinteria construida con Next.js App R
 ## Caracteristicas
 
 - CRUD completo de pedidos (`/api/tasks` y `/api/tasks/:id`).
-- Login demo por email/password con cookie de sesion.
+- Login con email/contraseña (Firebase REST en servidor) y GitHub OAuth si esta configurado.
+- Registro de cuentas en `/register` (Firebase Auth en el navegador).
 - Rutas protegidas para trabajo interno (`/dashboard`, `/tasks/*`, `/stats`).
-- Redireccion post-login con `next` para mantener el flujo.
+- Redireccion post-login segura con `next` y `callbackUrl`.
 - UI con Server Components + Client Components donde hay estado.
 
 ---
@@ -28,6 +29,8 @@ Aplicacion web de gestion de pedidos de carpinteria construida con Next.js App R
 | Capa                 | Uso                                                  |
 | -------------------- | ---------------------------------------------------- |
 | Next.js (App Router) | Rutas, renderizado servidor/cliente y Route Handlers |
+| NextAuth             | Sesion JWT, proveedores credentials y GitHub         |
+| Firebase Auth        | Registro en cliente; login email/password en servidor |
 | TypeScript           | Tipado estatico                                      |
 | React                | Componentes y estado de UI                           |
 | Zod                  | Validacion de payloads en API                        |
@@ -44,32 +47,30 @@ nextjs-boilerplate/
 ├── src/
 │   ├── app/
 │   │   ├── api/
-│   │   │   ├── auth/
-│   │   │   │   ├── login/route.ts
-│   │   │   │   └── logout/route.ts
+│   │   │   ├── auth/[...nextauth]/route.ts
 │   │   │   └── tasks/
 │   │   │       ├── route.ts
 │   │   │       └── [id]/route.ts
-│   │   ├── dashboard/page.tsx
-│   │   ├── login/page.tsx
-│   │   ├── stats/page.tsx
-│   │   ├── tasks/
-│   │   │   ├── new/page.tsx
-│   │   │   └── [id]/page.tsx
+│   │   ├── (app)/          # Rutas privadas (dashboard, tasks, stats)
+│   │   ├── (public)/       # login, register, inicio
 │   │   ├── layout.tsx
 │   │   └── page.tsx
 │   ├── components/
 │   │   ├── auth-login-form.tsx
-│   │   ├── auth-session-controls.tsx
-│   │   ├── site-navbar.tsx
+│   │   ├── auth-register-form.tsx
 │   │   └── tasks/
-│   ├── lib/
-│   │   ├── auth.ts
-│   │   ├── tasks-cookie-store.ts
-│   │   └── validators/task.ts
-│   └── types/task.ts
+│   └── lib/
+│       ├── auth.ts
+│       ├── firebase-auth-rest.ts
+│       ├── firebase-client.ts
+│       ├── safe-redirect.ts
+│       ├── credentials-sign-in-errors.ts
+│       ├── server-env.ts
+│       └── tasks-cookie-store.ts
 └── README.md
 ```
+
+Copia `.env.example` a `.env.local` y rellena las variables antes de desarrollar.
 
 ---
 
@@ -79,6 +80,7 @@ nextjs-boilerplate/
 git clone https://github.com/dnhosemacs-svg/nextjs-boilerplate
 cd nextjs-boilerplate
 npm install
+cp .env.example .env.local   # edita .env.local con tus valores
 npm run dev
 ```
 
@@ -88,32 +90,36 @@ Aplicacion disponible en [http://localhost:3000](http://localhost:3000).
 
 ## Configuracion
 
-Crea `.env.local` en la raiz del proyecto (no se sube a git) y define las variables que necesites.
+Crea `.env.local` en la raiz del proyecto (no se sube a git). Ver plantilla en [.env.example](.env.example).
 
 | Variable | Entorno | Descripcion |
 | -------- | ------- | ----------- |
-| `NEXTAUTH_SECRET` | Produccion obligatoria | Firma de JWT de NextAuth. En local es opcional (hay aviso y valor solo-dev). |
-| `AUTH_SECRET` | Opcional | Alias; si ya usas solo `NEXTAUTH_SECRET`, no hace falta. |
-| `NEXTAUTH_URL` | Produccion recomendada | URL publica de la app (OAuth y sesion). Ejemplo local: `http://localhost:3000`. |
-| `VERCEL_URL` | Vercel (automatico) | La plataforma la inyecta; si existe, cuenta como URL canonica en validacion de build. |
-| `NEXT_PUBLIC_APP_URL` | Opcional | Base para enlaces desde el cliente si no quieres depender de `VERCEL_URL`. |
+| `NEXTAUTH_SECRET` | Produccion obligatoria | Firma del JWT de NextAuth. Alias: `AUTH_SECRET`. |
+| `NEXTAUTH_URL` | Produccion recomendada | URL publica (OAuth y sesion). Local: `http://localhost:3000`. |
+| `VERCEL_URL` | Vercel (automatico) | Cuenta como URL canonica en validacion de build. |
 | `GITHUB_ID` / `GITHUB_SECRET` | Opcional | OAuth GitHub; deben ir juntos o ninguno. |
+| `FIREBASE_API_KEY` | Produccion obligatoria | Clave web Firebase; login email/password en servidor. |
+| `NEXT_PUBLIC_FIREBASE_API_KEY` | Cliente | Misma clave web; registro en navegador. |
+| `NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN` | Cliente | `authDomain` de firebaseConfig. |
+| `NEXT_PUBLIC_FIREBASE_PROJECT_ID` | Cliente | `projectId` de firebaseConfig. |
 
 ### Checklist: secretos y Vercel
 
-1. **Generar secreto** (en terminal, cualquier SO con OpenSSL instalado):
+1. **Generar secreto**:
 
    ```bash
    openssl rand -base64 32
    ```
 
-   Pega el resultado en `NEXTAUTH_SECRET` de `.env.local` y en el panel de Vercel.
+   Pegar en `NEXTAUTH_SECRET` (local y panel de Vercel).
 
-2. **Variables en local**: en `.env.local` define al menos `NEXTAUTH_SECRET` y `NEXTAUTH_URL=http://localhost:3000` antes de un `npm run build` local en modo produccion.
+2. **Firebase**: habilitar Email/Password en Authentication. Copiar clave y `firebaseConfig` desde la consola.
 
-3. **Fallos controlados**: en `NODE_ENV=production`, `next build` importa la validacion de [src/lib/server-env.ts](src/lib/server-env.ts). Si falta el secreto, o la URL canonica (`NEXTAUTH_URL`, `VERCEL_URL` o `NEXT_PUBLIC_APP_URL`), o solo uno de los pares GitHub, el build termina con un mensaje `[env] ...` explicando que falta.
+3. **GitHub OAuth** (opcional): callback `http://localhost:3000/api/auth/callback/github` y el de produccion en tu dominio Vercel.
 
-4. **Vercel (Preview y Production)**: Project Settings > Environment Variables. Define `NEXTAUTH_SECRET` en ambos entornos (mismo valor o distintos; distintos invalidan cookies entre entornos). Define `NEXTAUTH_URL` como la URL estable del despliegue (produccion: tu dominio; preview: puedes usar la URL de preview o confiar en `VERCEL_URL` que ya inyecta Vercel). Repite `GITHUB_ID` y `GITHUB_SECRET` si usas login con GitHub.
+4. **Build en produccion**: [src/lib/server-env.ts](src/lib/server-env.ts) valida secreto, URL canonica, `FIREBASE_API_KEY` y par GitHub. Errores con prefijo `[env]`.
+
+5. **Vercel**: definir las mismas variables en Preview y Production (`NEXTAUTH_SECRET`, Firebase, GitHub si aplica).
 
 ---
 
@@ -129,7 +135,8 @@ Crea `.env.local` en la raiz del proyecto (no se sube a git) y define las variab
 ## Rutas de la app
 
 - `/`: inicio publico del proyecto.
-- `/login`: acceso por credenciales demo.
+- `/login`: inicio de sesion (email/password y GitHub si esta configurado).
+- `/register`: crear cuenta con Firebase.
 - `/dashboard`: panel privado principal (protegida).
 - `/tasks/new`: crear pedido (protegida).
 - `/tasks/[id]`: ver/editar/eliminar pedido (protegida).
@@ -169,12 +176,12 @@ Rutas auxiliares:
 
 ### Auth (NextAuth)
 
-- `POST /api/auth/callback/credentials`
-  - Maneja el login del proveedor `credentials` (interno de NextAuth).
-- `POST /api/auth/signout`
-  - Cierra sesión (interno de NextAuth).
-- `GET /api/auth/session`
-  - Devuelve la sesión actual.
+Ruta catch-all: `src/app/api/auth/[...nextauth]/route.ts`. No hay `POST /api/auth/login` custom.
+
+- `GET/POST /api/auth/*` — rutas internas de NextAuth (sesion, callback credentials, callback github, signout, etc.).
+- `GET /api/auth/session` — sesion actual.
+
+El login desde la UI usa `signIn()` del cliente (`redirect: false` para credentials).
 
 ---
 
@@ -193,27 +200,28 @@ Rutas auxiliares:
 
 ## Flujo de autenticacion
 
-- Login exitoso crea la cookie de sesión de NextAuth (JWT firmado con `NEXTAUTH_SECRET`).
-- Middleware protege paginas internas y API de tareas.
-- Si no hay sesion y entras a ruta protegida, redirige a `/login?next=<ruta>`.
-- Si login no tiene `next`, redirige a `/dashboard`.
-- Si ya hay sesion y visitas `/login`, redirige a `/dashboard`.
+- Login con email/password: `signIn("credentials")` → NextAuth → Firebase REST (`signInWithPassword`).
+- Registro: Firebase SDK en `/register`; opcional auto-login con credentials.
+- Sesion: cookie JWT de NextAuth firmada con `NEXTAUTH_SECRET`.
+- Middleware protege paginas internas y `/api/tasks`.
+- Sin sesion en ruta protegida: `/login?next=<ruta>&callbackUrl=<ruta>` (rutas externas rechazadas).
+- Tras login: redireccion a `callbackUrl` o `next` validos; si no hay, `/dashboard`.
+- Con sesion en `/login` o `/register`: redireccion al destino de la query o `/dashboard`.
 
 ---
 
 ## Verificacion rapida
 
 1. Cerrar sesion.
-2. Intentar entrar a `/tasks/new` o `/stats` y verificar redireccion a `/login`.
-3. Iniciar sesion y confirmar retorno a la ruta indicada en `next`.
-4. Probar `GET /api/tasks` sin sesion y validar `401`.
-5. Volver a iniciar sesion y confirmar acceso normal.
+2. Entrar a `/tasks/new` sin sesion → redireccion a `/login` con `next` y `callbackUrl`.
+3. Iniciar sesion → volver a `/tasks/new`.
+4. `GET /api/tasks` sin sesion → `401`.
+5. Probar registro en `/register` y login con la cuenta creada.
+6. Si hay `GITHUB_ID`/`GITHUB_SECRET`, probar "Continuar con GitHub".
 
 ---
 
 ## Limitaciones conocidas
 
-- Persistencia en cookie por sesion; no hay base de datos.
-- Autenticacion demo sin proveedor real.
-- No apto para produccion sin auth robusta y almacenamiento persistente.
-
+- Pedidos persistidos en cookie por sesion; no hay base de datos de tareas.
+- Usuarios gestionados en Firebase; no hay panel de administracion de usuarios en la app.
