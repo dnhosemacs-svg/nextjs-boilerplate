@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Cormorant_Garamond, Geist_Mono, Manrope } from "next/font/google";
-import SessionProvider from "@/components/session-provider";
+import { getServerSession } from "next-auth";
+import Providers from "@/components/providers";
+import { authOptions } from "@/lib/auth";
 import "./globals.css";
 
 const manrope = Manrope({
@@ -25,18 +27,20 @@ export const metadata: Metadata = {
     "Herramienta interna para registrar y administrar pedidos del taller (equipo).",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const session = await getServerSession(authOptions);
+
   return (
     <html
       lang="es"
       className={`${manrope.variable} ${geistMono.variable} ${cormorant.variable} h-full antialiased`}
     >
       <body className="min-h-full">
-        <SessionProvider>{children}</SessionProvider>
+        <Providers session={session}>{children}</Providers>
       </body>
     </html>
   );
