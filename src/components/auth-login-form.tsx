@@ -5,13 +5,10 @@ import { useSearchParams } from "next/navigation";
 import { Button, PasswordInput, TextInput } from "@carbon/react";
 import { signIn } from "next-auth/react";
 import { getCredentialsSignInErrorMessage } from "@/lib/credentials-sign-in-errors";
+import { getPostLoginDestination } from "@/lib/safe-redirect";
 
 const UNEXPECTED_ERROR_MESSAGE =
   "No se pudo iniciar sesión. Inténtalo de nuevo.";
-
-function isSafeInternalPath(value: string | null): value is string {
-  return !!value && value.startsWith("/") && !value.startsWith("//");
-}
 
 export default function AuthLoginForm() {
   const searchParams = useSearchParams();
@@ -22,10 +19,10 @@ export default function AuthLoginForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSocialSubmitting, setIsSocialSubmitting] = useState(false);
 
-  const postLoginDestination = useMemo(() => {
-    const nextPath = searchParams.get("next");
-    return isSafeInternalPath(nextPath) ? nextPath : "/dashboard";
-  }, [searchParams]);
+  const postLoginDestination = useMemo(
+    () => getPostLoginDestination(searchParams),
+    [searchParams],
+  );
 
   const showRegisteredNotice = searchParams.get("registered") === "1";
 
