@@ -1,5 +1,9 @@
 import type { FirebaseError } from "firebase/app";
 
+/** Mensaje único en UI para no revelar si un email ya existe, etc. */
+export const GENERIC_FIREBASE_AUTH_ERROR_MESSAGE =
+  "No se pudo crear la cuenta. Revisa tus datos o inicia sesión si ya tienes una cuenta.";
+
 function getFirebaseErrorCode(error: unknown): string | undefined {
   if (!error || typeof error !== "object" || !("code" in error)) {
     return undefined;
@@ -8,11 +12,7 @@ function getFirebaseErrorCode(error: unknown): string | undefined {
   return typeof code === "string" ? code : undefined;
 }
 
-/**
- * Convierte errores del SDK de Firebase Auth en mensajes legibles para la UI.
- * Usar en formularios de registro/login en el cliente.
- */
-export function getFirebaseAuthErrorMessage(error: unknown): string {
+function getDetailedFirebaseAuthErrorMessage(error: unknown): string {
   switch (getFirebaseErrorCode(error)) {
     case "auth/email-already-in-use":
       return "Ese email ya está registrado.";
@@ -31,4 +31,31 @@ export function getFirebaseAuthErrorMessage(error: unknown): string {
     default:
       return "No se pudo completar la operación. Inténtalo de nuevo.";
   }
+}
+
+type FirebaseAuthErrorMessageOptions = {
+  /** Si true, no expone códigos concretos (anti-enumeración). Por defecto true. */
+  safe?: boolean;
+};
+
+/**
+ * Convierte errores del SDK de Firebase Auth en texto para la UI.
+ * En formularios públicos usa safe: true (valor por defecto).
+ */
+export function getFirebaseAuthErrorMessage(
+  error: unknown,
+  options?: FirebaseAuthErrorMessageOptions,
+): string {
+  const safe = options?.safe !== false;
+  if (safe) {
+    return GENERIC_FIREBASE_AUTH_ERROR_MESSAGE;
+  }
+  return getDetailedFirebaseAuthErrorMessage(error);
+}
+
+/** Solo desarrollo: código Firebase real en consola, no en pantalla. */
+export function logFirebaseAuthError(context: string, error: unknown): void {
+  if (process.env.NODE_ENV !== "development") return;
+  const code = getFirebaseErrorCode(error);
+  console.debug(`[${context}] firebase auth`, code ?? error);
 }

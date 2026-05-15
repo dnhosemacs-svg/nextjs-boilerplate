@@ -27,7 +27,7 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(redirectUrl);
   }
 
-  if (pathname === "/login" && isLoggedIn) {
+  if ((pathname === "/login" || pathname === "/register") && isLoggedIn) {
     return NextResponse.redirect(new URL("/dashboard", request.url));
   }
 
@@ -41,5 +41,6 @@ export const config = {
     "/stats/:path*",
     "/api/tasks/:path*",
     "/login",
+    "/register",
   ],
 };

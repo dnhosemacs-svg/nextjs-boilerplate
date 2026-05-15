@@ -27,6 +27,8 @@ export default function AuthLoginForm() {
     return isSafeInternalPath(nextPath) ? nextPath : "/dashboard";
   }, [searchParams]);
 
+  const showRegisteredNotice = searchParams.get("registered") === "1";
+
   const isSubmitDisabled = useMemo(() => {
     return (
       isSubmitting ||
@@ -128,6 +130,12 @@ export default function AuthLoginForm() {
           className="carbon-input"
         />
       </div>
+
+      {showRegisteredNotice ? (
+        <p className="rounded-lg border border-green-500/30 bg-green-500/10 px-3 py-2 text-sm text-green-800 dark:text-green-300">
+          Cuenta creada. Inicia sesión con tu email y contraseña.
+        </p>
+      ) : null}
 
       {error ? (
         <p className="rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-2 text-sm text-red-700 dark:text-red-300">
