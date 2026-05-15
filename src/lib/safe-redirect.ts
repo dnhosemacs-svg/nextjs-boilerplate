@@ -5,6 +5,13 @@ export function isSafeInternalPath(value: string | null): value is string {
   return !!value && value.startsWith("/") && !value.startsWith("//");
 }
 
+/** Destinos que no deben usarse tras login (evitan bucles con middleware/páginas de auth). */
+const AUTH_ENTRY_PATHS = new Set(["/login", "/register"]);
+
+function isValidPostLoginPath(value: string | null): value is string {
+  return isSafeInternalPath(value) && !AUTH_ENTRY_PATHS.has(value);
+}
+
 type SearchParamsReader = Pick<URLSearchParams, "get">;
 
 /**
@@ -27,10 +34,10 @@ export function getPostLoginDestination(
   fallback = "/dashboard",
 ): string {
   const callbackUrl = searchParams.get("callbackUrl");
-  if (isSafeInternalPath(callbackUrl)) return callbackUrl;
+  if (isValidPostLoginPath(callbackUrl)) return callbackUrl;
 
   const next = searchParams.get("next");
-  if (isSafeInternalPath(next)) return next;
+  if (isValidPostLoginPath(next)) return next;
 
   return fallback;
 }

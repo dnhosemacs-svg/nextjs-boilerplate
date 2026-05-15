@@ -4,11 +4,21 @@ import { getServerSession } from "next-auth";
 
 import AuthRegisterForm from "@/components/auth-register-form";
 import { authOptions } from "@/lib/auth";
+import { getPostLoginDestination } from "@/lib/safe-redirect";
 
-export default async function RegisterPage() {
+type RegisterPageProps = {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+};
+
+export default async function RegisterPage({ searchParams }: RegisterPageProps) {
   const session = await getServerSession(authOptions);
   if (session?.user) {
-    redirect("/dashboard");
+    const query = await searchParams;
+    const params = new URLSearchParams();
+    for (const [key, value] of Object.entries(query)) {
+      if (typeof value === "string") params.set(key, value);
+    }
+    redirect(getPostLoginDestination(params));
   }
 
   return (
