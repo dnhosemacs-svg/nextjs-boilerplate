@@ -74,10 +74,8 @@ export default function AuthLoginForm() {
       }
 
       window.location.href = postLoginDestination;
-    } catch (submitError) {
-      const message =
-        submitError instanceof Error ? submitError.message : "Error inesperado";
-      setError(message);
+    } catch {
+      setError("No se pudo iniciar sesión. Inténtalo de nuevo.");
     } finally {
       setIsSubmitting(false);
     }

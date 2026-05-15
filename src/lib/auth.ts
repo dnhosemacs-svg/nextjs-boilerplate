@@ -1,6 +1,7 @@
 import type { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GitHubProvider from "next-auth/providers/github";
+import { signInWithPassword } from "@/lib/firebase-auth-rest";
 import { getAuthSecret } from "@/lib/server-env";
 
 export const authOptions = {
@@ -27,12 +28,27 @@ export const authOptions = {
         const email = credentials?.email?.trim().toLowerCase() ?? "";
         const password = credentials?.password?.trim() ?? "";
 
-        // TODO: reemplazar con validación contra base de datos
-        if (email === "admin@carpinteria.local" && password === "123456") {
-          return { id: "1", email, name: "Admin" };
+        if (!email || !password) {
+          return null;
         }
 
-        return null;
+        const result = await signInWithPassword(email, password);
+
+        if (!result.ok) {
+          if (result.reason === "config") {
+            console.error(
+              "[auth] CredentialsProvider: revisa FIREBASE_API_KEY en el entorno",
+            );
+          }
+          return null;
+        }
+
+        const { user } = result;
+        return {
+          id: user.localId,
+          email: user.email,
+          name: user.displayName ?? user.email.split("@")[0] ?? user.email,
+        };
       },
     }),
   ],
