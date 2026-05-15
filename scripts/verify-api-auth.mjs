@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Paso 5: APIs sensibles con doble capa (middleware 401 + requireApiSession en handlers).
+ * Paso 4: APIs sensibles con doble capa (middleware 401 + requireApiSession en handlers).
  * Uso: npm run verify:api-auth
  */
 import { readFileSync, readdirSync, statSync } from "node:fs";

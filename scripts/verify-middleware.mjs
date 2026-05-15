@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Paso 3: verifica protección de rutas vía middleware (withAuth + APIs).
+ * Paso 4: middleware (withAuth + APIs 401) alineado con protected-api-routes y safe-redirect.
  * Comprobaciones estáticas en middleware.ts y, si el servidor responde, pruebas HTTP.
  *
  * Uso:
@@ -23,8 +23,9 @@ function read(relPath) {
   return readFileSync(join(ROOT, relPath), "utf8");
 }
 
-// —— Estáticas: middleware.ts ——
+// —— Estáticas: middleware + catálogo de APIs ——
 const middleware = read("middleware.ts");
+const protectedRoutes = read("src/lib/protected-api-routes.ts");
 
 assert(
   middleware.includes('from "next-auth/middleware"'),
@@ -43,25 +44,46 @@ assert(
   "middleware.ts: debe usar getAuthSecret() (mismo secreto que auth.ts)",
 );
 assert(
-  /pathname\.startsWith\(["']\/api\/tasks["']\)/.test(middleware),
-  "middleware.ts: debe proteger /api/tasks con bloque aparte (401 JSON)",
+  middleware.includes("handleProtectedApi"),
+  "middleware.ts: debe definir handleProtectedApi para APIs",
+);
+assert(
+  middleware.includes("isProtectedApiPath"),
+  "middleware.ts: debe usar isProtectedApiPath (lista en protected-api-routes.ts)",
+);
+assert(
+  protectedRoutes.includes('"/api/tasks"'),
+  "protected-api-routes.ts: debe listar /api/tasks",
+);
+assert(
+  middleware.includes("getPostLoginDestination"),
+  "middleware.ts: redirect con sesión en /login|/register debe usar getPostLoginDestination",
 );
 assert(
   /NextResponse\.json\([\s\S]*401/.test(middleware),
   "middleware.ts: APIs sin sesión deben devolver 401 JSON",
 );
-assert(
-  middleware.includes('"/dashboard/:path*"'),
-  "middleware.ts: matcher debe incluir /dashboard/:path*",
-);
-assert(
-  middleware.includes('"/stats"'),
-  "middleware.ts: matcher debe incluir /stats",
-);
-assert(
-  middleware.includes('"/api/tasks/:path*"'),
-  "middleware.ts: matcher debe incluir /api/tasks/:path*",
-);
+
+const matcherRoutes = [
+  '"/dashboard/:path*"',
+  '"/tasks/:path*"',
+  '"/stats"',
+  '"/api/tasks/:path*"',
+  '"/login"',
+  '"/register"',
+];
+for (const route of matcherRoutes) {
+  assert(middleware.includes(route), `middleware.ts: matcher debe incluir ${route}`);
+}
+
+// Cada prefijo protegido de API debe tener cobertura en el matcher
+const apiPrefixes = [...protectedRoutes.matchAll(/"(\/api\/[^"]+)"/g)].map((m) => m[1]);
+for (const prefix of apiPrefixes) {
+  assert(
+    middleware.includes(`"${prefix}`) || middleware.includes(`${prefix}/:path*`),
+    `middleware.ts: matcher debe cubrir API protegida ${prefix}`,
+  );
+}
 
 // —— HTTP (solo si el servidor está arriba) ——
 async function probe(
@@ -169,6 +191,10 @@ const httpCases = [
     run: () => probe("/login", { expectStatus: 200 }),
   },
   {
+    name: "sin sesión /register → accesible (200)",
+    run: () => probe("/register", { expectStatus: 200 }),
+  },
+  {
     name: "sin sesión / → pública (200)",
     run: () => probe("/", { expectStatus: 200 }),
   },
@@ -220,5 +246,5 @@ console.log(
   `verify:middleware — OK (estáticas + ${httpRan} pruebas HTTP en ${BASE_URL}).`,
 );
 console.log(
-  "  Prueba manual pendiente: login → /dashboard y usuario logueado en /login → redirect.",
+  "  Modelo: páginas privadas → withAuth; APIs → isProtectedApiPath + 401 JSON.",
 );

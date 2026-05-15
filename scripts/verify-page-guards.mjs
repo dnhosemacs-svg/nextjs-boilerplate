@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Paso 6: páginas (app) sin guards duplicados; protección vía middleware + login/register.
+ * Paso 4: páginas (app) sin guards duplicados; protección vía middleware + login/register.
  * Uso: npm run verify:page-guards
  */
 import { readFileSync, readdirSync, statSync } from "node:fs";
@@ -52,8 +52,14 @@ assert(
   "login/page.tsx: debe redirigir si ya hay sesión (único guard en páginas públicas)",
 );
 assert(
-  registerPage.includes("getServerSession") && registerPage.includes("redirect"),
-  "register/page.tsx: debe redirigir si ya hay sesión",
+  registerPage.includes("getServerSession") &&
+    registerPage.includes("redirect") &&
+    registerPage.includes("getPostLoginDestination"),
+  "register/page.tsx: debe redirigir con getPostLoginDestination si ya hay sesión",
+);
+assert(
+  loginPage.includes("getPostLoginDestination"),
+  "login/page.tsx: debe usar getPostLoginDestination al redirigir con sesión",
 );
 
 const middleware = read("middleware.ts");

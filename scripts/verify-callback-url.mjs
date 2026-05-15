@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Paso 3/4: callbackUrl unificado (withAuth + login/register + auth-login-form).
+ * Paso 4: callbackUrl unificado (withAuth + login/register + auth-login-form).
  * Uso: npm run verify:callback-url
  */
 import { readFileSync, readdirSync, statSync } from "node:fs";
