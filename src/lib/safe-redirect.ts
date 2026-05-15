@@ -23,3 +23,13 @@ export function getPostLoginDestination(
 
   return fallback;
 }
+
+/**
+ * Guarda la ruta a la que volver tras login en la URL de /login.
+ * Escribe `callbackUrl` (Auth.js) y `next` (middleware histórico del proyecto).
+ */
+export function applyLoginReturnParams(loginUrl: URL, returnPath: string): void {
+  if (!isSafeInternalPath(returnPath)) return;
+  loginUrl.searchParams.set("next", returnPath);
+  loginUrl.searchParams.set("callbackUrl", returnPath);
+}

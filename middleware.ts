@@ -1,6 +1,10 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import { getToken } from "next-auth/jwt";
+import {
+  applyLoginReturnParams,
+  getPostLoginDestination,
+} from "@/lib/safe-redirect";
 import { getAuthSecret } from "@/lib/server-env";
 
 export async function middleware(request: NextRequest) {
@@ -22,15 +26,14 @@ export async function middleware(request: NextRequest) {
   }
 
   if (isProtectedPage && !isLoggedIn) {
-    const redirectUrl = new URL("/login", request.url);
-    const destination = `${pathname}${search}`;
-    redirectUrl.searchParams.set("next", destination);
-    redirectUrl.searchParams.set("callbackUrl", destination);
-    return NextResponse.redirect(redirectUrl);
+    const loginUrl = new URL("/login", request.url);
+    applyLoginReturnParams(loginUrl, `${pathname}${search}`);
+    return NextResponse.redirect(loginUrl);
   }
 
   if ((pathname === "/login" || pathname === "/register") && isLoggedIn) {
-    return NextResponse.redirect(new URL("/dashboard", request.url));
+    const destination = getPostLoginDestination(request.nextUrl.searchParams);
+    return NextResponse.redirect(new URL(destination, request.url));
   }
 
   return NextResponse.next();
