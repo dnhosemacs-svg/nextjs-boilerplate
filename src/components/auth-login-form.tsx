@@ -4,8 +4,8 @@ import { useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { Button, PasswordInput, TextInput } from "@carbon/react";
 import { signIn } from "next-auth/react";
+import { getCredentialsSignInErrorMessage } from "@/lib/credentials-sign-in-errors";
 
-const CREDENTIALS_ERROR_MESSAGE = "Credenciales inválidas.";
 const UNEXPECTED_ERROR_MESSAGE =
   "No se pudo iniciar sesión. Inténtalo de nuevo.";
 
@@ -78,7 +78,7 @@ export default function AuthLoginForm() {
         if (process.env.NODE_ENV === "development" && result?.error) {
           console.debug("[login] credentials failed:", result.error);
         }
-        setError(CREDENTIALS_ERROR_MESSAGE);
+        setError(getCredentialsSignInErrorMessage(result?.error));
         return;
       }
 

@@ -1,6 +1,7 @@
 import type { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GitHubProvider from "next-auth/providers/github";
+import { CREDENTIALS_SIGN_IN_ERROR_CODES } from "@/lib/credentials-sign-in-errors";
 import { signInWithPassword } from "@/lib/firebase-auth-rest";
 import { getAuthSecret } from "@/lib/server-env";
 
@@ -57,15 +58,15 @@ export const authOptions = {
             console.error(
               "[auth] CredentialsProvider: revisa FIREBASE_API_KEY en el entorno",
             );
-            throw new Error("CONFIG_ERROR");
+            throw new Error(CREDENTIALS_SIGN_IN_ERROR_CODES.CONFIG_ERROR);
           }
           if (result.reason === "network") {
-            throw new Error("NETWORK_ERROR");
+            throw new Error(CREDENTIALS_SIGN_IN_ERROR_CODES.NETWORK_ERROR);
           }
           if (result.reason === "invalid_credentials") {
-            throw new Error("INVALID_CREDENTIALS");
+            throw new Error(CREDENTIALS_SIGN_IN_ERROR_CODES.INVALID_CREDENTIALS);
           }
-          throw new Error("UNKNOWN_ERROR");
+          throw new Error(CREDENTIALS_SIGN_IN_ERROR_CODES.UNKNOWN_ERROR);
         }
 
         const { user } = result;
