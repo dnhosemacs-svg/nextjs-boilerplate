@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import AuthLoginForm from "@/components/auth-login-form";
+import SessionDebug from "@/components/session-debug";
 import { isGithubOAuthConfigured } from "@/lib/server-env";
 
 export default function LoginPage() {
@@ -30,6 +31,15 @@ export default function LoginPage() {
             </Link>
           </div>
         </section>
+
+        {process.env.NODE_ENV === "development" ? (
+          <section
+            className="mt-6"
+            aria-label="Diagnóstico de sesión (solo desarrollo)"
+          >
+            <SessionDebug />
+          </section>
+        ) : null}
       </div>
     </main>
   );
