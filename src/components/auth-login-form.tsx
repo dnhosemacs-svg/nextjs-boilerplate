@@ -5,6 +5,10 @@ import { useSearchParams } from "next/navigation";
 import { Button, PasswordInput, TextInput } from "@carbon/react";
 import { signIn } from "next-auth/react";
 
+const CREDENTIALS_ERROR_MESSAGE = "Credenciales inválidas.";
+const UNEXPECTED_ERROR_MESSAGE =
+  "No se pudo iniciar sesión. Inténtalo de nuevo.";
+
 function isSafeInternalPath(value: string | null): value is string {
   return !!value && value.startsWith("/") && !value.startsWith("//");
 }
@@ -68,14 +72,20 @@ export default function AuthLoginForm() {
         redirect: false,
       });
 
-      if (result?.error) {
-        setError("Credenciales inválidas.");
+      if (!result?.ok) {
+        if (process.env.NODE_ENV === "development" && result?.error) {
+          console.debug("[login] credentials failed:", result.error);
+        }
+        setError(CREDENTIALS_ERROR_MESSAGE);
         return;
       }
 
       window.location.href = postLoginDestination;
-    } catch {
-      setError("No se pudo iniciar sesión. Inténtalo de nuevo.");
+    } catch (submitError) {
+      if (process.env.NODE_ENV === "development") {
+        console.debug("[login] unexpected error:", submitError);
+      }
+      setError(UNEXPECTED_ERROR_MESSAGE);
     } finally {
       setIsSubmitting(false);
     }
