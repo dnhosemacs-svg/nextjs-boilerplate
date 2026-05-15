@@ -6,6 +6,7 @@ import StatusBadge from "@/components/tasks/status-badge";
 import TaskForm from "@/components/tasks/task-form";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+import { buildLoginRedirectPath } from "@/lib/safe-redirect";
 import { getTaskByIdFromCookieStore } from "@/lib/tasks-cookie-store";
 
 type TaskDetailPageProps = {
@@ -37,7 +38,7 @@ export default async function TaskDetailPage({ params }: TaskDetailPageProps) {
   const { id } = await params;
   const session = await getServerSession(authOptions);
   if (!session?.user) {
-    redirect(`/login?next=/tasks/${encodeURIComponent(id)}`);
+    redirect(buildLoginRedirectPath(`/tasks/${id}`));
   }
 
   const task = await getTaskByIdFromCookieStore(id).catch(() => null);

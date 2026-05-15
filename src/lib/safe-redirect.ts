@@ -8,8 +8,19 @@ export function isSafeInternalPath(value: string | null): value is string {
 type SearchParamsReader = Pick<URLSearchParams, "get">;
 
 /**
- * Destino tras login. Auth.js usa `callbackUrl`; el middleware del proyecto usa `next`.
- * Prioridad: callbackUrl → next → fallback.
+ * Ruta de login con `callbackUrl` (estándar Auth.js / withAuth).
+ */
+export function buildLoginRedirectPath(returnPath: string): string {
+  if (!isSafeInternalPath(returnPath)) {
+    return "/login";
+  }
+  const params = new URLSearchParams({ callbackUrl: returnPath });
+  return `/login?${params.toString()}`;
+}
+
+/**
+ * Destino tras login. Auth.js y withAuth usan `callbackUrl`.
+ * Se mantiene lectura de `next` solo por enlaces antiguos guardados.
  */
 export function getPostLoginDestination(
   searchParams: SearchParamsReader,
@@ -25,11 +36,9 @@ export function getPostLoginDestination(
 }
 
 /**
- * Guarda la ruta a la que volver tras login en la URL de /login.
- * Escribe `callbackUrl` (Auth.js) y `next` (middleware histórico del proyecto).
+ * Escribe `callbackUrl` en una URL de /login ya construida.
  */
 export function applyLoginReturnParams(loginUrl: URL, returnPath: string): void {
   if (!isSafeInternalPath(returnPath)) return;
-  loginUrl.searchParams.set("next", returnPath);
   loginUrl.searchParams.set("callbackUrl", returnPath);
 }

@@ -3,12 +3,13 @@ import { redirect } from "next/navigation";
 
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+import { buildLoginRedirectPath } from "@/lib/safe-redirect";
 import { listTasksFromCookieStore } from "@/lib/tasks-cookie-store";
 
 export default async function StatsPage() {
   const session = await getServerSession(authOptions);
   if (!session?.user) {
-    redirect("/login?next=/stats");
+    redirect(buildLoginRedirectPath("/stats"));
   }
 
   const tasks = await listTasksFromCookieStore();

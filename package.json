@@ -9,8 +9,9 @@
     "lint": "eslint",
     "verify:auth": "node scripts/verify-auth.mjs",
     "verify:middleware": "node scripts/verify-middleware.mjs",
+    "verify:callback-url": "node scripts/verify-callback-url.mjs",
     "verify:session": "node scripts/verify-session-hydration.mjs",
-    "verify:navigation": "npm run verify:session && npm run verify:auth && npm run verify:middleware"
+    "verify:navigation": "npm run verify:session && npm run verify:auth && npm run verify:middleware && npm run verify:callback-url"
   },
   "dependencies": {
     "@carbon/react": "^1.106.0",

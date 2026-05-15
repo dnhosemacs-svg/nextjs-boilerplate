@@ -2,11 +2,12 @@ import TaskForm from "@/components/tasks/task-form";
 import { redirect } from "next/navigation";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+import { buildLoginRedirectPath } from "@/lib/safe-redirect";
 
 export default async function NewTaskPage() {
   const session = await getServerSession(authOptions);
   if (!session?.user) {
-    redirect("/login?next=/tasks/new");
+    redirect(buildLoginRedirectPath("/tasks/new"));
   }
 
   return (
