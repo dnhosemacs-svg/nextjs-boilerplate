@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
-import { signOut } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 
 const publicNavItems = [
   { href: "/", label: "Inicio" },
@@ -22,13 +22,12 @@ function isActivePath(currentPath: string, href: string) {
   return currentPath === href || currentPath.startsWith(`${href}/`);
 }
 
-type SiteNavbarProps = {
-  isAuthenticated: boolean;
-};
-
-export default function SiteNavbar({ isAuthenticated }: SiteNavbarProps) {
+export default function SiteNavbar() {
+  const { data: session, status } = useSession();
   const pathname = usePathname();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+
+  const isAuthenticated = status === "authenticated" && !!session?.user;
   const navItems = isAuthenticated
     ? [privateNavItems[0], ...publicNavItems, ...privateNavItems.slice(1)]
     : publicNavItems;
@@ -47,7 +46,7 @@ export default function SiteNavbar({ isAuthenticated }: SiteNavbarProps) {
       <header className="z-50 w-fit max-w-[calc(100vw-1rem)] rounded-2xl border border-[rgb(207_190_167/0.45)] bg-[rgb(246_240_231/90%)] shadow-[0_10px_26px_-22px_rgb(45_34_25/0.7),0_2px_10px_-8px_rgb(45_34_25/0.45)] backdrop-blur-md supports-[backdrop-filter]:bg-[rgb(246_240_231/80%)]">
         <div className="flex items-center justify-center px-4 py-3.5 md:px-5 md:py-4">
           <div className="flex items-center gap-4 overflow-x-auto pb-1 md:gap-4">
-            <nav aria-label="Principal">
+            <nav aria-label="Principal" aria-busy={status === "loading"}>
               <ul className="flex items-center gap-2.5 md:gap-2.5">
                 {navItems.map((item) => {
                   const isActive = isActivePath(pathname, item.href);
@@ -66,7 +65,14 @@ export default function SiteNavbar({ isAuthenticated }: SiteNavbarProps) {
               </ul>
             </nav>
 
-            {isAuthenticated ? (
+            {status === "loading" ? (
+              <span
+                className="ui-pill ui-pill-secondary shrink-0 pointer-events-none opacity-60"
+                aria-hidden
+              >
+                …
+              </span>
+            ) : isAuthenticated ? (
               <button
                 type="button"
                 onClick={onLogout}
