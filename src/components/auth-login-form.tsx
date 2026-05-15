@@ -10,7 +10,14 @@ import { getPostLoginDestination } from "@/lib/safe-redirect";
 const UNEXPECTED_ERROR_MESSAGE =
   "No se pudo iniciar sesión. Inténtalo de nuevo.";
 
-export default function AuthLoginForm() {
+type AuthLoginFormProps = {
+  /** Lo calcula la página de login en servidor según GITHUB_ID / GITHUB_SECRET. */
+  githubOAuthEnabled?: boolean;
+};
+
+export default function AuthLoginForm({
+  githubOAuthEnabled = false,
+}: AuthLoginFormProps) {
   const searchParams = useSearchParams();
 
   const [email, setEmail] = useState("");
@@ -92,18 +99,24 @@ export default function AuthLoginForm() {
 
   return (
     <form className="flex flex-col gap-8 md:gap-10 carbon-shell" onSubmit={onSubmit}>
-      <div className="flex flex-col gap-3">
-        <Button
-          type="button"
-          kind="secondary"
-          disabled={isSubmitting || isSocialSubmitting}
-          onClick={onGitHubSignIn}
-          className="carbon-btn-secondary self-stretch md:self-start"
-        >
-          {isSocialSubmitting ? "Redirigiendo a GitHub..." : "Continuar con GitHub"}
-        </Button>
-        <p className="text-sm text-[var(--muted)]">O inicia sesión con email y contraseña.</p>
-      </div>
+      {githubOAuthEnabled ? (
+        <div className="flex flex-col gap-3">
+          <Button
+            type="button"
+            kind="secondary"
+            disabled={isSubmitting || isSocialSubmitting}
+            onClick={onGitHubSignIn}
+            className="carbon-btn-secondary self-stretch md:self-start"
+          >
+            {isSocialSubmitting
+              ? "Redirigiendo a GitHub..."
+              : "Continuar con GitHub"}
+          </Button>
+          <p className="text-sm text-[var(--muted)]">
+            O inicia sesión con email y contraseña.
+          </p>
+        </div>
+      ) : null}
 
       <div className="flex flex-col gap-6 md:gap-8">
         <TextInput

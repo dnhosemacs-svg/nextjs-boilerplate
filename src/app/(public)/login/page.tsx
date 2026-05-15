@@ -1,8 +1,10 @@
 import Link from "next/link";
 
 import AuthLoginForm from "@/components/auth-login-form";
+import { isGithubOAuthConfigured } from "@/lib/server-env";
 
 export default function LoginPage() {
+  const githubOAuthEnabled = isGithubOAuthConfigured();
   return (
     <main className="page-shell max-w-4xl items-start justify-center">
       <div className="w-full max-w-xl">
@@ -16,7 +18,7 @@ export default function LoginPage() {
           </header>
 
           <div className="login-block">
-            <AuthLoginForm />
+            <AuthLoginForm githubOAuthEnabled={githubOAuthEnabled} />
           </div>
 
           <div className="login-actions flex flex-wrap gap-3">

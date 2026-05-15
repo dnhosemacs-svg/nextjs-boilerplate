@@ -55,6 +55,13 @@ function assertGithubPair(): void {
   }
 }
 
+/** true si GitHub OAuth está listo para usarse (ambas variables definidas). */
+export function isGithubOAuthConfigured(): boolean {
+  const id = process.env.GITHUB_ID?.trim() ?? "";
+  const secret = process.env.GITHUB_SECRET?.trim() ?? "";
+  return id.length > 0 && secret.length > 0;
+}
+
 /** Clave web de Firebase (REST signInWithPassword). Solo servidor. */
 export function getFirebaseApiKey(): string {
   return process.env.FIREBASE_API_KEY?.trim() ?? "";
