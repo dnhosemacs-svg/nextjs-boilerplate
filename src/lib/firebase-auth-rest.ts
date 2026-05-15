@@ -1,3 +1,5 @@
+import { getFirebaseApiKey } from "@/lib/server-env";
+
 const FIREBASE_SIGN_IN_URL =
   "https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword";
 
@@ -69,7 +71,7 @@ export async function signInWithPassword(
   email: string,
   password: string,
 ): Promise<FirebaseSignInResult> {
-  const apiKey = process.env.FIREBASE_API_KEY?.trim() ?? "";
+  const apiKey = getFirebaseApiKey();
   if (!apiKey) {
     console.error("[firebase-auth] FIREBASE_API_KEY no configurada");
     return { ok: false, reason: "config" };

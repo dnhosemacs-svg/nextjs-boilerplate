@@ -55,6 +55,19 @@ function assertGithubPair(): void {
   }
 }
 
+/** Clave web de Firebase (REST signInWithPassword). Solo servidor. */
+export function getFirebaseApiKey(): string {
+  return process.env.FIREBASE_API_KEY?.trim() ?? "";
+}
+
+function assertFirebaseApiKey(): void {
+  if (getFirebaseApiKey().length > 0) return;
+
+  throw new Error(
+    "[env] Falta FIREBASE_API_KEY en producción (login email/contraseña vía Firebase REST).",
+  );
+}
+
 /** Comprueba variables críticas antes de build o arranque en producción. */
 export function assertServerEnv(): void {
   assertGithubPair();
@@ -62,4 +75,5 @@ export function assertServerEnv(): void {
 
   getAuthSecret();
   assertCanonicalAppUrl();
+  assertFirebaseApiKey();
 }
