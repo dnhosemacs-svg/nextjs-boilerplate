@@ -622,6 +622,10 @@ button:focus-visible,
   backdrop-filter: blur(6px);
 }
 
+.private-header-menu-btn {
+  flex-shrink: 0;
+}
+
 .private-header-actions {
   display: flex;
   gap: 0.5rem;
@@ -661,6 +665,10 @@ button:focus-visible,
 }
 
 @media (min-width: 768px) {
+  .private-header-menu-btn {
+    display: none;
+  }
+
   .private-sidebar {
     position: sticky;
     top: 0;

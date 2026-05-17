@@ -28,7 +28,11 @@ export default function PrivateHeader({ onOpenSidebar }: PrivateHeaderProps) {
 
   return (
     <header className="private-header">
-      <button type="button" onClick={onOpenSidebar} className="ui-pill ui-pill-secondary md:hidden">
+      <button
+        type="button"
+        onClick={onOpenSidebar}
+        className="private-header-menu-btn ui-pill ui-pill-secondary"
+      >
         Menú
       </button>
 
