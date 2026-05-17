@@ -29,7 +29,7 @@ export default async function DashboardPage() {
       <header className="dashboard-hero">
         <div>
           <p className="eyebrow">Panel operativo</p>
-          <h1 className="section-heading">Dashboard del taller</h1>
+          <h1 className="section-heading">Panel del taller</h1>
           <p className="content-description">
             Vista general para priorizar pedidos, monitorear la carga del equipo y actuar rápido.
           </p>
@@ -73,7 +73,7 @@ export default async function DashboardPage() {
 
         {recentTasks.length === 0 ? (
           <p className="text-sm text-[var(--muted)]">
-            Aún no hay pedidos cargados. Registrá el primero para empezar.
+            Aún no hay pedidos cargados. Registra el primero para empezar.
           </p>
         ) : (
           <ul className="dashboard-recent-list">

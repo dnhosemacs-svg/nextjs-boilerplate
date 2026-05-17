@@ -41,10 +41,10 @@ export default function Home() {
           />
           <div className="absolute inset-x-3 bottom-3 z-20 p-6 sm:inset-x-5 sm:bottom-5 sm:p-8 md:inset-x-6 md:bottom-6 md:p-12">
             <p className="eyebrow mb-3 !text-white/90 drop-shadow-sm">
-              Carpinteria a medida
+              Carpintería a medida
             </p>
             <h1 className="display-heading max-w-3xl text-4xl text-[var(--surface)] sm:text-5xl md:text-6xl">
-              Diseno y fabricacion en madera para proyectos residenciales y comerciales.
+              Diseño y fabricación en madera para proyectos residenciales y comerciales.
             </h1>
             <p className="mt-4 max-w-2xl text-sm leading-relaxed text-[rgb(251_247_241/0.88)] sm:text-base">
               Creamos mobiliario y soluciones en madera adaptadas a cada espacio, con enfoque en
@@ -124,7 +124,7 @@ export default function Home() {
             <div>
               <p className="eyebrow">¿Listo para avanzar?</p>
               <h2 className="section-heading mt-2 max-w-xl">
-                Si ya trabajas con nosotros, entra a tu panel. Si no, contactanos.
+                Si ya trabajas con nosotros, entra a tu panel. Si no, contáctanos.
               </h2>
               <p className="mt-3 max-w-xl text-sm leading-relaxed text-[var(--muted)] sm:text-base">
                 Centralizamos pedidos y seguimiento para mantener cada proyecto claro y ordenado.

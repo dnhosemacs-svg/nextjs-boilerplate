@@ -13,7 +13,7 @@ const publicNavItems = [
 ];
 
 const privateNavItems = [
-  { href: "/dashboard", label: "Dashboard" },
+  { href: "/dashboard", label: "Panel" },
   { href: "/tasks/new", label: "Nuevo pedido" },
   { href: "/stats", label: "Estadísticas" },
 ];
@@ -95,7 +95,7 @@ export default function SiteNavbar() {
               </button>
             ) : (
               <Link href="/login" className="ui-pill ui-pill-secondary shrink-0">
-                Login
+                Iniciar sesión
               </Link>
             )}
           </div>

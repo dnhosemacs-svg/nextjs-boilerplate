@@ -24,7 +24,7 @@ export async function POST(request: Request) {
     json = await request.json();
   } catch {
     return NextResponse.json(
-      { error: "Invalid JSON body" },
+      { error: "Cuerpo JSON no válido" },
       { status: 400 },
     );
   }
@@ -32,7 +32,7 @@ export async function POST(request: Request) {
   const parsed = createTaskSchema.safeParse(json);
   if (!parsed.success) {
     return NextResponse.json(
-      { error: "Validation error", issues: parsed.error.issues },
+      { error: "Error de validación", issues: parsed.error.issues },
       { status: 400 },
     );
   }

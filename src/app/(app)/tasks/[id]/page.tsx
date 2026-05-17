@@ -18,16 +18,16 @@ export async function generateMetadata({
 
   if (!task) {
     return {
-      title: "Pedido no encontrado | Carpinteria TaskFlow",
+      title: "Pedido no encontrado | Carpintería TaskFlow",
       description: "El pedido solicitado no existe o ha sido eliminado.",
     };
   }
 
   return {
-    title: `${task.title} | Carpinteria TaskFlow`,
+    title: `${task.title} | Carpintería TaskFlow`,
     description:
       task.description?.slice(0, 140) ??
-      `Detalle del pedido ${task.id} en el gestor de carpinteria.`,
+      `Detalle del pedido ${task.id} en el gestor de carpintería.`,
   };
 }
 

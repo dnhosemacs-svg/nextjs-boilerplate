@@ -50,7 +50,7 @@ export default function AuthRegisterForm() {
       return;
     }
     if (!isValidEmail(normalizedEmail)) {
-      setError("Introduce un email válido.");
+      setError("Introduce un correo electrónico válido.");
       return;
     }
     if (normalizedPassword.length < MIN_PASSWORD_LENGTH) {
@@ -105,7 +105,7 @@ export default function AuthRegisterForm() {
     >
       <div className="flex flex-col gap-6 md:gap-8">
         <TextInput
-          labelText="Email"
+          labelText="Correo electrónico"
           id="register-email"
           type="email"
           autoComplete="email"

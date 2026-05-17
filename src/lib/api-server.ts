@@ -17,7 +17,7 @@ async function getServerBaseUrl() {
 
 async function parseResponse<T>(response: Response): Promise<T> {
   if (!response.ok) {
-    let message = "Request failed";
+    let message = "La solicitud falló";
 
     try {
       const errorBody = (await response.json()) as { error?: string };

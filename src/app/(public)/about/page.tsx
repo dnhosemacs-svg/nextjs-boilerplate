@@ -31,7 +31,7 @@ export default function AboutPage() {
         <article className="content-highlight content-block">
           <p className="eyebrow">Estado actual</p>
           <p className="mt-3 text-sm leading-relaxed text-[var(--muted)] sm:text-base">
-            Actualmente esta versión está orientada a equipos pequeños y procesos simples.
+            Actualmente, esta versión está orientada a equipos pequeños y procesos simples.
             Próximamente incorporará autenticación por usuario, control de permisos y evolución del
             módulo de estadísticas.
           </p>

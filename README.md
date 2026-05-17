@@ -1,8 +1,8 @@
-# TaskFlow Carpinteria
+# TaskFlow Carpintería
 
 > Panel interno para gestionar pedidos del taller.
 
-Aplicacion web de gestion de pedidos de carpinteria construida con Next.js App Router. Incluye CRUD de pedidos, autenticacion con NextAuth (Firebase + GitHub OAuth opcional), proteccion de rutas con middleware y panel de estadisticas.
+Aplicación web de gestión de pedidos de carpintería construida con Next.js App Router. Incluye CRUD de pedidos, autenticación con NextAuth (Firebase + GitHub OAuth opcional), protección de rutas con middleware y panel de estadísticas.
 
 
 | Despliegue | URL                                                     |
@@ -12,29 +12,29 @@ Aplicacion web de gestion de pedidos de carpinteria construida con Next.js App R
 
 ---
 
-## Caracteristicas
+## Características
 
 - CRUD completo de pedidos (`/api/tasks` y `/api/tasks/:id`).
-- Login con email/contraseña (Firebase REST en servidor) y GitHub OAuth si esta configurado.
+- Inicio de sesión con correo electrónico/contraseña (Firebase REST en servidor) y GitHub OAuth si está configurado.
 - Registro de cuentas en `/register` (Firebase Auth en el navegador).
 - Rutas protegidas para trabajo interno (`/dashboard`, `/tasks/*`, `/stats`).
-- Redireccion post-login segura con `next` y `callbackUrl`.
+- Redirección post-login segura con `next` y `callbackUrl`.
 - UI con Server Components + Client Components donde hay estado.
 
 ---
 
-## Tecnologias
+## Tecnologías
 
 
 | Capa                 | Uso                                                  |
 | -------------------- | ---------------------------------------------------- |
 | Next.js (App Router) | Rutas, renderizado servidor/cliente y Route Handlers |
-| NextAuth             | Sesion JWT, proveedores credentials y GitHub         |
-| Firebase Auth        | Registro en cliente; login email/password en servidor |
-| TypeScript           | Tipado estatico                                      |
+| NextAuth             | Sesión JWT, proveedores credentials y GitHub         |
+| Firebase Auth        | Registro en cliente; login correo/contraseña en servidor |
+| TypeScript           | Tipado estático                                      |
 | React                | Componentes y estado de UI                           |
-| Zod                  | Validacion de payloads en API                        |
-| CSS global           | Estilos de aplicacion                                |
+| Zod                  | Validación de payloads en API                        |
+| CSS global           | Estilos de aplicación                                |
 
 
 ---
@@ -90,43 +90,43 @@ cp .env.example .env.local   # edita .env.local con tus valores
 npm run dev
 ```
 
-Aplicacion disponible en [http://localhost:3000](http://localhost:3000).
+Aplicación disponible en [http://localhost:3000](http://localhost:3000).
 
 ---
 
-## Configuracion
+## Configuración
 
-Crea `.env.local` en la raiz del proyecto (no se sube a git). Plantilla: [.env.example](.env.example).
+Crea `.env.local` en la raíz del proyecto (no se sube a git). Plantilla: [.env.example](.env.example).
 
 ### Variables de entorno
 
-| Variable | Local | Produccion | Descripcion |
+| Variable | Local | Producción | Descripción |
 | -------- | ----- | ------------ | ----------- |
 | `NEXTAUTH_SECRET` | Recomendado | **Obligatorio** | Firma del JWT de Auth.js. Alias: `AUTH_SECRET`. Sin valor en dev se usa un secreto temporal (ver consola). |
-| `NEXTAUTH_URL` | `http://localhost:3000` | **Recomendado** | URL publica de la app (callbacks OAuth y cookies). |
-| `VERCEL_URL` | — | Automatico en Vercel | Alternativa de URL canonica en build si no defines `NEXTAUTH_URL`. |
+| `NEXTAUTH_URL` | `http://localhost:3000` | **Recomendado** | URL pública de la app (callbacks OAuth y cookies). |
+| `VERCEL_URL` | — | Automático en Vercel | Alternativa de URL canónica en build si no defines `NEXTAUTH_URL`. |
 | `GITHUB_ID` / `GITHUB_SECRET` | Opcional | Opcional (par completo) | OAuth GitHub; ambas o ninguna ([server-env.ts](src/lib/server-env.ts)). |
-| `FIREBASE_API_KEY` | Recomendado | **Obligatorio** | Clave web Firebase; login email/password en servidor (sin `NEXT_PUBLIC_`). |
+| `FIREBASE_API_KEY` | Recomendado | **Obligatorio** | Clave web Firebase; login correo/contraseña en servidor (sin `NEXT_PUBLIC_`). |
 | `NEXT_PUBLIC_FIREBASE_API_KEY` | Si usas registro | Si usas registro | Misma clave web; restringir por dominio en Google Cloud. |
 | `NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN` | Si usas registro | Si usas registro | `authDomain` de firebaseConfig. |
 | `NEXT_PUBLIC_FIREBASE_PROJECT_ID` | Si usas registro | Si usas registro | `projectId` de firebaseConfig. |
 
-### Local vs produccion
+### Local vs producción
 
-| Paso | Desarrollo (`npm run dev`) | Produccion (Vercel) |
+| Paso | Desarrollo (`npm run dev`) | Producción (Vercel) |
 | ---- | -------------------------- | ------------------- |
 | Copiar plantilla | `cp .env.example .env.local` | Variables en Project Settings → Environment Variables |
-| Secreto sesion | `NEXTAUTH_SECRET` (openssl) | Mismo valor seguro en Preview y Production |
+| Secreto sesión | `NEXTAUTH_SECRET` (openssl) | Mismo valor seguro en Preview y Production |
 | URL app | `NEXTAUTH_URL=http://localhost:3000` | `NEXTAUTH_URL=https://tu-dominio.vercel.app` |
-| Firebase login | `FIREBASE_API_KEY` + `NEXT_PUBLIC_*` para `/register` | Igual; Email/Password habilitado en Firebase Console |
+| Firebase login | `FIREBASE_API_KEY` + `NEXT_PUBLIC_*` para `/register` | Igual; correo/contraseña habilitado en Firebase Console |
 | GitHub OAuth | Callback `http://localhost:3000/api/auth/callback/github` | Callback `https://tu-dominio/api/auth/callback/github` |
-| Validacion build | Relajada en dev | [src/lib/server-env.ts](src/lib/server-env.ts) falla el build si falta secreto, URL, Firebase o par GitHub incompleto |
+| Validación build | Relajada en dev | [src/lib/server-env.ts](src/lib/server-env.ts) falla el build si falta secreto, URL, Firebase o par GitHub incompleto |
 
 ### Checklist: secretos y despliegue
 
 1. Generar secreto: `openssl rand -base64 32` → `NEXTAUTH_SECRET`.
-2. Firebase: Authentication → Sign-in method → Email/Password activado.
-3. GitHub OAuth (opcional): OAuth App con callback `/api/auth/callback/github` en local y produccion.
+2. Firebase: Authentication → Sign-in method → correo/contraseña activado.
+3. GitHub OAuth (opcional): OAuth App con callback `/api/auth/callback/github` en local y producción.
 4. Vercel: mismas variables en Preview y Production; redeploy tras cambios.
 
 ---
@@ -134,16 +134,16 @@ Crea `.env.local` en la raiz del proyecto (no se sube a git). Plantilla: [.env.e
 ## Scripts
 
 - `npm run dev`: servidor de desarrollo.
-- `npm run build`: build de produccion.
-- `npm run start`: ejecutar build de produccion.
-- `npm run lint`: analisis estatico con ESLint.
+- `npm run build`: build de producción.
+- `npm run start`: ejecutar build de producción.
+- `npm run lint`: análisis estático con ESLint.
 
 ---
 
 ## Rutas de la app
 
-- `/`: inicio publico del proyecto.
-- `/login`: inicio de sesion (email/password y GitHub si esta configurado).
+- `/`: inicio público del proyecto.
+- `/login`: inicio de sesión (correo/contraseña y GitHub si está configurado).
 - `/register`: crear cuenta con Firebase.
 - `/dashboard`: panel privado principal (protegida).
 - `/tasks/new`: crear pedido (protegida).
@@ -166,7 +166,7 @@ Rutas auxiliares:
   - **401**: no autenticado.
 - `POST /api/tasks`
   - **201**: devuelve `Task` creado.
-  - **400**: body invalido o error de validacion.
+  - **400**: cuerpo inválido o error de validación.
   - **401**: no autenticado.
 - `GET /api/tasks/:id`
   - **200**: devuelve `Task`.
@@ -174,7 +174,7 @@ Rutas auxiliares:
   - **401**: no autenticado.
 - `PUT /api/tasks/:id`
   - **200**: devuelve `Task` actualizado.
-  - **400**: body invalido o error de validacion.
+  - **400**: cuerpo inválido o error de validación.
   - **404**: no encontrado.
   - **401**: no autenticado.
 - `DELETE /api/tasks/:id`
@@ -186,8 +186,8 @@ Rutas auxiliares:
 
 Ruta catch-all: `src/app/api/auth/[...nextauth]/route.ts`. No hay `POST /api/auth/login` custom.
 
-- `GET/POST /api/auth/*` — rutas internas de NextAuth (sesion, callback credentials, callback github, signout, etc.).
-- `GET /api/auth/session` — sesion actual.
+- `GET/POST /api/auth/*` — rutas internas de NextAuth (sesión, callback credentials, callback github, signout, etc.).
+- `GET /api/auth/session` — sesión actual.
 
 El login desde la UI usa `signIn()` del cliente (`redirect: false` para credentials).
 
@@ -206,57 +206,57 @@ El login desde la UI usa `signIn()` del cliente (`redirect: false` para credenti
 
 ---
 
-## Autenticacion (Auth.js + Firebase + OAuth)
+## Autenticación (Auth.js + Firebase + OAuth)
 
 Stack:
 
-- **Auth.js (NextAuth)**: sesion JWT en cookie, proveedores en [src/lib/auth.ts](src/lib/auth.ts), handler en `src/app/api/auth/[...nextauth]/route.ts`.
-- **Firebase Auth**: registro en cliente (`/register`); validacion de email/password en servidor vía REST (`signInWithPassword` en [src/lib/firebase-auth-rest.ts](src/lib/firebase-auth-rest.ts)).
-- **GitHub OAuth** (opcional): boton en `/login` si `GITHUB_ID` y `GITHUB_SECRET` estan definidos.
+- **Auth.js (NextAuth)**: sesión JWT en cookie, proveedores en [src/lib/auth.ts](src/lib/auth.ts), handler en `src/app/api/auth/[...nextauth]/route.ts`.
+- **Firebase Auth**: registro en cliente (`/register`); validación de correo/contraseña en servidor vía REST (`signInWithPassword` en [src/lib/firebase-auth-rest.ts](src/lib/firebase-auth-rest.ts)).
+- **GitHub OAuth** (opcional): botón en `/login` si `GITHUB_ID` y `GITHUB_SECRET` están definidos.
 
-Rutas de autenticacion:
+Rutas de autenticación:
 
 | Ruta | Acceso | Comportamiento |
 | ---- | ------ | -------------- |
-| `/login` | Publica | Email/password (`signIn("credentials", { redirect: false })`) y GitHub si esta configurado. |
-| `/register` | Publica | Alta con Firebase SDK; tras crear cuenta, login en `/login?registered=1`. |
-| `/dashboard` | Privada | Panel principal; requiere sesion (middleware). |
+| `/login` | Pública | Correo/contraseña (`signIn("credentials", { redirect: false })`) y GitHub si está configurado. |
+| `/register` | Pública | Alta con Firebase SDK; tras crear cuenta, login en `/login?registered=1`. |
+| `/dashboard` | Privada | Panel principal; requiere sesión (middleware). |
 
 Flujo resumido:
 
-1. **Credentials**: formulario → Auth.js → Firebase REST en servidor → JWT de sesion → redirect a `callbackUrl` / `next` seguro o `/dashboard`.
-2. **GitHub**: `signIn("github")` → GitHub → `/api/auth/callback/github` → sesion Auth.js → mismo destino post-login.
-3. **Proteccion**: [middleware.ts](middleware.ts) redirige paginas sin sesion a `/login`; APIs `/api/tasks` devuelven `401` JSON.
+1. **Credentials**: formulario → Auth.js → Firebase REST en servidor → JWT de sesión → redirect a `callbackUrl` / `next` seguro o `/dashboard`.
+2. **GitHub**: `signIn("github")` → GitHub → `/api/auth/callback/github` → sesión Auth.js → mismo destino post-login.
+3. **Protección**: [middleware.ts](middleware.ts) redirige páginas sin sesión a `/login`; APIs `/api/tasks` devuelven `401` JSON.
 
 Detalle: [docs/seguridad/oauth.md](docs/seguridad/oauth.md), [docs/seguridad/middleware.md](docs/seguridad/middleware.md), [docs/seguridad/credenciales.md](docs/seguridad/credenciales.md).
 
 ---
 
-## Verificacion del flujo auth
+## Verificación del flujo auth
 
-### Automatica
+### Automática
 
 ```bash
 npm run verify:auth
 ```
 
-Comprueba que el login use `signIn("credentials", { redirect: false })`, que no exista `POST /api/auth/login` custom ni `document.cookie` manual en modulos de auth, y que los redirects/errores sigan el contrato del proyecto.
+Comprueba que el login use `signIn("credentials", { redirect: false })`, que no exista `POST /api/auth/login` custom ni `document.cookie` manual en módulos de auth, y que los redirects/errores sigan el contrato del proyecto.
 
-Despues: `npm run lint` y `npm run build`.
+Después: `npm run lint` y `npm run build`.
 
-### Manual (checklist rapido)
+### Manual (checklist rápido)
 
-1. **Sin sesion**: abrir `/dashboard` → debe ir a `/login` con `callbackUrl` (y a menudo `next`) apuntando a `/dashboard`.
+1. **Sin sesión**: abrir `/dashboard` → debe ir a `/login` con `callbackUrl` (y a menudo `next`) apuntando a `/dashboard`.
 2. **Registro**: en `/register` crear cuenta → mensaje en `/login?registered=1` → login con esas credenciales → llegar a `/dashboard`.
-3. **Credentials erroneas**: contraseña incorrecta → «Credenciales invalidas.» (sin filtrar si el email existe).
-4. **API protegida**: `GET /api/tasks` sin cookie de sesion → `401` (p. ej. pestaña anonima o `curl`).
-5. **Deep link**: sin sesion, `/tasks/new` → login → tras entrar, volver a `/tasks/new`.
-6. **OAuth** (si GitHub configurado): «Continuar con GitHub» → consentimiento → vuelta autenticado a destino valido.
-7. **Sesion activa**: con sesion, visitar `/login` o `/register` → redireccion a `/dashboard` (o `callbackUrl` valido).
+3. **Credenciales erróneas**: contraseña incorrecta → «Credenciales inválidas.» (sin filtrar si el correo existe).
+4. **API protegida**: `GET /api/tasks` sin cookie de sesión → `401` (p. ej. pestaña anónima o `curl`).
+5. **Deep link**: sin sesión, `/tasks/new` → login → tras entrar, volver a `/tasks/new`.
+6. **OAuth** (si GitHub configurado): «Continuar con GitHub» → consentimiento → vuelta autenticado a destino válido.
+7. **Sesión activa**: con sesión, visitar `/login` o `/register` → redirección a `/dashboard` (o `callbackUrl` válido).
 
 ---
 
 ## Limitaciones conocidas
 
-- Pedidos persistidos en cookie por sesion; no hay base de datos de tareas.
-- Usuarios gestionados en Firebase; no hay panel de administracion de usuarios en la app.
+- Pedidos persistidos en cookie por sesión; no hay base de datos de tareas.
+- Usuarios gestionados en Firebase; no hay panel de administración de usuarios en la app.

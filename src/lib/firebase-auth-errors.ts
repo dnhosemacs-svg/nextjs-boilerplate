@@ -15,13 +15,13 @@ function getFirebaseErrorCode(error: unknown): string | undefined {
 function getDetailedFirebaseAuthErrorMessage(error: unknown): string {
   switch (getFirebaseErrorCode(error)) {
     case "auth/email-already-in-use":
-      return "Ese email ya está registrado.";
+      return "Ese correo electrónico ya está registrado.";
     case "auth/invalid-email":
-      return "El email no es válido.";
+      return "El correo electrónico no es válido.";
     case "auth/weak-password":
       return "La contraseña es demasiado débil (mínimo 6 caracteres).";
     case "auth/operation-not-allowed":
-      return "El registro por email no está habilitado en Firebase.";
+      return "El registro por correo electrónico no está habilitado en Firebase.";
     case "auth/network-request-failed":
       return "Error de red. Comprueba tu conexión.";
     case "auth/too-many-requests":

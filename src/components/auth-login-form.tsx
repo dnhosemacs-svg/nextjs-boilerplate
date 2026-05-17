@@ -65,7 +65,7 @@ export default function AuthLoginForm({
     const normalizedPassword = password.trim();
 
     if (!normalizedEmail || !normalizedPassword) {
-      setError("Email y password son obligatorios.");
+      setError("El correo electrónico y la contraseña son obligatorios.");
       return;
     }
 
@@ -113,14 +113,14 @@ export default function AuthLoginForm({
               : "Continuar con GitHub"}
           </Button>
           <p className="text-sm text-[var(--muted)]">
-            O inicia sesión con email y contraseña.
+            O inicia sesión con correo electrónico y contraseña.
           </p>
         </div>
       ) : null}
 
       <div className="flex flex-col gap-6 md:gap-8">
         <TextInput
-          labelText="Email"
+          labelText="Correo electrónico"
           id="email"
           type="email"
           required
@@ -131,7 +131,7 @@ export default function AuthLoginForm({
         />
 
         <PasswordInput
-          labelText="Password"
+          labelText="Contraseña"
           id="password"
           required
           value={password}
@@ -143,7 +143,7 @@ export default function AuthLoginForm({
 
       {showRegisteredNotice ? (
         <p className="rounded-lg border border-green-500/30 bg-green-500/10 px-3 py-2 text-sm text-green-800 dark:text-green-300">
-          Cuenta creada. Inicia sesión con tu email y contraseña.
+          Cuenta creada. Inicia sesión con tu correo electrónico y contraseña.
         </p>
       ) : null}
 
@@ -159,7 +159,7 @@ export default function AuthLoginForm({
         kind="primary"
         className="carbon-btn-primary self-start"
       >
-        {isSubmitting ? "Entrando..." : "Iniciar sesion"}
+        {isSubmitting ? "Entrando..." : "Iniciar sesión"}
       </Button>
     </form>
   );
