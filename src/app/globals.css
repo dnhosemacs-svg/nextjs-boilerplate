@@ -642,28 +642,6 @@ button:focus-visible,
   padding-block: 0.95rem 2.75rem;
 }
 
-.private-fab {
-  position: fixed;
-  right: 1rem;
-  bottom: 1rem;
-  z-index: 40;
-  border-radius: 999px;
-  padding: 0.8rem 1rem;
-  font-size: 0.875rem;
-  font-weight: 700;
-  background: var(--brand);
-  color: #fffdf9;
-  box-shadow: 0 10px 24px -14px rgb(45 34 25 / 0.8);
-  transition:
-    transform 0.15s ease,
-    background-color 0.15s ease;
-}
-
-.private-fab:hover {
-  background: var(--brand-strong);
-  transform: translateY(-1px);
-}
-
 @media (min-width: 768px) {
   .private-header-menu-btn {
     display: none;
@@ -686,11 +664,6 @@ button:focus-visible,
 
   .private-content .page-shell {
     padding-block: 0.85rem 3.2rem;
-  }
-
-  .private-fab {
-    right: 1.5rem;
-    bottom: 1.5rem;
   }
 }
 
@@ -737,6 +710,10 @@ button:focus-visible,
   letter-spacing: -0.02em;
 }
 
+.dashboard-recent-title {
+  margin-bottom: 1.25rem;
+}
+
 .dashboard-recent-list {
   display: flex;
   flex-direction: column;
@@ -752,6 +729,22 @@ button:focus-visible,
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
+}
+
+.dashboard-recent-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.45rem;
+}
+
+.dashboard-recent-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.35rem;
+  flex-shrink: 0;
 }
 
 .dashboard-recent-item:hover {

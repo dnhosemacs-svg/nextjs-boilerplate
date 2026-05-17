@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useState } from "react";
 import { sessionUserLabel } from "@/lib/session-user-label";
 import { signOut, useSession } from "next-auth/react";
@@ -49,10 +48,6 @@ export default function PrivateHeader({ onOpenSidebar }: PrivateHeaderProps) {
             {userLabel}
           </span>
         ) : null}
-
-        <Link href="/stats" className="ui-pill ui-pill-secondary">
-          Estadísticas
-        </Link>
 
         {status === "loading" ? (
           <span

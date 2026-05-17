@@ -1,6 +1,7 @@
 import Link from "next/link";
+import QuickCompleteButton from "@/components/tasks/quick-complete-button";
+import StatusBadge from "@/components/tasks/status-badge";
 import { listTasksFromCookieStore } from "@/lib/tasks-cookie-store";
-import { formatTaskStatus } from "@/lib/task-status";
 
 function formatRelativeDate(value: string) {
   const date = new Date(value);
@@ -64,12 +65,7 @@ export default async function DashboardPage() {
       </section>
 
       <section className="surface-card">
-        <div className="mb-4 flex items-center justify-between gap-3">
-          <h2 className="section-heading text-3xl">Actividad reciente</h2>
-          <Link href="/tasks/new" className="ui-pill ui-pill-primary">
-            Nuevo pedido
-          </Link>
-        </div>
+        <h2 className="section-heading text-3xl dashboard-recent-title">Actividad reciente</h2>
 
         {recentTasks.length === 0 ? (
           <p className="text-sm text-[var(--muted)]">
@@ -81,13 +77,22 @@ export default async function DashboardPage() {
               <li key={task.id} className="dashboard-recent-item">
                 <div>
                   <p className="text-sm font-semibold">{task.title}</p>
-                  <p className="mt-1 text-xs text-[var(--muted)]">
-                    {formatTaskStatus(task.status)} · {formatRelativeDate(task.updatedAt)}
-                  </p>
+                  <div className="dashboard-recent-meta">
+                    <StatusBadge status={task.status} />
+                    <span className="text-xs text-[var(--muted)]">
+                      {formatRelativeDate(task.updatedAt)}
+                    </span>
+                  </div>
                 </div>
-                <Link href={`/tasks/${task.id}`} className="ui-link-underline">
-                  Ver detalle
-                </Link>
+                <div className="dashboard-recent-actions">
+                  <Link href={`/tasks/${task.id}`} className="ui-link-underline">
+                    Ver detalle
+                  </Link>
+                  <QuickCompleteButton
+                    taskId={task.id}
+                    isDone={task.status === "done"}
+                  />
+                </div>
               </li>
             ))}
           </ul>
