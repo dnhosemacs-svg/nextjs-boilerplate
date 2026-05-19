@@ -29,6 +29,12 @@ function collectPages(dir, acc = []) {
 
 const appPages = collectPages(join(ROOT, "src/app/(app)"));
 
+const appLayout = read("src/app/(app)/layout.tsx");
+assert(
+  appLayout.includes("getServerSession") && appLayout.includes("redirect"),
+  "(app)/layout.tsx: debe redirigir a /login si no hay sesión",
+);
+
 for (const file of appPages) {
   const rel = relative(ROOT, file).replace(/\\/g, "/");
   const content = read(rel);
@@ -63,7 +69,15 @@ assert(
 );
 
 const middleware = read("middleware.ts");
-for (const route of ["/dashboard", "/stats", "/tasks", "/login", "/register"]) {
+for (const route of [
+  "/dashboard",
+  "/stats",
+  "/tasks",
+  "/products",
+  "/categories",
+  "/login",
+  "/register",
+]) {
   assert(middleware.includes(`"${route}`), `middleware.ts: matcher debe cubrir ${route}`);
 }
 
@@ -73,5 +87,5 @@ if (failures.length > 0) {
   process.exit(1);
 }
 
-console.log("verify:page-guards — OK (sin guards duplicados en (app); login/register conservan redirect).");
-console.log("  Protección de páginas privadas: solo middleware.ts (+ sesión en layout para UI).");
+console.log("verify:page-guards — OK (guard en (app)/layout; páginas sin guards duplicados).");
+console.log("  Protección: middleware.ts + redirect en (app)/layout.tsx si no hay sesión.");

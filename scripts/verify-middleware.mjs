@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Paso 4: middleware (withAuth + APIs 401) alineado con protected-api-routes y safe-redirect.
+ * Paso 4: proxy (páginas + APIs 401) alineado con protected-api-routes y safe-redirect.
  * Comprobaciones estáticas en middleware.ts y, si el servidor responde, pruebas HTTP.
  *
  * Uso:
@@ -28,16 +28,8 @@ const middleware = read("middleware.ts");
 const protectedRoutes = read("src/lib/protected-api-routes.ts");
 
 assert(
-  middleware.includes('from "next-auth/middleware"'),
-  "middleware.ts: debe importar from \"next-auth/middleware\"",
-);
-assert(
-  /withAuth\s*\(/.test(middleware),
-  "middleware.ts: debe usar withAuth(...)",
-);
-assert(
-  /signIn:\s*["']\/login["']/.test(middleware),
-  "middleware.ts: pages.signIn debe ser \"/login\"",
+  /export\s+async\s+function\s+middleware/.test(middleware),
+  "middleware.ts: debe exportar async function middleware",
 );
 assert(
   middleware.includes("getAuthSecret"),
@@ -46,6 +38,10 @@ assert(
 assert(
   middleware.includes("handleProtectedApi"),
   "middleware.ts: debe definir handleProtectedApi para APIs",
+);
+assert(
+  middleware.includes("handleProtectedPage"),
+  "middleware.ts: debe definir handleProtectedPage para páginas privadas",
 );
 assert(
   middleware.includes("isProtectedApiPath"),
@@ -68,6 +64,10 @@ const matcherRoutes = [
   '"/dashboard/:path*"',
   '"/tasks/:path*"',
   '"/stats"',
+  '"/products"',
+  '"/products/:path*"',
+  '"/categories"',
+  '"/categories/:path*"',
   '"/api/tasks/:path*"',
   '"/login"',
   '"/register"',
@@ -107,10 +107,10 @@ async function probe(
   }
 
   if (expectRedirect) {
-    if (res.status !== 307 && res.status !== 308) {
+    if (res.status !== 307 && res.status !== 308 && res.status !== 302) {
       return {
         ok: false,
-        detail: `${path}: status ${res.status}, esperado redirect 307/308`,
+        detail: `${path}: status ${res.status}, esperado redirect 302/307/308`,
       };
     }
   } else if (expectStatus !== undefined && res.status !== expectStatus) {
@@ -171,6 +171,14 @@ const httpCases = [
       }),
   },
   {
+    name: "sin sesión /categories → redirect login",
+    run: () =>
+      probe("/categories", {
+        expectRedirect: true,
+        locationIncludes: "/login",
+      }),
+  },
+  {
     name: "sin sesión /tasks/new → redirect login",
     run: () =>
       probe("/tasks/new", {
@@ -223,7 +231,7 @@ if (failures.length > 0) {
   for (const msg of failures) console.error(`  • ${msg}`);
   if (looksLikeStaleDev) {
     console.error(
-      "\n  Sugerencia: reinicia `npm run dev` tras cambiar middleware/proxy,",
+      "\n  Sugerencia: reinicia `npm run dev` tras cambiar middleware.ts,",
     );
     console.error(
       "  o prueba contra build de producción: npm run build && npm run start",
@@ -246,5 +254,5 @@ console.log(
   `verify:middleware — OK (estáticas + ${httpRan} pruebas HTTP en ${BASE_URL}).`,
 );
 console.log(
-  "  Modelo: páginas privadas → withAuth; APIs → isProtectedApiPath + 401 JSON.",
+  "  Modelo: páginas privadas → handleProtectedPage; APIs → isProtectedApiPath + 401 JSON.",
 );

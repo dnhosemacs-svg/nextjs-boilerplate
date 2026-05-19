@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { sessionUserLabel } from "@/lib/session-user-label";
 import { signOut, useSession } from "next-auth/react";
@@ -9,12 +11,14 @@ type PrivateHeaderProps = {
 };
 
 export default function PrivateHeader({ onOpenSidebar }: PrivateHeaderProps) {
+  const pathname = usePathname();
   const { data: session, status } = useSession();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   const isAuthenticated = status === "authenticated" && !!session?.user;
   const userLabel =
     isAuthenticated && session?.user ? sessionUserLabel(session.user) : null;
+  const loginHref = `/login?${new URLSearchParams({ callbackUrl: pathname }).toString()}`;
 
   async function onLogout() {
     setIsLoggingOut(true);
@@ -56,7 +60,7 @@ export default function PrivateHeader({ onOpenSidebar }: PrivateHeaderProps) {
           >
             …
           </span>
-        ) : (
+        ) : isAuthenticated ? (
           <button
             type="button"
             onClick={onLogout}
@@ -65,6 +69,10 @@ export default function PrivateHeader({ onOpenSidebar }: PrivateHeaderProps) {
           >
             {isLoggingOut ? "Saliendo..." : "Cerrar sesión"}
           </button>
+        ) : (
+          <Link href={loginHref} className="ui-pill ui-pill-secondary">
+            Iniciar sesión
+          </Link>
         )}
       </div>
     </header>
