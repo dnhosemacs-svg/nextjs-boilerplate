@@ -72,8 +72,9 @@ nextjs-boilerplate/
 
 Copia `.env.example` a `.env.local` y rellena las variables antes de desarrollar.
 
-Documentación de seguridad (entregable):
+Documentación:
 
+- [Arquitectura del inventario (v1)](docs/arquitectura.md)
 - [OAuth 2.0 / GitHub](docs/seguridad/oauth.md)
 - [Middleware y protección de rutas](docs/seguridad/middleware.md)
 - [Credenciales y contraseñas](docs/seguridad/credenciales.md)
