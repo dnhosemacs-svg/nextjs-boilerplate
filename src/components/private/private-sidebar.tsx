@@ -3,7 +3,12 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-const navItems = [
+const inventoryItems = [
+  { href: "/products", label: "Productos" },
+  { href: "/categories", label: "Categorías" },
+];
+
+const orderItems = [
   { href: "/dashboard", label: "Panel" },
   { href: "/tasks/new", label: "Nuevo pedido" },
   { href: "/stats", label: "Estadísticas" },
@@ -17,6 +22,38 @@ type PrivateSidebarProps = {
   open: boolean;
   onClose: () => void;
 };
+
+type NavItem = { href: string; label: string };
+
+function NavLinkList({
+  items,
+  pathname,
+  onClose,
+}: {
+  items: NavItem[];
+  pathname: string;
+  onClose: () => void;
+}) {
+  return (
+    <ul className="private-nav-list">
+      {items.map((item) => {
+        const isActive = isActivePath(pathname, item.href);
+        return (
+          <li key={item.href}>
+            <Link
+              href={item.href}
+              onClick={onClose}
+              aria-current={isActive ? "page" : undefined}
+              className={`private-nav-link ${isActive ? "is-active" : ""}`}
+            >
+              {item.label}
+            </Link>
+          </li>
+        );
+      })}
+    </ul>
+  );
+}
 
 export default function PrivateSidebar({ open, onClose }: PrivateSidebarProps) {
   const pathname = usePathname();
@@ -38,24 +75,14 @@ export default function PrivateSidebar({ open, onClose }: PrivateSidebarProps) {
           <h2 className="section-heading text-3xl">Taller</h2>
         </div>
 
-        <nav aria-label="Navegación privada">
-          <ul className="private-nav-list">
-            {navItems.map((item) => {
-              const isActive = isActivePath(pathname, item.href);
-              return (
-                <li key={item.href}>
-                  <Link
-                    href={item.href}
-                    onClick={onClose}
-                    aria-current={isActive ? "page" : undefined}
-                    className={`private-nav-link ${isActive ? "is-active" : ""}`}
-                  >
-                    {item.label}
-                  </Link>
-                </li>
-              );
-            })}
-          </ul>
+        <nav aria-label="Inventario">
+          <p className="eyebrow mb-2 mt-4">Inventario</p>
+          <NavLinkList items={inventoryItems} pathname={pathname} onClose={onClose} />
+        </nav>
+
+        <nav aria-label="Pedidos" className="mt-6">
+          <p className="eyebrow mb-2">Pedidos</p>
+          <NavLinkList items={orderItems} pathname={pathname} onClose={onClose} />
         </nav>
       </aside>
     </>
