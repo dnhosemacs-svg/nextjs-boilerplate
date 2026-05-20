@@ -7,6 +7,10 @@ Archivos para importar en **Postman** o **Thunder Client** (ambos admiten import
 1. Postman: **Import** → selecciona `carpinteria-api.postman_collection.json` y `carpinteria-api.postman_environment.json`.
 2. Thunder Client: menú **Collections** → **Import** → elige la misma colección JSON.
 
+## Verificación manual
+
+Sigue el checklist paso a paso: [CHECKLIST.md](CHECKLIST.md) (21 requests; cubre **401**, felices, **400**, **404** y **409**).
+
 ## Sesión (obligatorio)
 
 1. `npm run dev` e inicia sesión en `http://localhost:3000/login`.

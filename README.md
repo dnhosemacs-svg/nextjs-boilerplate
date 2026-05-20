@@ -211,7 +211,7 @@ El login desde la UI usa `signIn()` del cliente (`redirect: false` para credenti
 
 > **Nota:** No versiones en git valores reales de cookies ni entornos exportados con secretos; usa variables locales o placeholders en colecciones compartidas.
 
-**Colección lista para importar:** [tools/postman/](tools/postman/) — `carpinteria-api.postman_collection.json` y `carpinteria-api.postman_environment.json` (Postman o Thunder Client). Tras importar, rellena la variable `cookie` del entorno y sigue [tools/postman/README.md](tools/postman/README.md).
+**Colección lista para importar:** [tools/postman/](tools/postman/) — `carpinteria-api.postman_collection.json` y `carpinteria-api.postman_environment.json` (Postman o Thunder Client). Tras importar, rellena la variable `cookie` del entorno y sigue [tools/postman/README.md](tools/postman/README.md). Checklist de verificación manual: [tools/postman/CHECKLIST.md](tools/postman/CHECKLIST.md).
 
 ---
 
