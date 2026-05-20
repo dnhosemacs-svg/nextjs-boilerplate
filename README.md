@@ -192,6 +192,25 @@ Ruta catch-all: `src/app/api/auth/[...nextauth]/route.ts`. No hay `POST /api/aut
 
 El login desde la UI usa `signIn()` del cliente (`redirect: false` para credentials).
 
+### Probar APIs autenticadas (Thunder Client / Postman)
+
+1. Arranca `npm run dev` e inicia sesión en `/login` con un usuario válido (Firebase + credenciales del proyecto).
+2. En el navegador, DevTools → **Cookies** de `http://localhost:3000` y copia el valor de la cookie de sesión de NextAuth. En local suele llamarse **`next-auth.session-token`** (en HTTPS/producción el nombre puede incluir prefijos `__Secure-` / `__Host-`).
+3. En **Thunder Client** o **Postman**, define `baseUrl` como `http://localhost:3000` y en cada petición protegida envía el header **`Cookie`** con ese par nombre/valor, por ejemplo: `next-auth.session-token=<valor copiado>`. También puedes guardar la cadena completa en una variable del entorno/colección.
+4. Comprueba que sin cookie (o con sesión caducada) las APIs sensibles responden **401** JSON (`{"error":"No autenticado"}`). Rutas relevantes: `src/app/api/tasks/*`, `src/app/api/products/*`, `src/app/api/categories/*`.
+
+**Verificación rápida de códigos** (con sesión válida salvo donde se indica):
+
+| Código | Cómo obtenerlo (orientativo) |
+| ------ | ---------------------------- |
+| **401** | Cualquier `GET`/`POST`/… a `/api/tasks`, `/api/products` o `/api/categories` **sin** header `Cookie`. |
+| **200** / **201** | Por ejemplo `GET /api/categories` o `POST /api/categories` con JSON válido. |
+| **400** | Cuerpo o query inválidos: p. ej. `POST /api/categories` con `{"name":""}`, o `GET /api/products?sortBy=noValido`. |
+| **404** | `PATCH` o `DELETE` en `/api/categories/:id` o `/api/products/:id` con un **id que no exista** en la base de datos. |
+| **409** | `POST /api/categories` con un **nombre ya usado**; o `DELETE /api/categories/:id` cuando esa categoría **tiene productos** (crear categoría → `POST /api/products` con ese `categoryId` → luego `DELETE` de la categoría). |
+
+> **Nota:** No versiones en git valores reales de cookies ni entornos exportados con secretos; usa variables locales o placeholders en colecciones compartidas.
+
 ---
 
 ## Modelo de datos
