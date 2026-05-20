@@ -1,0 +1,467 @@
+{
+  "info": {
+    "_postman_id": "carpinteria-api-collection",
+    "name": "TaskFlow Carpintería — API",
+    "description": "Colección para verificar APIs autenticadas con sesión NextAuth (cookie).\n\n**Antes de probar:**\n1. `npm run dev`\n2. Inicia sesión en `/login`\n3. Copia la cookie `next-auth.session-token` del navegador\n4. Importa el entorno `carpinteria-api.postman_environment.json` y pega el valor en la variable `cookie`\n\nLas carpetas «409 — …» y algunos casos felices encadenan variables automáticamente con scripts de test.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:3000" },
+    { "key": "cookie", "value": "" },
+    { "key": "categoryId", "value": "" },
+    { "key": "categoryIdWithProducts", "value": "" },
+    { "key": "productId", "value": "" },
+    { "key": "fakeId", "value": "00000000-0000-0000-0000-000000000000" }
+  ],
+  "item": [
+    {
+      "name": "00 — Sesión",
+      "item": [
+        {
+          "name": "GET session (comprobar login)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Cookie", "value": "{{cookie}}" }
+            ],
+            "url": "{{baseUrl}}/api/auth/session"
+          },
+          "response": []
+        },
+        {
+          "name": "401 — GET categories sin cookie",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/categories"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "01 — Categories (felices)",
+      "item": [
+        {
+          "name": "200 — GET categories",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Cookie", "value": "{{cookie}}" }
+            ],
+            "url": "{{baseUrl}}/api/categories"
+          },
+          "response": []
+        },
+        {
+          "name": "201 — POST category",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "  const body = pm.response.json();",
+                  "  if (body && body.id) {",
+                  "    pm.environment.set('categoryId', body.id);",
+                  "    pm.collectionVariables.set('categoryId', body.id);",
+                  "  }",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Cookie", "value": "{{cookie}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Categoría API {{$timestamp}}\"\n}"
+            },
+            "url": "{{baseUrl}}/api/categories"
+          },
+          "response": []
+        },
+        {
+          "name": "200 — PATCH category",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Cookie", "value": "{{cookie}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Categoría API renombrada {{$timestamp}}\"\n}"
+            },
+            "url": "{{baseUrl}}/api/categories/{{categoryId}}"
+          },
+          "response": []
+        },
+        {
+          "name": "200 — DELETE category (sin productos)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Cookie", "value": "{{cookie}}" }
+            ],
+            "url": "{{baseUrl}}/api/categories/{{categoryId}}"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "02 — Categories (errores)",
+      "item": [
+        {
+          "name": "400 — POST category name vacío",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Cookie", "value": "{{cookie}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"\"\n}"
+            },
+            "url": "{{baseUrl}}/api/categories"
+          },
+          "response": []
+        },
+        {
+          "name": "404 — PATCH category id inexistente",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Cookie", "value": "{{cookie}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"No existe\"\n}"
+            },
+            "url": "{{baseUrl}}/api/categories/{{fakeId}}"
+          },
+          "response": []
+        },
+        {
+          "name": "404 — DELETE category id inexistente",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Cookie", "value": "{{cookie}}" }
+            ],
+            "url": "{{baseUrl}}/api/categories/{{fakeId}}"
+          },
+          "response": []
+        },
+        {
+          "name": "409 — POST category nombre duplicado",
+          "item": [
+            {
+              "name": "1. POST category (primera)",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "if (pm.response.code === 201) {",
+                      "  const body = pm.response.json();",
+                      "  if (body && body.name) {",
+                      "    pm.environment.set('duplicateCategoryName', body.name);",
+                      "    pm.collectionVariables.set('duplicateCategoryName', body.name);",
+                      "  }",
+                      "}"
+                    ],
+                    "type": "text/javascript"
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  { "key": "Cookie", "value": "{{cookie}}" },
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Duplicada API {{$timestamp}}\"\n}"
+                },
+                "url": "{{baseUrl}}/api/categories"
+              },
+              "response": []
+            },
+            {
+              "name": "2. POST category (mismo nombre → 409)",
+              "request": {
+                "method": "POST",
+                "header": [
+                  { "key": "Cookie", "value": "{{cookie}}" },
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"{{duplicateCategoryName}}\"\n}"
+                },
+                "url": "{{baseUrl}}/api/categories"
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "409 — DELETE category con productos (ejecutar en orden)",
+          "item": [
+            {
+              "name": "1. POST category",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "if (pm.response.code === 201) {",
+                      "  const body = pm.response.json();",
+                      "  if (body && body.id) {",
+                      "    pm.environment.set('categoryIdWithProducts', body.id);",
+                      "    pm.collectionVariables.set('categoryIdWithProducts', body.id);",
+                      "  }",
+                      "}"
+                    ],
+                    "type": "text/javascript"
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  { "key": "Cookie", "value": "{{cookie}}" },
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Con productos {{$timestamp}}\"\n}"
+                },
+                "url": "{{baseUrl}}/api/categories"
+              },
+              "response": []
+            },
+            {
+              "name": "2. POST product en esa categoría",
+              "request": {
+                "method": "POST",
+                "header": [
+                  { "key": "Cookie", "value": "{{cookie}}" },
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Producto bloqueo delete\",\n  \"sku\": \"SKU-BLOCK-{{$timestamp}}\",\n  \"price\": 10,\n  \"stock\": 1,\n  \"categoryId\": \"{{categoryIdWithProducts}}\"\n}"
+                },
+                "url": "{{baseUrl}}/api/products"
+              },
+              "response": []
+            },
+            {
+              "name": "3. DELETE category → 409",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  { "key": "Cookie", "value": "{{cookie}}" }
+                ],
+                "url": "{{baseUrl}}/api/categories/{{categoryIdWithProducts}}"
+              },
+              "response": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "03 — Products (felices)",
+      "item": [
+        {
+          "name": "200 — GET products",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Cookie", "value": "{{cookie}}" }
+            ],
+            "url": "{{baseUrl}}/api/products?sortBy=name&sortOrder=asc"
+          },
+          "response": []
+        },
+        {
+          "name": "201 — POST product",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "if (!pm.environment.get('categoryId') && !pm.collectionVariables.get('categoryId')) {",
+                  "  console.warn('Ejecuta antes «201 — POST category» o define categoryId en el entorno.');",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "  const body = pm.response.json();",
+                  "  if (body && body.id) {",
+                  "    pm.environment.set('productId', body.id);",
+                  "    pm.collectionVariables.set('productId', body.id);",
+                  "  }",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Cookie", "value": "{{cookie}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Producto API {{$timestamp}}\",\n  \"description\": \"Prueba Postman\",\n  \"sku\": \"SKU-TEST-{{$timestamp}}\",\n  \"price\": 12.5,\n  \"stock\": 0,\n  \"categoryId\": \"{{categoryId}}\"\n}"
+            },
+            "url": "{{baseUrl}}/api/products"
+          },
+          "response": []
+        },
+        {
+          "name": "200 — PATCH product",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Cookie", "value": "{{cookie}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Producto API renombrado\"\n}"
+            },
+            "url": "{{baseUrl}}/api/products/{{productId}}"
+          },
+          "response": []
+        },
+        {
+          "name": "200 — PATCH stock",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Cookie", "value": "{{cookie}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"stock\": 5\n}"
+            },
+            "url": "{{baseUrl}}/api/products/{{productId}}/stock"
+          },
+          "response": []
+        },
+        {
+          "name": "200 — DELETE product",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Cookie", "value": "{{cookie}}" }
+            ],
+            "url": "{{baseUrl}}/api/products/{{productId}}"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "04 — Products (errores)",
+      "item": [
+        {
+          "name": "400 — GET products sortBy inválido",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Cookie", "value": "{{cookie}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/products?sortBy=noValido",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "products"],
+              "query": [{ "key": "sortBy", "value": "noValido" }]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "400 — POST product categoryId inexistente",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Cookie", "value": "{{cookie}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Sin categoría\",\n  \"price\": 5,\n  \"categoryId\": \"{{fakeId}}\"\n}"
+            },
+            "url": "{{baseUrl}}/api/products"
+          },
+          "response": []
+        },
+        {
+          "name": "404 — PATCH product id inexistente",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Cookie", "value": "{{cookie}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Fantasma\"\n}"
+            },
+            "url": "{{baseUrl}}/api/products/{{fakeId}}"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "05 — Tasks (muestra auth)",
+      "item": [
+        {
+          "name": "200 — GET tasks",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Cookie", "value": "{{cookie}}" }
+            ],
+            "url": "{{baseUrl}}/api/tasks"
+          },
+          "response": []
+        },
+        {
+          "name": "401 — GET tasks sin cookie",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/tasks"
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}
