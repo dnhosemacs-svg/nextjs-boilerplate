@@ -28,6 +28,16 @@ function collectApiRoutes(dir, acc = []) {
   return acc;
 }
 
+/** Rutas API que exigen middleware + requireApiSession (deben figurar en protected-api-routes). */
+function isCatalogProtectedApiRoute(rel) {
+  return (
+    rel.includes("/api/tasks/") ||
+    rel.endsWith("api/tasks/route.ts") ||
+    rel.includes("/api/categories/") ||
+    rel.endsWith("api/categories/route.ts")
+  );
+}
+
 const protectedRoutes = read("src/lib/protected-api-routes.ts");
 const middleware = read("middleware.ts");
 const apiAuth = read("src/lib/api-auth.ts");
@@ -35,6 +45,10 @@ const apiAuth = read("src/lib/api-auth.ts");
 assert(
   protectedRoutes.includes('"/api/tasks"'),
   "protected-api-routes.ts: debe listar /api/tasks",
+);
+assert(
+  protectedRoutes.includes('"/api/categories"'),
+  "protected-api-routes.ts: debe listar /api/categories",
 );
 assert(
   middleware.includes("isProtectedApiPath"),
@@ -63,8 +77,8 @@ for (const file of routeFiles) {
     continue;
   }
 
-  const isUnderProtectedPrefix = rel.includes("/api/tasks/");
-  if (!isUnderProtectedPrefix && !rel.endsWith("api/tasks/route.ts")) {
+  const isUnderProtectedPrefix = isCatalogProtectedApiRoute(rel);
+  if (!isUnderProtectedPrefix) {
     failures.push(
       `${rel}: ruta API no catalogada; añádela a protected-api-routes.ts o documenta por qué es pública`,
     );
@@ -90,11 +104,12 @@ for (const file of routeFiles) {
 
 async function probe(path, { method = "GET", expectStatus, bodyIncludes, notRedirect }) {
   try {
+    const wantsJsonBody = method === "POST" || method === "PATCH";
     const res = await fetch(`${BASE_URL}${path}`, {
       method,
       redirect: "manual",
-      headers: method === "POST" ? { "content-type": "application/json" } : undefined,
-      body: method === "POST" ? "{}" : undefined,
+      headers: wantsJsonBody ? { "content-type": "application/json" } : undefined,
+      body: wantsJsonBody ? "{}" : undefined,
     });
     const location = res.headers.get("location") ?? "";
     const body = await res.text();
@@ -138,6 +153,45 @@ const httpCases = [
     name: "GET /api/tasks/fake-id sin sesión → 401 JSON",
     run: () =>
       probe("/api/tasks/test-id", {
+        expectStatus: 401,
+        bodyIncludes: "No autenticado",
+        notRedirect: true,
+      }),
+  },
+  {
+    name: "GET /api/categories sin sesión → 401 JSON",
+    run: () =>
+      probe("/api/categories", {
+        expectStatus: 401,
+        bodyIncludes: "No autenticado",
+        notRedirect: true,
+      }),
+  },
+  {
+    name: "POST /api/categories sin sesión → 401 JSON",
+    run: () =>
+      probe("/api/categories", {
+        method: "POST",
+        expectStatus: 401,
+        bodyIncludes: "No autenticado",
+        notRedirect: true,
+      }),
+  },
+  {
+    name: "PATCH /api/categories/fake-id sin sesión → 401 JSON",
+    run: () =>
+      probe("/api/categories/test-id", {
+        method: "PATCH",
+        expectStatus: 401,
+        bodyIncludes: "No autenticado",
+        notRedirect: true,
+      }),
+  },
+  {
+    name: "DELETE /api/categories/fake-id sin sesión → 401 JSON",
+    run: () =>
+      probe("/api/categories/test-id", {
+        method: "DELETE",
         expectStatus: 401,
         bodyIncludes: "No autenticado",
         notRedirect: true,
