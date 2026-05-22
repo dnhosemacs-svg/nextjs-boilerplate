@@ -725,6 +725,10 @@ button:focus-visible,
 }
 
 @media (min-width: 768px) {
+  .private-shell {
+    --private-band-height: 6.15rem;
+  }
+
   .private-header-menu-btn {
     display: none;
   }
@@ -734,6 +738,21 @@ button:focus-visible,
     top: 0;
     transform: none;
     height: 100vh;
+  }
+
+  .private-sidebar-top {
+    min-height: calc(var(--private-band-height) - 1.5rem);
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+  }
+
+  .private-header {
+    min-height: var(--private-band-height);
+    box-sizing: border-box;
+    align-items: center;
+    padding-block: 0;
   }
 
   .private-main {
