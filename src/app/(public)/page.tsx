@@ -26,7 +26,7 @@ const galleryItems = [
 export default function Home() {
 
   return (
-    <main className="page-shell">
+    <main className="page-shell page-shell--home">
       <div className="flex w-full flex-col gap-8 md:gap-12">
         <section className="surface-card relative overflow-hidden p-0">
           <div className="absolute inset-0 z-10 bg-gradient-to-r from-black/70 via-black/45 to-black/20" />
@@ -64,24 +64,25 @@ export default function Home() {
 
         <section>
           <article className="surface-card presentation-card">
-            <p className="eyebrow">Flujo en el taller</p>
+            <p className="eyebrow">Tu proyecto, paso a paso</p>
             <h2 className="section-heading max-w-xl">
-              Cómo encaja esta app en el día a día del equipo.
+              Próximamente podrás gestionar tu pedido desde aquí.
             </h2>
             <p className="text-sm leading-relaxed text-[var(--muted)] sm:text-base">
-              Cada pedido lo crea alguien del taller cuando entra un trabajo nuevo. Así todos
-              ven el mismo estado, las notas y el detalle sin depender de papel suelto o grupos
-              de mensajes.
+              Estamos preparando un espacio para que puedas crear tu cuenta, iniciar sesión y
+              solicitar trabajos a medida con la misma claridad que en el taller: un solo sitio
+              para el detalle de tu proyecto, el estado del encargo y la comunicación con
+              nosotros.
             </p>
             <ul className="mt-1 grid gap-3 text-sm text-[var(--foreground)] sm:grid-cols-3">
               <li className="rounded-2xl border border-[var(--line)] bg-[var(--surface-strong)] p-4">
-                Registrar pedido y prioridad
+                Regístrate y cuéntanos qué necesitas
               </li>
               <li className="rounded-2xl border border-[var(--line)] bg-[var(--surface-strong)] p-4">
-                Seguimiento en fabricación
+                Sigue el avance de tu pedido en tiempo real
               </li>
               <li className="rounded-2xl border border-[var(--line)] bg-[var(--surface-strong)] p-4">
-                Cierre y revisión en lista
+                Recibe tu pieza y revisa el resultado contigo
               </li>
             </ul>
           </article>
