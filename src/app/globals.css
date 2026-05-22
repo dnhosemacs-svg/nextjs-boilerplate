@@ -127,6 +127,88 @@ body {
   padding-top: 1rem;
 }
 
+/* Home — galería y CTA: separación fija (flex gap, sin colapso de márgenes) */
+.home-gallery {
+  display: flex;
+  flex-direction: column;
+  gap: 2.75rem;
+}
+
+.home-gallery-header {
+  margin: 0;
+  padding: 0;
+  flex-shrink: 0;
+}
+
+.home-gallery-header .eyebrow + .section-heading {
+  margin-top: 1rem;
+  line-height: 1.25;
+  padding-bottom: 0.35rem;
+}
+
+.home-gallery-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: minmax(0, 1fr);
+  margin: 0;
+  padding: 0;
+}
+
+.home-gallery-card-copy {
+  padding: 1.75rem 1.75rem 2.75rem;
+}
+
+.home-gallery-card-copy p {
+  margin-top: 0.625rem;
+}
+
+.home-cta-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.home-cta-copy .eyebrow + .section-heading {
+  margin-top: 0.25rem;
+  line-height: 1.25;
+}
+
+.home-cta-copy .home-cta-actions {
+  margin-top: 0.5rem;
+}
+
+@media (min-width: 768px) {
+  .home-gallery {
+    gap: 3.5rem;
+  }
+
+  .home-gallery-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1rem;
+  }
+
+  .home-gallery-header .eyebrow + .section-heading {
+    margin-top: 1.15rem;
+    padding-bottom: 0.5rem;
+  }
+
+  .home-gallery-card-copy {
+    padding: 2rem 2rem 3rem;
+  }
+
+  .home-cta-copy {
+    gap: 1.75rem;
+  }
+
+  .home-cta-copy .eyebrow + .section-heading {
+    margin-top: 0.35rem;
+  }
+
+  .home-cta-copy .home-cta-actions {
+    margin-top: 0.75rem;
+  }
+}
+
 /* Hero inicio: imagen a sangre en la tarjeta */
 .surface-card.home-hero {
   padding: 0;
@@ -836,6 +918,7 @@ button:focus-visible,
   }
 }
 
+
 @media (min-width: 768px) {
   .content-block {
     margin-bottom: 1.5rem;
@@ -1255,6 +1338,68 @@ button:focus-visible,
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
+}
+
+/* Pasos «Tu proyecto» — fondo que envuelve todo el texto */
+.presentation-card-steps {
+  display: grid;
+  gap: 0.75rem;
+  margin: 0.25rem 0 0;
+  padding: 0;
+  list-style: none;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.presentation-card-step {
+  display: block;
+  box-sizing: border-box;
+  min-width: 0;
+  width: 100%;
+  border-radius: 0.625rem;
+  border: none;
+  background-color: var(--surface-strong);
+  padding: 1.1rem 1.25rem;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--foreground);
+  overflow-wrap: break-word;
+}
+
+@media (min-width: 640px) {
+  .presentation-card-steps {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.875rem;
+    align-items: stretch;
+  }
+
+  .presentation-card-step {
+    padding: 1.2rem 1.35rem;
+    min-height: 4.75rem;
+  }
+}
+
+/* Home — padding en tarjetas de contenido (regla al final para que siempre aplique) */
+.page-shell--home .surface-card.home-gallery,
+.page-shell--home .surface-card.home-cta,
+.page-shell--home .surface-card.presentation-card {
+  padding: 3rem !important;
+}
+
+.page-shell--home .surface-card.presentation-card {
+  border: none !important;
+}
+
+.presentation-card-step {
+  border: none !important;
+  outline: none;
+}
+
+@media (min-width: 768px) {
+  .page-shell--home .surface-card.home-gallery,
+  .page-shell--home .surface-card.home-cta,
+  .page-shell--home .surface-card.presentation-card {
+    padding: 3.75rem !important;
+  }
 }
 
 @layer base {

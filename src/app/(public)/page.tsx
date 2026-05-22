@@ -68,29 +68,27 @@ export default function Home() {
               para el detalle de tu proyecto, el estado del encargo y la comunicación con
               nosotros.
             </p>
-            <ul className="mt-1 grid gap-3 text-sm text-[var(--foreground)] sm:grid-cols-3">
-              <li className="rounded-2xl border border-[var(--line)] bg-[var(--surface-strong)] p-4">
+            <ul className="presentation-card-steps">
+              <li className="presentation-card-step">
                 Regístrate y cuéntanos qué necesitas
               </li>
-              <li className="rounded-2xl border border-[var(--line)] bg-[var(--surface-strong)] p-4">
+              <li className="presentation-card-step">
                 Sigue el avance de tu pedido en tiempo real
               </li>
-              <li className="rounded-2xl border border-[var(--line)] bg-[var(--surface-strong)] p-4">
+              <li className="presentation-card-step">
                 Recibe tu pieza y revisa el resultado contigo
               </li>
             </ul>
           </article>
         </section>
 
-        <section className="surface-card">
-          <div className="mb-6">
-            <div>
-              <p className="eyebrow">Referencia visual</p>
-              <h2 className="section-heading">Inspiración y acabados</h2>
-            </div>
-          </div>
+        <section className="surface-card home-gallery">
+          <header className="home-gallery-header">
+            <p className="eyebrow">Referencia visual</p>
+            <h2 className="section-heading">Inspiración y acabados</h2>
+          </header>
 
-          <div className="grid gap-4 md:grid-cols-3">
+          <div className="home-gallery-grid">
             {galleryItems.map((item) => (
               <article
                 key={item.title}
@@ -104,27 +102,27 @@ export default function Home() {
                   sizes="(max-width: 768px) 100vw, 33vw"
                   className="h-56 w-full object-cover transition duration-500 group-hover:scale-[1.03]"
                 />
-                <div className="p-4">
+                <div className="home-gallery-card-copy">
                   <h3 className="text-base font-semibold">{item.title}</h3>
-                  <p className="mt-1 text-sm text-[var(--muted)]">{item.place}</p>
+                  <p className="text-sm text-[var(--muted)]">{item.place}</p>
                 </div>
               </article>
             ))}
           </div>
         </section>
 
-        <section className="surface-card warm-gradient relative overflow-hidden">
+        <section className="surface-card warm-gradient home-cta relative overflow-hidden">
           <div className="soft-grid pointer-events-none absolute inset-0 opacity-50" />
           <div className="relative z-10 grid gap-6 md:grid-cols-[1.15fr_1fr] md:items-center">
-            <div>
+            <div className="home-cta-copy">
               <p className="eyebrow">¿Listo para avanzar?</p>
-              <h2 className="section-heading mt-2 max-w-xl">
+              <h2 className="section-heading max-w-xl">
                 Si ya trabajas con nosotros, entra a tu panel. Si no, contáctanos.
               </h2>
-              <p className="mt-3 max-w-xl text-sm leading-relaxed text-[var(--muted)] sm:text-base">
+              <p className="max-w-xl text-sm leading-relaxed text-[var(--muted)] sm:text-base">
                 Centralizamos pedidos y seguimiento para mantener cada proyecto claro y ordenado.
               </p>
-              <div className="mt-6 flex flex-wrap gap-3">
+              <div className="home-cta-actions flex flex-wrap gap-3">
                 <HomeAuthCta />
                 <Link href="/about" className="ui-pill ui-pill-secondary">
                   Contactar
