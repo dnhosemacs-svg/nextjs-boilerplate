@@ -32,6 +32,13 @@ export async function PATCH(request: Request, { params }: Context) {
     );
   }
 
+  if (process.env.DEMO_STOCK_500 === "true") {
+    return NextResponse.json(
+      { error: "Error simulado (demo DEMO_STOCK_500)" },
+      { status: 500 },
+    );
+  }
+
   const existing = await db.product.findUnique({ where: { id } });
   if (!existing) {
     return NextResponse.json({ error: "No encontrado" }, { status: 404 });
