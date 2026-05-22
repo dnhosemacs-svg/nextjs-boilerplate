@@ -22,7 +22,7 @@ export function CategoryFilter() {
       value={categoryId ?? ALL}
       onValueChange={(value) =>
         setProductFilters({
-          categoryId: value === ALL ? undefined : value,
+          categoryId: value && value !== ALL ? value : undefined,
         })
       }
       disabled={isLoading}
