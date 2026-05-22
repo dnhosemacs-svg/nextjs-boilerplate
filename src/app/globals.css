@@ -113,15 +113,78 @@ body {
 .page-shell {
   margin-inline: auto;
   display: flex;
+  flex-direction: column;
+  align-items: stretch;
   width: 100%;
   max-width: 72rem;
   flex: 1 1 0%;
+  min-width: 0;
   padding-inline: 1rem;
   padding-block: 2rem 3rem;
 }
 
 .page-shell--home {
   padding-top: 1rem;
+}
+
+/* Hero inicio: proporción estable al zoom / ancho de ventana */
+.home-hero {
+  position: relative;
+  width: 100%;
+  padding: 0;
+  overflow: hidden;
+}
+
+.home-hero-media {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  min-height: 28rem;
+  max-height: 42rem;
+}
+
+.home-hero-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  background: linear-gradient(
+    to right,
+    rgb(0 0 0 / 0.7) 0%,
+    rgb(0 0 0 / 0.45) 55%,
+    rgb(0 0 0 / 0.2) 100%
+  );
+  pointer-events: none;
+}
+
+.home-hero-content {
+  position: absolute;
+  inset: auto 0.75rem 0.75rem 0.75rem;
+  z-index: 20;
+  padding: 1.5rem;
+}
+
+@media (min-width: 640px) {
+  .home-hero-media {
+    aspect-ratio: 16 / 10;
+    min-height: 30rem;
+  }
+
+  .home-hero-content {
+    inset: auto 1.25rem 1.25rem 1.25rem;
+    padding: 2rem;
+  }
+}
+
+@media (min-width: 768px) {
+  .home-hero-media {
+    min-height: 32rem;
+    max-height: 40rem;
+  }
+
+  .home-hero-content {
+    inset: auto 1.5rem 1.5rem 1.5rem;
+    padding: 3rem;
+  }
 }
 
 .surface-card {

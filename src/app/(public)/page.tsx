@@ -27,19 +27,20 @@ export default function Home() {
 
   return (
     <main className="page-shell page-shell--home">
-      <div className="flex w-full flex-col gap-8 md:gap-12">
-        <section className="surface-card relative overflow-hidden p-0">
-          <div className="absolute inset-0 z-10 bg-gradient-to-r from-black/70 via-black/45 to-black/20" />
-          <Image
-            src="https://images.pexels.com/photos/5974335/pexels-photo-5974335.jpeg?auto=compress&cs=tinysrgb&w=2000"
-            alt="Carpintero trabajando una pieza de madera en su taller"
-            width={2000}
-            height={1200}
-            priority
-            sizes="(max-width: 768px) 100vw, 1100px"
-            className="h-[66svh] min-h-[460px] w-full object-cover object-center"
-          />
-          <div className="absolute inset-x-3 bottom-3 z-20 p-6 sm:inset-x-5 sm:bottom-5 sm:p-8 md:inset-x-6 md:bottom-6 md:p-12">
+      <div className="flex w-full min-w-0 flex-col gap-8 md:gap-12">
+        <section className="surface-card home-hero">
+          <div className="home-hero-media">
+            <Image
+              src="https://images.pexels.com/photos/5974335/pexels-photo-5974335.jpeg?auto=compress&cs=tinysrgb&w=2000"
+              alt="Carpintero trabajando una pieza de madera en su taller"
+              fill
+              priority
+              sizes="(max-width: 72rem) 100vw, 72rem"
+              className="object-cover object-center"
+            />
+          </div>
+          <div className="home-hero-overlay" aria-hidden />
+          <div className="home-hero-content">
             <p className="eyebrow mb-3 !text-white/90 drop-shadow-sm">
               Carpintería a medida
             </p>
@@ -50,15 +51,6 @@ export default function Home() {
               Creamos mobiliario y soluciones en madera adaptadas a cada espacio, con enfoque en
               calidad de materiales, detalle artesanal y cumplimiento de plazos.
             </p>
-            <div className="mt-7 flex flex-wrap items-center gap-3">
-              <HomeAuthCta />
-              <Link
-                href="/about"
-                className="ui-pill border border-white/70 bg-black/20 !text-white/95 shadow-sm backdrop-blur-md hover:border-white/85 hover:bg-black/30"
-              >
-                Sobre el proyecto
-              </Link>
-            </div>
           </div>
         </section>
 
