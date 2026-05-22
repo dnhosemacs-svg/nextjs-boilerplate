@@ -120,6 +120,10 @@ body {
   padding-block: 2rem 3rem;
 }
 
+.page-shell--home {
+  padding-top: 1rem;
+}
+
 .surface-card {
   width: 100%;
   border-radius: 1.5rem;
@@ -172,6 +176,10 @@ body {
     padding-block: 3rem 4.5rem;
   }
 
+  .page-shell--home {
+    padding-top: 1.25rem;
+  }
+
   .surface-card {
     padding: 2rem;
   }
@@ -183,6 +191,199 @@ body {
 
 a {
   color: inherit;
+}
+
+/* Cabecera pública: logo (izq), nav (centro), sesión (der) */
+.site-header-wrap {
+  padding-top: 0;
+  padding-bottom: 0.25rem;
+}
+
+.site-header-bar {
+  --site-nav-band-height: 4.5rem;
+  --site-header-edge-inset: 0.85rem;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  width: 100%;
+  min-height: var(--site-nav-band-height);
+  column-gap: 1rem;
+  padding-block: 0 0.35rem;
+}
+
+.site-header-logo {
+  grid-column: 1;
+  grid-row: 1;
+  justify-self: start;
+  align-self: start;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  padding-left: var(--site-header-edge-inset);
+  line-height: 0;
+  text-decoration: none;
+}
+
+.site-logo-svg {
+  display: block;
+  width: auto;
+  height: 6.75rem;
+}
+
+.site-logo-svg .logo-mark {
+  fill: var(--brand);
+  transition: fill 0.3s ease;
+}
+
+.site-logo-svg .logo-text {
+  font-family: "Montserrat", "Helvetica Neue", var(--font-manrope), Arial, sans-serif;
+  font-weight: 700;
+  fill: var(--brand-strong);
+  text-anchor: middle;
+  letter-spacing: 6px;
+  transition: fill 0.3s ease;
+}
+
+.site-logo-svg .logo-sub {
+  font-family: "Montserrat", "Helvetica Neue", var(--font-manrope), Arial, sans-serif;
+  font-weight: 400;
+  fill: var(--muted);
+  text-anchor: middle;
+  letter-spacing: 12px;
+}
+
+.site-header-logo:hover .site-logo-svg .logo-mark {
+  fill: var(--focus-ring);
+}
+
+.site-header-logo:hover .site-logo-svg .logo-text {
+  fill: var(--foreground);
+}
+
+.site-header-nav {
+  grid-column: 2;
+  grid-row: 1;
+  justify-self: center;
+  align-self: center;
+  z-index: 1;
+  width: max-content;
+  max-width: min(100%, 28rem);
+}
+
+.site-navbar {
+  border-radius: 1rem;
+  border: 1px solid rgb(207 190 167 / 0.45);
+  background: rgb(246 240 231 / 90%);
+  box-shadow:
+    0 10px 26px -22px rgb(45 34 25 / 0.7),
+    0 2px 10px -8px rgb(45 34 25 / 0.45);
+  backdrop-filter: blur(8px);
+}
+
+@supports (backdrop-filter: blur(8px)) {
+  .site-navbar {
+    background: rgb(246 240 231 / 80%);
+  }
+}
+
+.site-navbar-list {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  margin: 0;
+  padding: 0.875rem 1rem;
+  list-style: none;
+  overflow-x: auto;
+}
+
+.site-header-actions {
+  grid-column: 3;
+  grid-row: 1;
+  justify-self: end;
+  align-self: center;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding-right: var(--site-header-edge-inset);
+}
+
+@media (min-width: 768px) {
+  .site-header-wrap {
+    position: relative;
+    min-height: 9.75rem;
+  }
+
+  .site-header-bar {
+    --site-header-edge-inset: 1.15rem;
+    position: relative;
+    height: var(--site-nav-band-height);
+    min-height: var(--site-nav-band-height);
+    align-items: center;
+  }
+
+  .site-header-logo {
+    position: absolute;
+    top: 0;
+    left: 0;
+    grid-column: auto;
+    grid-row: auto;
+  }
+
+  .site-logo-svg {
+    height: 9.75rem;
+  }
+
+  .site-header-nav {
+    max-width: min(100%, 32rem);
+  }
+}
+
+@media (min-width: 1024px) {
+  .site-header-wrap {
+    min-height: 10.75rem;
+  }
+
+  .site-logo-svg {
+    height: 10.75rem;
+  }
+}
+
+@media (max-width: 767px) {
+  .site-header-bar {
+    grid-template-columns: 1fr auto;
+    grid-template-rows: auto auto;
+    align-items: start;
+    height: auto;
+    min-height: 0;
+    row-gap: 0.75rem;
+    padding-block: 0 0.65rem;
+  }
+
+  .site-header-logo {
+    position: static;
+    grid-column: 1;
+    grid-row: 1;
+    align-self: start;
+  }
+
+  .site-header-actions {
+    grid-column: 2;
+    grid-row: 1;
+    align-self: center;
+  }
+
+  .site-header-nav {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    justify-self: center;
+    align-self: center;
+    max-width: 100%;
+  }
+
+  .site-logo-svg {
+    height: 5.75rem;
+  }
 }
 
 .ui-pill {

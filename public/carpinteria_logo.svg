@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" width="100%" height="100%">
+  <style>
+    .logo-mark { fill: #8b5e3c; transition: fill 0.3s ease; }
+    .logo-text {
+      font-family: "Montserrat", "Helvetica Neue", sans-serif;
+      font-weight: 700;
+      fill: #70482d;
+      text-anchor: middle;
+      letter-spacing: 6px;
+      transition: fill 0.3s ease;
+    }
+    .logo-sub {
+      font-family: "Montserrat", "Helvetica Neue", sans-serif;
+      font-weight: 400;
+      fill: #6e6051;
+      text-anchor: middle;
+      letter-spacing: 12px;
+      font-size: 14px;
+    }
+    svg:hover .logo-mark { fill: #b57a4f; }
+    svg:hover .logo-text { fill: #2d2219; }
+  </style>
+  <g transform="translate(250, 220)">
+    <path
+      class="logo-mark"
+      d="M 45,-65 L 75,-45 L 55,-25 L 85,-2 L 60,15 L 85,42 L 55,55 L 72,85 L 38,82 L 45,115 L 10,102 L 5,135 L -30,112 L -45,140 L -75,107 L -98,128 L -118,88 L -140,98 L -148,52 L -165,52 L -160,2 L -172,-15 L -155,-35 L -158,-55 L -132,-68 L -125,-90 L -92,-95 L -75,-115 L -40,-108 L -15,-125 L 15,-105 L 45,-115 L 35,-80 Z M 30,-50 A 85,85 0 1,0 30,70 L 10,45 A 55,55 0 1,1 10,-30 Z"
+    />
+    <path
+      class="logo-mark"
+      d="M 0,-15 A 35,35 0 1,0 0,35 L 0,20 A 20,20 0 1,1 0,-2 Z"
+      opacity="0.85"
+    />
+  </g>
+  <text x="253" y="390" class="logo-text" font-size="24">CARPINTERùA</text>
+  <text x="256" y="425" class="logo-sub">DISEùO Y MADERA</text>
+</svg>

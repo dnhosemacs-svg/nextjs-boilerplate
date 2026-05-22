@@ -5,8 +5,7 @@ export default function PublicLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <div className="min-h-full flex flex-col">
-      <div className="w-full px-4 md:px-6">
-        <div aria-hidden className="h-3" />
+      <div className="site-header-wrap w-full px-4 md:px-6">
         <SiteNavbar />
       </div>
       {children}
