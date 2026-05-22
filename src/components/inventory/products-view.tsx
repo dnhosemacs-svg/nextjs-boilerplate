@@ -14,7 +14,7 @@ export function ProductsView() {
       <Card>
         <InventoryPageHeader
           title="Productos"
-          description="Listado, filtros y alta rápida."
+          description="Listado, filtros, alta, edición y eliminación."
         />
         <CardContent className="space-y-6">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
