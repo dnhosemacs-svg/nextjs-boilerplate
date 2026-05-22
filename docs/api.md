@@ -157,6 +157,23 @@ Errores específicos de conflicto y FK:
 
 ---
 
+### UI (página Productos)
+
+Ruta: `/products`. Componentes en `src/components/inventory/`.
+
+| Acción en UI | Componente | Endpoint |
+|--------------|------------|----------|
+| **Crear** | Formulario «Nuevo producto» (`ProductForm`, modo `create`) | `POST /api/products` |
+| **Editar** | Lápiz en tarjeta → formulario inline (`ProductForm`, modo `edit`) | `PATCH /api/products/:id` (sin `stock`) |
+| **Ajustar stock** | Botones ± en tarjeta (`ProductCard`) | `PATCH /api/products/:id/stock` |
+| **Eliminar** | Papelera → `ConfirmDialog` → confirmar | `DELETE /api/products/:id` |
+
+**React Query:** tras crear, editar o borrar un producto, las mutaciones en `src/hooks/inventory/use-product-mutations.ts` invalidan `products` y `categories` (el listado de productos muestra el nombre de categoría anidado). El stock usa `useUpdateStockMutation` con actualización optimista e invalidación de listas filtradas.
+
+**Errores en UI:** los mensajes del cuerpo `{ "error": "…" }` se muestran bajo el formulario o bajo el diálogo de borrado. Casos habituales al editar: **409** SKU duplicado, **400** categoría inexistente, **404** producto no encontrado. El borrado de producto no devuelve **409** por dependencias (a diferencia de `DELETE /api/categories/:id`).
+
+---
+
 ## Stock (`/api/products/:id/stock`)
 
 No existe una ruta global `/api/stock`. El inventario se actualiza en el sub-recurso anidado del producto.
