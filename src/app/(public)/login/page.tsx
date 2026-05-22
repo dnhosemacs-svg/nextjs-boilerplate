@@ -24,8 +24,8 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
 
   const githubOAuthEnabled = isGithubOAuthConfigured();
   return (
-    <main className="page-shell max-w-4xl items-start justify-center">
-      <div className="w-full max-w-xl">
+    <main className="page-shell login-page max-w-4xl justify-center">
+      <div className="login-page-form w-full max-w-xl">
         <section className="surface-card login-layout">
           <header className="login-block flex flex-col gap-3">
             <p className="eyebrow">Acceso interno</p>

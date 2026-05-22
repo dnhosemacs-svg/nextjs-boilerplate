@@ -521,10 +521,17 @@ a {
 
   .site-header-bar {
     --site-header-edge-inset: 1.15rem;
+    --site-header-controls-offset: 0.875rem;
     position: relative;
     height: var(--site-nav-band-height);
     min-height: var(--site-nav-band-height);
-    align-items: center;
+    align-items: start;
+  }
+
+  .site-header-nav,
+  .site-header-actions {
+    align-self: start;
+    margin-top: var(--site-header-controls-offset);
   }
 
   .site-header-logo {
@@ -854,6 +861,16 @@ button:focus-visible,
   .stats-block {
     margin-bottom: 1.5rem;
   }
+}
+
+.login-page {
+  align-items: center;
+}
+
+.login-page-form {
+  margin-inline: auto;
+  width: 100%;
+  max-width: 36rem;
 }
 
 .login-layout {
