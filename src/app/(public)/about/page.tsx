@@ -1,8 +1,15 @@
+import PresentationStepCards from "@/components/presentation-step-cards";
+
 const principles = [
   "Priorizar claridad operativa antes que complejidad técnica innecesaria.",
   "Centralizar la información de pedidos para evitar reprocesos en el taller.",
   "Mantener una interfaz rápida, legible y coherente para uso diario del equipo.",
 ];
+
+const principleItems = principles.map((text, index) => ({
+  key: `principle-${index}`,
+  body: text,
+}));
 
 export default function AboutPage() {
   return (
@@ -17,16 +24,7 @@ export default function AboutPage() {
           </p>
         </header>
 
-        <div className="content-grid content-block">
-          {principles.map((item) => (
-            <article
-              key={item}
-              className="content-card"
-            >
-              <p className="text-sm leading-relaxed text-[var(--foreground)]">{item}</p>
-            </article>
-          ))}
-        </div>
+        <PresentationStepCards items={principleItems} />
 
         <article className="content-highlight content-block">
           <p className="eyebrow">Estado actual</p>
