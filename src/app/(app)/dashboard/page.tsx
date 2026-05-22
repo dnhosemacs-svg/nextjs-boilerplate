@@ -26,45 +26,36 @@ export default async function DashboardPage() {
   const done = tasks.filter((task) => task.status === "done").length;
 
   return (
-    <main className="page-shell dashboard-shell items-start">
-      <header className="dashboard-hero">
-        <div>
-          <p className="eyebrow">Panel operativo</p>
+    <main className="page-shell dashboard-shell">
+      <div className="dashboard-top">
+        <header className="dashboard-hero">
           <h1 className="section-heading">Panel del taller</h1>
           <p className="content-description">
             Vista general para priorizar pedidos, monitorear la carga del equipo y actuar rápido.
           </p>
-        </div>
-        <div className="dashboard-hero-actions">
-          <Link href="/stats" className="ui-pill ui-pill-secondary">
-            Ver métricas
-          </Link>
-          <Link href="/tasks/new" className="ui-pill ui-pill-primary">
-            Crear pedido
-          </Link>
-        </div>
-      </header>
+        </header>
 
-      <section className="dashboard-kpi-grid">
-        <article className="dashboard-kpi-card">
-          <p className="eyebrow">Total pedidos</p>
-          <p className="dashboard-kpi-value">{total}</p>
-        </article>
-        <article className="dashboard-kpi-card">
-          <p className="eyebrow">Pendientes</p>
-          <p className="dashboard-kpi-value">{pending}</p>
-        </article>
-        <article className="dashboard-kpi-card">
-          <p className="eyebrow">En proceso</p>
-          <p className="dashboard-kpi-value">{inProgress}</p>
-        </article>
-        <article className="dashboard-kpi-card">
-          <p className="eyebrow">Completados</p>
-          <p className="dashboard-kpi-value">{done}</p>
-        </article>
-      </section>
+        <section className="dashboard-kpi-grid">
+          <article className="dashboard-kpi-card">
+            <p className="eyebrow">Total pedidos</p>
+            <p className="dashboard-kpi-value">{total}</p>
+          </article>
+          <article className="dashboard-kpi-card">
+            <p className="eyebrow">Pendientes</p>
+            <p className="dashboard-kpi-value">{pending}</p>
+          </article>
+          <article className="dashboard-kpi-card">
+            <p className="eyebrow">En proceso</p>
+            <p className="dashboard-kpi-value">{inProgress}</p>
+          </article>
+          <article className="dashboard-kpi-card">
+            <p className="eyebrow">Completados</p>
+            <p className="dashboard-kpi-value">{done}</p>
+          </article>
+        </section>
+      </div>
 
-      <section className="surface-card">
+      <section className="surface-card dashboard-recent-section">
         <h2 className="section-heading text-3xl dashboard-recent-title">Actividad reciente</h2>
 
         {recentTasks.length === 0 ? (

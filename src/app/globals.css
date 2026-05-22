@@ -754,6 +754,32 @@ button:focus-visible,
   gap: 1.1rem;
 }
 
+.dashboard-top {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+  width: 100%;
+}
+
+.dashboard-recent-section {
+  width: 100%;
+}
+
+@media (min-width: 768px) {
+  .dashboard-shell {
+    align-items: center;
+  }
+
+  .dashboard-top {
+    width: min(100%, clamp(28rem, 88%, 64rem));
+    margin-inline: auto;
+  }
+
+  .dashboard-recent-section {
+    align-self: stretch;
+  }
+}
+
 .dashboard-hero {
   border: 1px solid var(--line);
   border-radius: 1rem;
@@ -842,12 +868,6 @@ button:focus-visible,
 @media (min-width: 1024px) {
   .dashboard-kpi-grid {
     grid-template-columns: repeat(4, minmax(0, 1fr));
-  }
-
-  .dashboard-hero {
-    flex-direction: row;
-    align-items: flex-start;
-    justify-content: space-between;
   }
 }
 
