@@ -1,3 +1,5 @@
+import InfoStepsCards from "@/components/info-steps-cards";
+
 const quickGuide = [
   {
     title: "1. Cuéntanos tu idea",
@@ -26,17 +28,7 @@ export default function InfoPage() {
           </p>
         </header>
 
-        <div className="content-grid content-block">
-          {quickGuide.map((step) => (
-            <article
-              key={step.title}
-              className="content-card"
-            >
-              <h2 className="text-base font-semibold">{step.title}</h2>
-              <p className="mt-2 text-sm leading-relaxed text-[var(--muted)]">{step.detail}</p>
-            </article>
-          ))}
-        </div>
+        <InfoStepsCards steps={quickGuide} />
 
         <article className="content-highlight content-block">
           <p className="eyebrow">Compromisos</p>

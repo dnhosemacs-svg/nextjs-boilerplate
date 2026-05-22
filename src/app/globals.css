@@ -725,6 +725,15 @@ button:focus-visible,
   }
 }
 
+/* Tarjeta 3 centrada en /info */
+@media (min-width: 768px) {
+  .content-card--step-centered {
+    width: calc((100% - 1rem) / 2);
+    max-width: 100%;
+    margin-inline: auto;
+  }
+}
+
 .status-badge {
   display: inline-flex;
   align-items: center;
