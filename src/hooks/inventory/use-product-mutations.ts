@@ -28,6 +28,7 @@ export function useUpdateProductMutation() {
       updateProduct(id, input),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.products.all });
+      queryClient.invalidateQueries({ queryKey: queryKeys.categories.all });
     },
   });
 }
@@ -39,6 +40,7 @@ export function useDeleteProductMutation() {
     mutationFn: (id: string) => deleteProduct(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.products.all });
+      queryClient.invalidateQueries({ queryKey: queryKeys.categories.all });
     },
   });
 }
