@@ -38,19 +38,21 @@ export default function Home() {
               sizes="(max-width: 72rem) 100vw, 72rem"
               className="object-cover object-center"
             />
-          </div>
-          <div className="home-hero-overlay" aria-hidden />
-          <div className="home-hero-content">
-            <p className="eyebrow mb-3 !text-white/90 drop-shadow-sm">
-              Carpintería a medida
-            </p>
-            <h1 className="display-heading max-w-3xl text-4xl text-[var(--surface)] sm:text-5xl md:text-6xl">
-              Diseño y fabricación en madera para proyectos residenciales y comerciales.
-            </h1>
-            <p className="mt-4 max-w-2xl text-sm leading-relaxed text-[rgb(251_247_241/0.88)] sm:text-base">
-              Creamos mobiliario y soluciones en madera adaptadas a cada espacio, con enfoque en
-              calidad de materiales, detalle artesanal y cumplimiento de plazos.
-            </p>
+            <div className="home-hero-overlay" aria-hidden />
+            <div className="home-hero-content">
+              <p className="eyebrow mb-3 !text-white/90 drop-shadow-sm">
+                Carpintería a medida
+              </p>
+              <h1 className="display-heading home-hero-title text-[var(--surface)]">
+                Diseño y fabricación en madera para proyectos residenciales y comerciales.
+              </h1>
+              <p className="home-hero-lead text-[rgb(251_247_241/0.9)]">
+                Diseñamos y fabricamos mobiliario y soluciones en madera adaptadas a tu espacio,
+                tu estilo y el uso real de cada estancia. Te acompañamos desde la primera medida
+                hasta la entrega, cuidando materiales, proporciones y acabados para que cada pieza
+                sea funcional, duradera y coherente con el conjunto del proyecto.
+              </p>
+            </div>
           </div>
         </section>
 

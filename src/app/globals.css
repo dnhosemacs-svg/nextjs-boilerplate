@@ -127,20 +127,29 @@ body {
   padding-top: 1rem;
 }
 
-/* Hero inicio: proporción estable al zoom / ancho de ventana */
-.home-hero {
-  position: relative;
-  width: 100%;
+/* Hero inicio: imagen a sangre en la tarjeta */
+.surface-card.home-hero {
   padding: 0;
   overflow: hidden;
 }
 
+.home-hero {
+  position: relative;
+  width: 100%;
+}
+
 .home-hero-media {
   position: relative;
+  display: block;
   width: 100%;
   aspect-ratio: 16 / 9;
   min-height: 28rem;
   max-height: 42rem;
+  overflow: hidden;
+}
+
+.home-hero-media img {
+  display: block;
 }
 
 .home-hero-overlay {
@@ -148,19 +157,62 @@ body {
   inset: 0;
   z-index: 10;
   background: linear-gradient(
-    to right,
-    rgb(0 0 0 / 0.7) 0%,
-    rgb(0 0 0 / 0.45) 55%,
-    rgb(0 0 0 / 0.2) 100%
+    90deg,
+    rgb(20 14 10 / 0.88) 0%,
+    rgb(20 14 10 / 0.72) 42%,
+    rgb(20 14 10 / 0.25) 58%,
+    transparent 78%
   );
   pointer-events: none;
 }
 
 .home-hero-content {
+  --hero-content-inset: 1.25rem;
   position: absolute;
-  inset: auto 0.75rem 0.75rem 0.75rem;
+  inset: 0 auto 0 0;
   z-index: 20;
-  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  width: 100%;
+  max-width: 100%;
+  padding: var(--hero-content-inset) 1.25rem 1.5rem var(--hero-content-inset);
+}
+
+.home-hero-title {
+  max-width: none;
+  font-size: 1.625rem;
+  line-height: 1.08;
+  letter-spacing: -0.02em;
+}
+
+.home-hero-lead {
+  margin-top: 1rem;
+  font-size: 0.9375rem;
+  line-height: 1.65;
+}
+
+@media (min-width: 640px) {
+  .home-hero-title {
+    font-size: 1.875rem;
+  }
+
+  .home-hero-lead {
+    margin-top: 1.125rem;
+    font-size: 1rem;
+    line-height: 1.7;
+  }
+}
+
+@media (min-width: 768px) {
+  .home-hero-title {
+    font-size: 2.125rem;
+  }
+
+  .home-hero-lead {
+    margin-top: 1.25rem;
+    line-height: 1.72;
+  }
 }
 
 @media (min-width: 640px) {
@@ -170,8 +222,10 @@ body {
   }
 
   .home-hero-content {
-    inset: auto 1.25rem 1.25rem 1.25rem;
-    padding: 2rem;
+    --hero-content-inset: 2rem;
+    width: min(100%, 30rem);
+    max-width: 52%;
+    padding: var(--hero-content-inset) 1.5rem 2rem var(--hero-content-inset);
   }
 }
 
@@ -182,8 +236,10 @@ body {
   }
 
   .home-hero-content {
-    inset: auto 1.5rem 1.5rem 1.5rem;
-    padding: 3rem;
+    --hero-content-inset: 2.75rem;
+    width: min(100%, 34rem);
+    max-width: 52%;
+    padding: var(--hero-content-inset) 2rem 2.5rem var(--hero-content-inset);
   }
 }
 
@@ -245,6 +301,10 @@ body {
 
   .surface-card {
     padding: 2rem;
+  }
+
+  .surface-card.home-hero {
+    padding: 0;
   }
 
   .section-heading {
