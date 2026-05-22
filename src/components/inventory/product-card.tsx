@@ -40,8 +40,8 @@ export function ProductCard({ product, onEdit, onDelete }: ProductCardProps) {
   }
 
   return (
-    <Card size="sm">
-      <CardHeader className="pb-0">
+    <Card size="sm" className="inventory-product-card !gap-4 !py-5">
+      <CardHeader className="!pb-2">
         <div className="flex items-start justify-between gap-2">
           <CardTitle className="min-w-0 flex-1">{product.name}</CardTitle>
           <div className="flex shrink-0 items-center gap-1">
@@ -74,7 +74,7 @@ export function ProductCard({ product, onEdit, onDelete }: ProductCardProps) {
           <CardDescription>SKU: {product.sku}</CardDescription>
         ) : null}
       </CardHeader>
-      <CardContent className="flex flex-col gap-3">
+      <CardContent className="flex flex-col gap-3 !pt-2 !pb-3">
         <p className="font-medium">{formatPrice(product.price)}</p>
         <div className="flex items-center justify-between gap-2">
           <span className="text-muted-foreground">Stock</span>

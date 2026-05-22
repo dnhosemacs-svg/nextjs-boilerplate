@@ -14,8 +14,8 @@ import { ProductForm } from "./product-form";
 
 function ProductListSkeleton() {
   return (
-    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-      {Array.from({ length: 6 }).map((_, i) => (
+    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      {Array.from({ length: 8 }).map((_, i) => (
         <Skeleton key={i} className="h-36 w-full rounded-xl" aria-hidden />
       ))}
     </div>
@@ -59,7 +59,7 @@ export function ProductList() {
       {isFetching && !isLoading ? (
         <p className="mb-2 text-xs text-muted-foreground">Actualizando…</p>
       ) : null}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {products.map((p) =>
           editing?.id === p.id ? (
             <div key={p.id} className="inventory-warm-edit-card">
