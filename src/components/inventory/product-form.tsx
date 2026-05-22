@@ -1,7 +1,9 @@
 "use client";
 
+import { useEffect } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -19,46 +21,106 @@ import {
   FieldGroup,
   FieldLabel,
 } from "@/components/ui/field";
-import { z } from "zod";
 import {
   createProductSchema,
   type CreateProductInput,
+  type UpdateProductInput,
 } from "@/lib/validators/product";
-
-type ProductFormValues = z.input<typeof createProductSchema>;
 import {
   useCategoriesQuery,
   useCreateProductMutation,
+  useUpdateProductMutation,
 } from "@/hooks/inventory";
+import type { Product } from "@/types/inventory";
 
-export function ProductForm() {
+const editProductFormSchema = createProductSchema.omit({ stock: true });
+
+type ProductFormValues = z.input<typeof createProductSchema>;
+type EditProductFormValues = z.input<typeof editProductFormSchema>;
+
+type ProductFormProps = {
+  mode?: "create" | "edit";
+  product?: Product;
+  onDone?: () => void;
+};
+
+export function ProductForm({
+  mode = "create",
+  product,
+  onDone,
+}: ProductFormProps) {
   const { data: categories = [] } = useCategoriesQuery();
   const createMutation = useCreateProductMutation();
+  const updateMutation = useUpdateProductMutation();
+  const isEdit = mode === "edit";
+  const fieldId = (name: string) =>
+    isEdit && product ? `product-${name}-${product.id}` : `product-${name}`;
 
-  const form = useForm<ProductFormValues, unknown, CreateProductInput>({
-    resolver: zodResolver(createProductSchema),
-    defaultValues: {
-      name: "",
-      description: "",
-      sku: "",
-      price: 0,
-      stock: 0,
-      categoryId: "",
-    },
+  const form = useForm<ProductFormValues | EditProductFormValues>({
+    resolver: zodResolver(isEdit ? editProductFormSchema : createProductSchema),
+    defaultValues: isEdit
+      ? {
+          name: product?.name ?? "",
+          description: product?.description ?? "",
+          sku: product?.sku ?? "",
+          price: Number(product?.price ?? 0),
+          categoryId: product?.categoryId ?? "",
+        }
+      : {
+          name: "",
+          description: "",
+          sku: "",
+          price: 0,
+          stock: 0,
+          categoryId: "",
+        },
   });
 
-  function onSubmit(values: CreateProductInput) {
+  useEffect(() => {
+    if (!isEdit || !product) return;
+    form.reset({
+      name: product.name,
+      description: product.description ?? "",
+      sku: product.sku ?? "",
+      price: Number(product.price),
+      categoryId: product.categoryId,
+    });
+  }, [product, isEdit, form]);
+
+  function onSubmit(values: ProductFormValues | EditProductFormValues) {
+    if (isEdit) {
+      if (!product) return;
+
+      const input: UpdateProductInput = {
+        name: values.name,
+        description: values.description?.trim() || null,
+        sku: values.sku?.trim() || null,
+        price: values.price,
+        categoryId: values.categoryId,
+      };
+
+      updateMutation.mutate(
+        { id: product.id, input },
+        { onSuccess: () => onDone?.() },
+      );
+      return;
+    }
+
+    const createValues = values as CreateProductInput;
     createMutation.mutate(
       {
-        ...values,
-        description: values.description?.trim() || undefined,
-        sku: values.sku?.trim() || undefined,
+        ...createValues,
+        description: createValues.description?.trim() || undefined,
+        sku: createValues.sku?.trim() || undefined,
       },
       {
         onSuccess: () => form.reset(),
       },
     );
   }
+
+  const pending = createMutation.isPending || updateMutation.isPending;
+  const apiError = createMutation.error ?? updateMutation.error;
 
   return (
     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -68,9 +130,9 @@ export function ProductForm() {
           control={form.control}
           render={({ field, fieldState }) => (
             <Field data-invalid={!!fieldState.error}>
-              <FieldLabel htmlFor="product-name">Nombre</FieldLabel>
+              <FieldLabel htmlFor={fieldId("name")}>Nombre</FieldLabel>
               <FieldContent>
-                <Input id="product-name" {...field} />
+                <Input id={fieldId("name")} {...field} />
                 <FieldError errors={[fieldState.error]} />
               </FieldContent>
             </Field>
@@ -82,10 +144,10 @@ export function ProductForm() {
           control={form.control}
           render={({ field, fieldState }) => (
             <Field data-invalid={!!fieldState.error}>
-              <FieldLabel htmlFor="product-description">Descripción</FieldLabel>
+              <FieldLabel htmlFor={fieldId("description")}>Descripción</FieldLabel>
               <FieldContent>
                 <Textarea
-                  id="product-description"
+                  id={fieldId("description")}
                   rows={3}
                   {...field}
                   value={field.value ?? ""}
@@ -101,9 +163,13 @@ export function ProductForm() {
           control={form.control}
           render={({ field, fieldState }) => (
             <Field data-invalid={!!fieldState.error}>
-              <FieldLabel htmlFor="product-sku">SKU</FieldLabel>
+              <FieldLabel htmlFor={fieldId("sku")}>SKU</FieldLabel>
               <FieldContent>
-                <Input id="product-sku" {...field} value={field.value ?? ""} />
+                <Input
+                  id={fieldId("sku")}
+                  {...field}
+                  value={field.value ?? ""}
+                />
                 <FieldError errors={[fieldState.error]} />
               </FieldContent>
             </Field>
@@ -146,10 +212,10 @@ export function ProductForm() {
 
             return (
               <Field data-invalid={!!fieldState.error}>
-                <FieldLabel htmlFor="product-price">Precio (€)</FieldLabel>
+                <FieldLabel htmlFor={fieldId("price")}>Precio (€)</FieldLabel>
                 <FieldContent>
                   <Input
-                    id="product-price"
+                    id={fieldId("price")}
                     type="number"
                     step="0.01"
                     min="0"
@@ -167,33 +233,35 @@ export function ProductForm() {
           }}
         />
 
-        <Controller
-          name="stock"
-          control={form.control}
-          render={({ field, fieldState }) => (
-            <Field data-invalid={!!fieldState.error}>
-              <FieldLabel htmlFor="product-stock">Stock inicial</FieldLabel>
-              <FieldContent>
-                <Input
-                  id="product-stock"
-                  type="number"
-                  min={0}
-                  value={field.value}
-                  onChange={(e) => field.onChange(Number(e.target.value))}
-                />
-                <FieldError errors={[fieldState.error]} />
-              </FieldContent>
-            </Field>
-          )}
-        />
+        {!isEdit ? (
+          <Controller
+            name="stock"
+            control={form.control}
+            render={({ field, fieldState }) => (
+              <Field data-invalid={!!fieldState.error}>
+                <FieldLabel htmlFor={fieldId("stock")}>Stock inicial</FieldLabel>
+                <FieldContent>
+                  <Input
+                    id={fieldId("stock")}
+                    type="number"
+                    min={0}
+                    value={field.value}
+                    onChange={(e) => field.onChange(Number(e.target.value))}
+                  />
+                  <FieldError errors={[fieldState.error]} />
+                </FieldContent>
+              </Field>
+            )}
+          />
+        ) : null}
       </FieldGroup>
 
-      {createMutation.isError ? (
-        <p className="text-sm text-destructive">{createMutation.error.message}</p>
+      {apiError ? (
+        <p className="text-sm text-destructive">{apiError.message}</p>
       ) : null}
 
-      <Button type="submit" disabled={createMutation.isPending}>
-        {createMutation.isPending ? "Guardando…" : "Crear producto"}
+      <Button type="submit" disabled={pending}>
+        {pending ? "Guardando…" : isEdit ? "Guardar cambios" : "Crear producto"}
       </Button>
     </form>
   );
