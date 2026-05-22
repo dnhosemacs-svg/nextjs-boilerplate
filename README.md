@@ -75,6 +75,7 @@ Copia `.env.example` a `.env.local` y rellena las variables antes de desarrollar
 Documentación:
 
 - [Arquitectura del inventario (v1)](docs/arquitectura.md)
+- [Gestión de estado (Query + Zustand)](docs/state-management.md)
 - [Referencia API REST](docs/api.md)
 - [OAuth 2.0 / GitHub](docs/seguridad/oauth.md)
 - [Middleware y protección de rutas](docs/seguridad/middleware.md)
