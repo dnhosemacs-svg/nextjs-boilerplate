@@ -78,19 +78,25 @@ El enunciado mínimo puede asumir solo “usuario logueado”. En este proyecto:
 
 Variables de entorno: ver `.env.example` y `README.md`.
 
-## Estado actual del repo (día 1)
+## Estado actual del repo (entrega v1)
 
 | Elemento | Estado |
 |----------|--------|
 | `npm run dev` | Script en `package.json` |
-| Login + middleware | Implementado |
-| Sidebar → `/products`, `/categories` | Placeholders (“API pendiente”) |
+| Login + middleware | Implementado (NextAuth + Firebase + GitHub opcional) |
+| Sidebar → `/products`, `/categories` | UI de inventario (shadcn + TanStack Query) |
 | Carbon en `/login` | `Button`, `TextInput`, `PasswordInput` de Carbon |
-| Zustand / TanStack Query | **Pendiente** (tarjetas siguientes o día 2) |
-| PostgreSQL / Prisma | **Implementado** (`prisma/schema.prisma`, migraciones, `src/lib/db.ts`) |
+| Zustand / TanStack Query | Implementado — ver [state-management.md](./state-management.md) |
+| PostgreSQL / Prisma (Neon) | Implementado — `prisma/schema.prisma`, `src/lib/db.ts` |
+| APIs inventario | `GET/POST/PATCH/DELETE` en `/api/categories`, `/api/products`, stock en `/api/products/:id/stock` |
 | Pedidos (`Task`) | Cookie `taskflow_tasks` (legacy del boilerplate; no es inventario) |
 
-Documentación relacionada:
+Documentación del módulo inventario:
+
+- [Referencia API REST](./api.md)
+- [Gestión de estado](./state-management.md)
+
+Documentación de auth y navegación:
 
 - [Flujo público/privado](./navigation-flow.md)
 - [OAuth](./seguridad/oauth.md)
@@ -183,27 +189,36 @@ En este repo, `prisma.config.ts` fija la URL del datasource del CLI a `env("DIRE
 
 **Resumen:** pooling para la app, conexión directa para migrar y mantener el esquema.
 
-### Tareas día 2 (referencia — lo que puede quedar)
+### Tareas de despliegue (Neon + Vercel)
 
-1. Cuenta Neon + `DATABASE_URL` y `DIRECT_URL` en `.env.local` y Vercel.
-2. ~~`prisma/schema.prisma`, migración, seed.~~ Hecho cuando existan migraciones aplicadas en tu entorno.
-3. ~~`src/lib/db.ts`.~~ Hecho.
-4. APIs `/api/categories`, `/api/products` con el mismo patrón que `/api/tasks`.
-5. Sustituir placeholders en `(app)/products` y `(app)/categories`.
+1. Cuenta Neon + `DATABASE_URL` (pooling ON) y `DIRECT_URL` (pooling OFF) en `.env.local` y Vercel.
+2. `npx prisma migrate deploy` en el entorno de producción (o migraciones aplicadas en el pipeline).
+3. `npx prisma db seed` solo en desarrollo/demo si lo necesitas.
+4. Redeploy en Vercel tras cambiar variables.
 
-## Gate día 1 (verificación manual)
+## Gate entrega (verificación manual)
 
 Marcar cuando todo pase:
 
-- [ ] `npm run dev` arranca sin error en `http://localhost:3000`
-- [ ] Login con email/contraseña (Firebase) llega a `/dashboard`
-- [ ] Sidebar: **Productos** → `/products` muestra placeholder
-- [ ] Sidebar: **Categorías** → `/categories` muestra placeholder
-- [ ] `/login` sigue mostrando controles Carbon (inputs/botones IBM)
-- [ ] Sin sesión, `/products` redirige a `/login`
-- [ ] Este archivo existe: `docs/arquitectura.md`
+- [x] `npm run dev` arranca sin error en `http://localhost:3000`
+- [x] Login con email/contraseña (Firebase) llega a `/dashboard`
+- [x] Sidebar: **Productos** → `/products` muestra listado y CRUD
+- [x] Sidebar: **Categorías** → `/categories` muestra listado y CRUD
+- [x] `/login` muestra controles Carbon
+- [x] Sin sesión, `/products` redirige a `/login`
+- [x] `docs/arquitectura.md`, `docs/api.md`, `docs/state-management.md` completos
+- [x] README con inventario, auth y variables Neon
+
+## Checklist tarjeta 4.6
+
+- [x] `docs/arquitectura.md` — capas, modelo Category/Product, Neon `DATABASE_URL` / `DIRECT_URL`
+- [x] `docs/api.md` — endpoints inventario + stock separado
+- [x] `docs/state-management.md` — Query + Zustand
+- [x] README actualizado
+- [ ] PR abierto hacia `main`
 
 ## Versión
 
 - **v1** — Día 1: arquitectura documentada; BD y Query/Zustand en implementación posterior.
 - **v1.1** — Modelo de datos en docs: diagrama Category–Product, precios Decimal, `DATABASE_URL` vs `DIRECT_URL`.
+- **v1.2** — Entrega: estado del repo alineado con inventario implementado; checklists 4.6 y gate de entrega.

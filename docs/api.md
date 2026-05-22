@@ -248,7 +248,16 @@ flowchart LR
 
 ---
 
+## Checklist tarjeta 4.6
+
+- [x] Todos los endpoints de inventario documentados con códigos 200/201/400/401/404/409
+- [x] Stock documentado en ruta dedicada `/api/products/:id/stock`
+- [x] Enlace desde `README.md` y `docs/arquitectura.md`
+
+---
+
 ## Documentación relacionada
 
 - [Arquitectura del inventario](arquitectura.md)
+- [Gestión de estado](state-management.md)
 - [Middleware y protección de rutas](seguridad/middleware.md)

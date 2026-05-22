@@ -2,7 +2,7 @@
 
 > Panel interno para gestionar pedidos del taller.
 
-Aplicación web de gestión de pedidos de carpintería construida con Next.js App Router. Incluye CRUD de pedidos, autenticación con NextAuth (Firebase + GitHub OAuth opcional), protección de rutas con middleware y panel de estadísticas.
+Aplicación web de gestión para el taller de carpintería construida con Next.js App Router. Incluye **inventario** (categorías y productos en PostgreSQL/Neon), CRUD de pedidos, autenticación con NextAuth (Firebase + GitHub OAuth opcional), protección de rutas con middleware y panel de estadísticas.
 
 
 | Despliegue | URL                                                     |
@@ -23,6 +23,22 @@ Aplicación web de gestión de pedidos de carpintería construida con Next.js Ap
 
 ---
 
+## Inventario (PostgreSQL + Neon)
+
+Módulo de categorías y productos persistidos en **PostgreSQL** (recomendado **Neon** en la nube):
+
+- **UI:** `/products`, `/categories` (rutas privadas).
+- **API:** `/api/categories`, `/api/products`, ajuste de stock en `PATCH /api/products/:id/stock`.
+- **ORM:** Prisma (`prisma/schema.prisma`) — modelos `Category` y `Product`.
+- **Estado en cliente:** TanStack Query (datos del servidor) + Zustand (filtros y sidebar). Ver [docs/state-management.md](docs/state-management.md).
+
+Documentación técnica:
+
+- [Arquitectura](docs/arquitectura.md)
+- [API REST inventario](docs/api.md)
+
+---
+
 ## Tecnologías
 
 
@@ -34,6 +50,9 @@ Aplicación web de gestión de pedidos de carpintería construida con Next.js Ap
 | TypeScript           | Tipado estático                                      |
 | React                | Componentes y estado de UI                           |
 | Zod                  | Validación de payloads en API                        |
+| Prisma + PostgreSQL  | Inventario (Neon en producción)                      |
+| TanStack Query       | Caché y mutaciones del inventario en cliente         |
+| Zustand              | Filtros y UI del panel privado                       |
 | CSS global           | Estilos de aplicación                                |
 
 
@@ -44,28 +63,37 @@ Aplicación web de gestión de pedidos de carpintería construida con Next.js Ap
 ```text
 nextjs-boilerplate/
 ├── middleware.ts
+├── prisma/
+│   ├── schema.prisma
+│   └── seed.ts
+├── docs/
+│   ├── arquitectura.md
+│   ├── api.md
+│   └── state-management.md
 ├── src/
 │   ├── app/
 │   │   ├── api/
 │   │   │   ├── auth/[...nextauth]/route.ts
+│   │   │   ├── categories/
+│   │   │   ├── products/
 │   │   │   └── tasks/
-│   │   │       ├── route.ts
-│   │   │       └── [id]/route.ts
-│   │   ├── (app)/          # Rutas privadas (dashboard, tasks, stats)
+│   │   ├── (app)/          # Rutas privadas (dashboard, products, categories, tasks, stats)
 │   │   ├── (public)/       # login, register, inicio
 │   │   ├── layout.tsx
 │   │   └── page.tsx
 │   ├── components/
 │   │   ├── auth-login-form.tsx
 │   │   ├── auth-register-form.tsx
+│   │   ├── inventory/
 │   │   └── tasks/
+│   ├── hooks/inventory/
+│   ├── stores/
 │   └── lib/
 │       ├── auth.ts
+│       ├── db.ts
 │       ├── firebase-auth-rest.ts
 │       ├── firebase-client.ts
-│       ├── safe-redirect.ts
-│       ├── credentials-sign-in-errors.ts
-│       ├── server-env.ts
+│       ├── validators/
 │       └── tasks-cookie-store.ts
 └── README.md
 ```
@@ -113,6 +141,8 @@ Crea `.env.local` en la raíz del proyecto (no se sube a git). Plantilla: [.env.
 | `NEXT_PUBLIC_FIREBASE_API_KEY` | Si usas registro | Si usas registro | Misma clave web; restringir por dominio en Google Cloud. |
 | `NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN` | Si usas registro | Si usas registro | `authDomain` de firebaseConfig. |
 | `NEXT_PUBLIC_FIREBASE_PROJECT_ID` | Si usas registro | Si usas registro | `projectId` de firebaseConfig. |
+| `DATABASE_URL` | **Obligatorio** (inventario) | **Obligatorio** | URL Neon con **connection pooling ON** — runtime de la app (`src/lib/db.ts`). |
+| `DIRECT_URL` | **Obligatorio** (migraciones) | **Obligatorio** | URL Neon con **pooling OFF** — Prisma CLI (`migrate`, `db push`, seed). |
 
 ### Local vs producción
 
@@ -124,6 +154,31 @@ Crea `.env.local` en la raíz del proyecto (no se sube a git). Plantilla: [.env.
 | Firebase login | `FIREBASE_API_KEY` + `NEXT_PUBLIC_*` para `/register` | Igual; correo/contraseña habilitado en Firebase Console |
 | GitHub OAuth | Callback `http://localhost:3000/api/auth/callback/github` | Callback `https://tu-dominio/api/auth/callback/github` |
 | Validación build | Relajada en dev | [src/lib/server-env.ts](src/lib/server-env.ts) falla el build si falta secreto, URL, Firebase o par GitHub incompleto |
+| Base de datos | `DATABASE_URL` + `DIRECT_URL` en `.env.local` | Mismas variables en Vercel; `npx prisma migrate deploy` en producción |
+
+### PostgreSQL en Neon
+
+1. Crea un proyecto en [Neon](https://neon.tech).
+2. En **Connect** copia dos URLs del mismo branch:
+   - **Pooling ON** → `DATABASE_URL` (la app en Vercel y `npm run dev`).
+   - **Pooling OFF** → `DIRECT_URL` (solo CLI Prisma; no uses el pooler para migrar).
+3. En local, en `.env.local`:
+
+```env
+DATABASE_URL=postgresql://...@...-pooler....neon.tech/...?sslmode=require
+DIRECT_URL=postgresql://...@....neon.tech/...?sslmode=require
+```
+
+4. Primera vez en el repo:
+
+```bash
+npx prisma migrate deploy
+npx prisma db seed   # opcional: datos de demo
+```
+
+5. En **Vercel** → Project → Settings → Environment Variables: añade `DATABASE_URL` y `DIRECT_URL` en **Preview** y **Production**, luego **Redeploy**.
+
+> **Importante:** `DATABASE_URL` = pooling para serverless; `DIRECT_URL` = conexión directa para migraciones. Detalle en [docs/arquitectura.md](docs/arquitectura.md#database_url-pooled-vs-direct_url-migraciones).
 
 ### Checklist: secretos y despliegue
 
@@ -131,6 +186,8 @@ Crea `.env.local` en la raíz del proyecto (no se sube a git). Plantilla: [.env.
 2. Firebase: Authentication → Sign-in method → correo/contraseña activado.
 3. GitHub OAuth (opcional): OAuth App con callback `/api/auth/callback/github` en local y producción.
 4. Vercel: mismas variables en Preview y Production; redeploy tras cambios.
+5. Neon: `DATABASE_URL` (pool ON) y `DIRECT_URL` (pool OFF) en local y Vercel.
+6. Tras cambiar BD: `npx prisma migrate deploy` (producción) y redeploy.
 
 ---
 
@@ -152,6 +209,8 @@ Crea `.env.local` en la raíz del proyecto (no se sube a git). Plantilla: [.env.
 - `/tasks/new`: crear pedido (protegida).
 - `/tasks/[id]`: ver/editar/eliminar pedido (protegida).
 - `/stats`: resumen operativo (protegida).
+- `/products`: inventario de productos (protegida).
+- `/categories`: gestión de categorías (protegida).
 
 Rutas auxiliares:
 
@@ -219,6 +278,12 @@ El login desde la UI usa `signIn()` del cliente (`redirect: false` para credenti
 
 ## Modelo de datos
 
+### Inventario (PostgreSQL)
+
+`Category` y `Product` en `prisma/schema.prisma`. Relación uno-a-muchos; `price` como `Decimal(10, 2)`. Detalle: [docs/arquitectura.md](docs/arquitectura.md).
+
+### Pedidos (legacy)
+
 `Task` (`src/types/task.ts`):
 
 - `id: string`
@@ -282,5 +347,6 @@ Después: `npm run lint` y `npm run build`.
 
 ## Limitaciones conocidas
 
-- Pedidos persistidos en cookie por sesión; no hay base de datos de tareas.
+- **Inventario:** persistido en PostgreSQL (Neon); requiere `DATABASE_URL` y `DIRECT_URL` configuradas.
+- **Pedidos (`Task`):** siguen en cookie por sesión (legacy del boilerplate).
 - Usuarios gestionados en Firebase; no hay panel de administración de usuarios en la app.

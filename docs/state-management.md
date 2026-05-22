@@ -222,11 +222,18 @@ Query observada: ["products", "list", { ...filtros }]
 
 ### Checklist tarjeta 4.4
 
-- [ ] `docs/state-management.md` + enlace en README
-- [ ] Sidebar conectado a Zustand (`private-shell.tsx`)
-- [ ] `staleTime` / `gcTime` documentados en código y doc
-- [ ] Demo `DEMO_STOCK_500` probada con rollback visible
-- [ ] Tres capturas DevTools (fresh, stale, fetching) + nota de la plantilla
+- [x] `docs/state-management.md` + enlace en README
+- [x] Sidebar conectado a Zustand (`private-shell.tsx`)
+- [x] `staleTime` / `gcTime` documentados en código y doc
+- [x] Demo `DEMO_STOCK_500` probada con rollback visible
+- [ ] Tres capturas DevTools (fresh, stale, fetching) + nota de la plantilla *(evidencia en Trello; opcional para el repo)*
+
+---
+
+## Checklist tarjeta 4.6
+
+- [x] Documento enlazado desde `README.md`
+- [x] Coherente con implementación en `src/stores/ui-store.ts` y `src/hooks/inventory/*`
 
 ---
 
