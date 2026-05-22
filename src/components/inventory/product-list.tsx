@@ -1,9 +1,16 @@
 "use client";
 
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useProductsQuery } from "@/hooks/inventory";
+import {
+  useDeleteProductMutation,
+  useProductsQuery,
+} from "@/hooks/inventory";
+import type { Product } from "@/types/inventory";
+import { ConfirmDialog } from "./confirm-dialog";
 import { ProductCard } from "./product-card";
+import { ProductForm } from "./product-form";
 
 function ProductListSkeleton() {
   return (
@@ -18,6 +25,9 @@ function ProductListSkeleton() {
 export function ProductList() {
   const { data, isLoading, isError, error, refetch, isFetching } =
     useProductsQuery();
+  const deleteMutation = useDeleteProductMutation();
+  const [editing, setEditing] = useState<Product | null>(null);
+  const [toDelete, setToDelete] = useState<Product | null>(null);
 
   if (isLoading) return <ProductListSkeleton />;
 
@@ -50,10 +60,49 @@ export function ProductList() {
         <p className="mb-2 text-xs text-muted-foreground">Actualizando…</p>
       ) : null}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {products.map((p) => (
-          <ProductCard key={p.id} product={p} />
-        ))}
+        {products.map((p) =>
+          editing?.id === p.id ? (
+            <div key={p.id} className="rounded-xl border p-4">
+              <h3 className="mb-3 text-sm font-medium">Editar producto</h3>
+              <ProductForm
+                mode="edit"
+                product={p}
+                onDone={() => setEditing(null)}
+              />
+            </div>
+          ) : (
+            <ProductCard
+              key={p.id}
+              product={p}
+              onEdit={() => setEditing(p)}
+              onDelete={() => setToDelete(p)}
+            />
+          ),
+        )}
       </div>
+
+      <ConfirmDialog
+        open={!!toDelete}
+        onOpenChange={(open) => !open && setToDelete(null)}
+        title="Eliminar producto"
+        description={`¿Seguro que quieres eliminar «${toDelete?.name}»? Esta acción no se puede deshacer.`}
+        loading={deleteMutation.isPending}
+        onConfirm={() => {
+          if (!toDelete) return;
+          deleteMutation.mutate(toDelete.id, {
+            onSuccess: () => {
+              setToDelete(null);
+              if (editing?.id === toDelete.id) setEditing(null);
+            },
+          });
+        }}
+      />
+
+      {deleteMutation.isError && toDelete ? (
+        <p className="mt-2 text-sm text-destructive">
+          {deleteMutation.error.message}
+        </p>
+      ) : null}
     </>
   );
 }
