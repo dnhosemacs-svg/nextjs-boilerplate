@@ -2,7 +2,7 @@ import { CategoriesView } from "@/components/inventory/categories-view";
 
 export default function CategoriesPage() {
   return (
-    <main className="page-shell max-w-3xl items-start">
+    <main className="page-shell dashboard-shell inventory-warm-page">
       <CategoriesView />
     </main>
   );

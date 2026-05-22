@@ -44,21 +44,23 @@ export function CategoryList() {
 
   return (
     <>
-      <ul className="divide-y rounded-xl border">
+      <ul className="inventory-warm-list">
         {data.map((cat) => (
           <li
             key={cat.id}
-            className="flex items-center justify-between gap-2 px-4 py-3"
+            className="inventory-warm-list-item"
           >
             {editing?.id === cat.id ? (
-              <CategoryForm
-                mode="edit"
-                category={cat}
-                onDone={() => setEditing(null)}
-              />
+              <div className="inventory-warm-list-edit w-full min-w-0">
+                <CategoryForm
+                  mode="edit"
+                  category={cat}
+                  onDone={() => setEditing(null)}
+                />
+              </div>
             ) : (
               <>
-                <span className="font-medium">{cat.name}</span>
+                <span className="inventory-warm-list-label">{cat.name}</span>
                 <div className="flex shrink-0 gap-1">
                   <Button
                     type="button"

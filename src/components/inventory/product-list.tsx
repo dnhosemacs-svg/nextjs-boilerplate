@@ -62,8 +62,8 @@ export function ProductList() {
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {products.map((p) =>
           editing?.id === p.id ? (
-            <div key={p.id} className="rounded-xl border p-4">
-              <h3 className="mb-3 text-sm font-medium">Editar producto</h3>
+            <div key={p.id} className="inventory-warm-edit-card">
+              <h3 className="inventory-warm-edit-title">Editar producto</h3>
               <ProductForm
                 mode="edit"
                 product={p}
