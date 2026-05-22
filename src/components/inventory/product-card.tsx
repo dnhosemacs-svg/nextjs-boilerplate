@@ -1,6 +1,6 @@
 "use client";
 
-import { MinusIcon, PlusIcon } from "lucide-react";
+import { MinusIcon, PencilIcon, PlusIcon, Trash2Icon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -15,6 +15,8 @@ import type { Product } from "@/types/inventory";
 
 type ProductCardProps = {
   product: Product;
+  onEdit?: () => void;
+  onDelete?: () => void;
 };
 
 function formatPrice(price: string) {
@@ -27,7 +29,7 @@ function formatPrice(price: string) {
     : price;
 }
 
-export function ProductCard({ product }: ProductCardProps) {
+export function ProductCard({ product, onEdit, onDelete }: ProductCardProps) {
   const stockMutation = useUpdateStockMutation();
   const pending = stockMutation.isPending;
 
@@ -41,8 +43,32 @@ export function ProductCard({ product }: ProductCardProps) {
     <Card size="sm">
       <CardHeader className="pb-0">
         <div className="flex items-start justify-between gap-2">
-          <CardTitle>{product.name}</CardTitle>
-          <Badge variant="secondary">{product.category.name}</Badge>
+          <CardTitle className="min-w-0 flex-1">{product.name}</CardTitle>
+          <div className="flex shrink-0 items-center gap-1">
+            <Badge variant="secondary">{product.category.name}</Badge>
+            {onEdit ? (
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon-sm"
+                onClick={onEdit}
+                aria-label={`Editar ${product.name}`}
+              >
+                <PencilIcon />
+              </Button>
+            ) : null}
+            {onDelete ? (
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon-sm"
+                onClick={onDelete}
+                aria-label={`Eliminar ${product.name}`}
+              >
+                <Trash2Icon />
+              </Button>
+            ) : null}
+          </div>
         </div>
         {product.sku ? (
           <CardDescription>SKU: {product.sku}</CardDescription>
