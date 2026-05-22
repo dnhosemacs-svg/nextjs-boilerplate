@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { useForm, Controller } from "react-hook-form";
+import { useForm, Controller, type Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
@@ -23,7 +23,6 @@ import {
 } from "@/components/ui/field";
 import {
   createProductSchema,
-  type CreateProductInput,
   type UpdateProductInput,
 } from "@/lib/validators/product";
 import {
@@ -35,8 +34,8 @@ import type { Product } from "@/types/inventory";
 
 const editProductFormSchema = createProductSchema.omit({ stock: true });
 
-type ProductFormValues = z.input<typeof createProductSchema>;
-type EditProductFormValues = z.input<typeof editProductFormSchema>;
+type CreateProductFormValues = z.infer<typeof createProductSchema>;
+type EditProductFormValues = z.infer<typeof editProductFormSchema>;
 
 type ProductFormProps = {
   mode?: "create" | "edit";
@@ -56,8 +55,10 @@ export function ProductForm({
   const fieldId = (name: string) =>
     isEdit && product ? `product-${name}-${product.id}` : `product-${name}`;
 
-  const form = useForm<ProductFormValues | EditProductFormValues>({
-    resolver: zodResolver(isEdit ? editProductFormSchema : createProductSchema),
+  const form = useForm<CreateProductFormValues | EditProductFormValues>({
+    resolver: zodResolver(
+      isEdit ? editProductFormSchema : createProductSchema,
+    ) as Resolver<CreateProductFormValues | EditProductFormValues>,
     defaultValues: isEdit
       ? {
           name: product?.name ?? "",
@@ -87,16 +88,18 @@ export function ProductForm({
     });
   }, [product, isEdit, form]);
 
-  function onSubmit(values: ProductFormValues | EditProductFormValues) {
+  function onSubmit(values: CreateProductFormValues | EditProductFormValues) {
     if (isEdit) {
       if (!product) return;
 
+      const editValues = editProductFormSchema.parse(values);
+
       const input: UpdateProductInput = {
-        name: values.name,
-        description: values.description?.trim() || null,
-        sku: values.sku?.trim() || null,
-        price: values.price,
-        categoryId: values.categoryId,
+        name: editValues.name,
+        description: editValues.description?.trim() || null,
+        sku: editValues.sku?.trim() || null,
+        price: editValues.price,
+        categoryId: editValues.categoryId,
       };
 
       updateMutation.mutate(
@@ -106,7 +109,7 @@ export function ProductForm({
       return;
     }
 
-    const createValues = values as CreateProductInput;
+    const createValues = createProductSchema.parse(values);
     createMutation.mutate(
       {
         ...createValues,
