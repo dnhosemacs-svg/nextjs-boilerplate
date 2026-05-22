@@ -1,0 +1,121 @@
+import type { Category, Product } from "@/types/inventory";
+import type { CreateCategoryInput, UpdateCategoryInput } from "@/lib/validators/category";
+import type {
+  CreateProductInput,
+  ProductListQuery,
+  UpdateProductInput,
+  UpdateProductStockInput,
+} from "@/lib/validators/product";
+
+async function parseResponse<T>(response: Response): Promise<T> {
+  if (!response.ok) {
+    let message = "La solicitud falló";
+
+    try {
+      const errorBody = (await response.json()) as { error?: string };
+      if (errorBody.error) {
+        message = errorBody.error;
+      }
+    } catch {
+      // Keep fallback message when body is not JSON
+    }
+
+    throw new Error(message);
+  }
+
+  return (await response.json()) as T;
+}
+
+function productsUrl(query?: ProductListQuery) {
+  const params = new URLSearchParams();
+  if (query?.search) params.set("search", query.search);
+  if (query?.categoryId) params.set("categoryId", query.categoryId);
+  if (query?.sortBy) params.set("sortBy", query.sortBy);
+  if (query?.sortOrder) params.set("sortOrder", query.sortOrder);
+  const qs = params.toString();
+  return qs ? `/api/products?${qs}` : "/api/products";
+}
+
+export async function getProducts(query?: ProductListQuery): Promise<Product[]> {
+  const response = await fetch(productsUrl(query), {
+    method: "GET",
+    cache: "no-store",
+  });
+  return parseResponse<Product[]>(response);
+}
+
+export async function createProduct(input: CreateProductInput): Promise<Product> {
+  const response = await fetch("/api/products", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(input),
+  });
+  return parseResponse<Product>(response);
+}
+
+export async function updateProduct(
+  id: string,
+  input: UpdateProductInput,
+): Promise<Product> {
+  const response = await fetch(`/api/products/${id}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(input),
+  });
+  return parseResponse<Product>(response);
+}
+
+export async function deleteProduct(id: string): Promise<Product> {
+  const response = await fetch(`/api/products/${id}`, {
+    method: "DELETE",
+  });
+  return parseResponse<Product>(response);
+}
+
+export async function updateProductStock(
+  id: string,
+  input: UpdateProductStockInput,
+): Promise<Product> {
+  const response = await fetch(`/api/products/${id}/stock`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(input),
+  });
+  return parseResponse<Product>(response);
+}
+
+export async function getCategories(): Promise<Category[]> {
+  const response = await fetch("/api/categories", {
+    method: "GET",
+    cache: "no-store",
+  });
+  return parseResponse<Category[]>(response);
+}
+
+export async function createCategory(input: CreateCategoryInput): Promise<Category> {
+  const response = await fetch("/api/categories", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(input),
+  });
+  return parseResponse<Category>(response);
+}
+
+export async function updateCategory(
+  id: string,
+  input: UpdateCategoryInput,
+): Promise<Category> {
+  const response = await fetch(`/api/categories/${id}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(input),
+  });
+  return parseResponse<Category>(response);
+}
+
+export async function deleteCategory(id: string): Promise<Category> {
+  const response = await fetch(`/api/categories/${id}`, {
+    method: "DELETE",
+  });
+  return parseResponse<Category>(response);
+}
