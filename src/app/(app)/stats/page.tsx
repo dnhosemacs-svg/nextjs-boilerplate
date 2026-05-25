@@ -1,13 +1,10 @@
 import Link from "next/link";
+import { getTaskStats } from "@/lib/task-stats";
 import { listTasksFromCookieStore } from "@/lib/tasks-cookie-store";
 
 export default async function StatsPage() {
   const tasks = await listTasksFromCookieStore();
-  const total = tasks.length;
-  const pending = tasks.filter((task) => task.status === "pending").length;
-  const inProgress = tasks.filter((task) => task.status === "in_progress").length;
-  const done = tasks.filter((task) => task.status === "done").length;
-  const completionRate = total > 0 ? Math.round((done / total) * 100) : 0;
+  const { total, pending, inProgress, done, completionRate } = getTaskStats(tasks);
   const statCards = [
     { label: "Total pedidos", value: total },
     { label: "Pendientes", value: pending },

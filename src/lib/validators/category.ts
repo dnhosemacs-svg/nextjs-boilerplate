@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+import { nonEmptyUpdateSchema } from "@/lib/validators/common";
+
 export const createCategorySchema = z.object({
   name: z
     .string()
@@ -10,17 +12,13 @@ export const createCategorySchema = z.object({
 
 export type CreateCategoryInput = z.infer<typeof createCategorySchema>;
 
-export const updateCategorySchema = z
-  .object({
-    name: z
-      .string()
-      .trim()
-      .min(1, "El nombre no puede estar vacío")
-      .max(120, "El nombre es demasiado largo")
-      .optional(),
-  })
-  .refine((data) => Object.keys(data).length > 0, {
-    message: "Debes enviar al menos un campo para actualizar",
-  });
+export const updateCategorySchema = nonEmptyUpdateSchema({
+  name: z
+    .string()
+    .trim()
+    .min(1, "El nombre no puede estar vacío")
+    .max(120, "El nombre es demasiado largo")
+    .optional(),
+});
 
 export type UpdateCategoryInput = z.infer<typeof updateCategorySchema>;

@@ -4,6 +4,7 @@ import Link from "next/link";
 import SiteLogo from "@/components/site-logo";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
+import { isActivePath, ORDER_NAV_ITEMS } from "@/lib/navigation";
 import { sessionUserLabel } from "@/lib/session-user-label";
 import { signOut, useSession } from "next-auth/react";
 
@@ -12,17 +13,6 @@ const publicNavItems = [
   { href: "/about", label: "Nosotros" },
   { href: "/info", label: "Servicios" },
 ];
-
-const privateNavItems = [
-  { href: "/dashboard", label: "Panel" },
-  { href: "/tasks/new", label: "Nuevo pedido" },
-  { href: "/stats", label: "Estadísticas" },
-];
-
-function isActivePath(currentPath: string, href: string) {
-  if (href === "/") return currentPath === "/";
-  return currentPath === href || currentPath.startsWith(`${href}/`);
-}
 
 function SiteLogoLink() {
   return (
@@ -92,7 +82,7 @@ export default function SiteNavbar() {
   const userLabel =
     isAuthenticated && session?.user ? sessionUserLabel(session.user) : null;
   const navItems = isAuthenticated
-    ? [privateNavItems[0], ...publicNavItems, ...privateNavItems.slice(1)]
+    ? [ORDER_NAV_ITEMS[0], ...publicNavItems, ...ORDER_NAV_ITEMS.slice(1)]
     : publicNavItems;
 
   async function onLogout() {
@@ -122,7 +112,7 @@ export default function SiteNavbar() {
           <nav aria-label="Principal">
             <ul className="site-navbar-list">
               {navItems.map((item) => {
-                const isActive = isActivePath(pathname, item.href);
+                const isActive = isActivePath(pathname, item.href, { exactRoot: true });
                 return (
                   <li key={item.href}>
                     <Link

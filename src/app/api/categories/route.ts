@@ -1,8 +1,12 @@
 import { NextResponse } from "next/server";
 
-import { Prisma } from "@/generated/prisma/client";
 import { requireApiSession } from "@/lib/api-auth";
+import {
+  parseJsonBody,
+  validationErrorResponse,
+} from "@/lib/api-route-utils";
 import { db } from "@/lib/db";
+import { handlePrismaWriteError } from "@/lib/prisma-errors";
 import { createCategorySchema } from "@/lib/validators/category";
 
 export async function GET() {
@@ -19,22 +23,12 @@ export async function POST(request: Request) {
   const auth = await requireApiSession();
   if (!auth.ok) return auth.response;
 
-  let json: unknown;
-  try {
-    json = await request.json();
-  } catch {
-    return NextResponse.json(
-      { error: "Cuerpo JSON no válido" },
-      { status: 400 },
-    );
-  }
+  const body = await parseJsonBody(request);
+  if (!body.ok) return body.response;
 
-  const parsed = createCategorySchema.safeParse(json);
+  const parsed = createCategorySchema.safeParse(body.data);
   if (!parsed.success) {
-    return NextResponse.json(
-      { error: "Error de validación", issues: parsed.error.issues },
-      { status: 400 },
-    );
+    return validationErrorResponse(parsed.error);
   }
 
   try {
@@ -42,13 +36,11 @@ export async function POST(request: Request) {
       data: { name: parsed.data.name },
     });
     return NextResponse.json(created, { status: 201 });
-  } catch (e) {
-    if (e instanceof Prisma.PrismaClientKnownRequestError && e.code === "P2002") {
-      return NextResponse.json(
-        { error: "Ya existe una categoría con ese nombre" },
-        { status: 409 },
-      );
-    }
-    throw e;
+  } catch (error) {
+    const prismaError = handlePrismaWriteError(error, {
+      unique: "Ya existe una categoría con ese nombre",
+    });
+    if (prismaError) return prismaError;
+    throw error;
   }
 }

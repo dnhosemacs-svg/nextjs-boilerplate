@@ -1,36 +1,27 @@
 import { NextResponse } from "next/server";
 
-import { Prisma } from "@/generated/prisma/client";
 import { requireApiSession } from "@/lib/api-auth";
+import {
+  type IdRouteContext,
+  parseJsonBody,
+  resolveRouteParams,
+  validationErrorResponse,
+} from "@/lib/api-route-utils";
 import { db } from "@/lib/db";
+import { handlePrismaWriteError } from "@/lib/prisma-errors";
 import { updateCategorySchema } from "@/lib/validators/category";
 
-type Context = {
-  params: { id: string } | Promise<{ id: string }>;
-};
-
-export async function PATCH(request: Request, { params }: Context) {
+export async function PATCH(request: Request, { params }: IdRouteContext) {
   const auth = await requireApiSession();
   if (!auth.ok) return auth.response;
 
-  const { id } = await Promise.resolve(params);
+  const { id } = await resolveRouteParams(params);
+  const body = await parseJsonBody(request);
+  if (!body.ok) return body.response;
 
-  let json: unknown;
-  try {
-    json = await request.json();
-  } catch {
-    return NextResponse.json(
-      { error: "Cuerpo JSON no válido" },
-      { status: 400 },
-    );
-  }
-
-  const parsed = updateCategorySchema.safeParse(json);
+  const parsed = updateCategorySchema.safeParse(body.data);
   if (!parsed.success) {
-    return NextResponse.json(
-      { error: "Error de validación", issues: parsed.error.issues },
-      { status: 400 },
-    );
+    return validationErrorResponse(parsed.error);
   }
 
   const existing = await db.category.findUnique({ where: { id } });
@@ -44,22 +35,20 @@ export async function PATCH(request: Request, { params }: Context) {
       data: parsed.data,
     });
     return NextResponse.json(updated, { status: 200 });
-  } catch (e) {
-    if (e instanceof Prisma.PrismaClientKnownRequestError && e.code === "P2002") {
-      return NextResponse.json(
-        { error: "Ya existe una categoría con ese nombre" },
-        { status: 409 },
-      );
-    }
-    throw e;
+  } catch (error) {
+    const prismaError = handlePrismaWriteError(error, {
+      unique: "Ya existe una categoría con ese nombre",
+    });
+    if (prismaError) return prismaError;
+    throw error;
   }
 }
 
-export async function DELETE(_request: Request, { params }: Context) {
+export async function DELETE(_request: Request, { params }: IdRouteContext) {
   const auth = await requireApiSession();
   if (!auth.ok) return auth.response;
 
-  const { id } = await Promise.resolve(params);
+  const { id } = await resolveRouteParams(params);
 
   const category = await db.category.findUnique({
     where: { id },

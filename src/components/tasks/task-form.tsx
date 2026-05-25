@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { Button, Select, SelectItem, TextArea, TextInput } from "@carbon/react";
 
 import { createTask, updateTask } from "@/lib/api";
+import { TASK_STATUS_OPTIONS } from "@/lib/task-status";
 import type { CreateTaskInput, UpdateTaskInput } from "@/lib/validators/task";
 import type { Task, TaskStatus } from "@/types/task";
 
@@ -13,12 +14,6 @@ type TaskFormProps = {
   mode: "create" | "edit";
   initialData?: Task;
 };
-
-const statusOptions: Array<{ value: TaskStatus; label: string }> = [
-  { value: "pending", label: "Pendiente" },
-  { value: "in_progress", label: "En progreso" },
-  { value: "done", label: "Completada" },
-];
 
 export default function TaskForm({ mode, initialData }: TaskFormProps) {
   const router = useRouter();
@@ -111,7 +106,7 @@ export default function TaskForm({ mode, initialData }: TaskFormProps) {
           onChange={(event) => setStatus(event.target.value as TaskStatus)}
           className="carbon-input"
         >
-          {statusOptions.map((option) => (
+          {TASK_STATUS_OPTIONS.map((option) => (
             <SelectItem key={option.value} value={option.value} text={option.label} />
           ))}
         </Select>

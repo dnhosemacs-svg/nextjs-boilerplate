@@ -3,27 +3,17 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-const inventoryItems = [
-  { href: "/products", label: "Productos" },
-  { href: "/categories", label: "Categorías" },
-];
-
-const orderItems = [
-  { href: "/dashboard", label: "Panel" },
-  { href: "/tasks/new", label: "Nuevo pedido" },
-  { href: "/stats", label: "Estadísticas" },
-];
-
-function isActivePath(currentPath: string, href: string) {
-  return currentPath === href || currentPath.startsWith(`${href}/`);
-}
+import {
+  INVENTORY_NAV_ITEMS,
+  isActivePath,
+  ORDER_NAV_ITEMS,
+  type NavItem,
+} from "@/lib/navigation";
 
 type PrivateSidebarProps = {
   open: boolean;
   onClose: () => void;
 };
-
-type NavItem = { href: string; label: string };
 
 function NavLinkList({
   items,
@@ -77,12 +67,12 @@ export default function PrivateSidebar({ open, onClose }: PrivateSidebarProps) {
 
         <nav aria-label="Inventario">
           <p className="eyebrow mb-2 mt-4">Inventario</p>
-          <NavLinkList items={inventoryItems} pathname={pathname} onClose={onClose} />
+          <NavLinkList items={[...INVENTORY_NAV_ITEMS]} pathname={pathname} onClose={onClose} />
         </nav>
 
         <nav aria-label="Pedidos" className="mt-6">
           <p className="eyebrow mb-2">Pedidos</p>
-          <NavLinkList items={orderItems} pathname={pathname} onClose={onClose} />
+          <NavLinkList items={[...ORDER_NAV_ITEMS]} pathname={pathname} onClose={onClose} />
         </nav>
       </aside>
     </>

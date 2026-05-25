@@ -10,6 +10,7 @@ import {
 import type { Category } from "@/types/inventory";
 import { CategoryForm } from "./category-form";
 import { ConfirmDialog } from "./confirm-dialog";
+import { QueryErrorState } from "./query-error-state";
 
 export function CategoryList() {
   const { data = [], isLoading, isError, error, refetch } = useCategoriesQuery();
@@ -23,14 +24,11 @@ export function CategoryList() {
 
   if (isError) {
     return (
-      <div>
-        <p className="text-sm text-destructive">
-          {error instanceof Error ? error.message : "Error al cargar categorías"}
-        </p>
-        <Button variant="outline" className="mt-2" onClick={() => refetch()}>
-          Reintentar
-        </Button>
-      </div>
+      <QueryErrorState
+        error={error}
+        fallbackMessage="Error al cargar categorías"
+        onRetry={() => refetch()}
+      />
     );
   }
 

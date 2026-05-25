@@ -1,35 +1,27 @@
 import { NextResponse } from "next/server";
 
 import { requireApiSession } from "@/lib/api-auth";
+import {
+  type IdRouteContext,
+  parseJsonBody,
+  resolveRouteParams,
+  validationErrorResponse,
+} from "@/lib/api-route-utils";
 import { db } from "@/lib/db";
+import { serializeProduct } from "@/lib/serializers/product";
 import { updateProductStockSchema } from "@/lib/validators/product";
 
-type Context = {
-  params: { id: string } | Promise<{ id: string }>;
-};
-
-export async function PATCH(request: Request, { params }: Context) {
+export async function PATCH(request: Request, { params }: IdRouteContext) {
   const auth = await requireApiSession();
   if (!auth.ok) return auth.response;
 
-  const { id } = await Promise.resolve(params);
+  const { id } = await resolveRouteParams(params);
+  const body = await parseJsonBody(request);
+  if (!body.ok) return body.response;
 
-  let json: unknown;
-  try {
-    json = await request.json();
-  } catch {
-    return NextResponse.json(
-      { error: "Cuerpo JSON no válido" },
-      { status: 400 },
-    );
-  }
-
-  const parsed = updateProductStockSchema.safeParse(json);
+  const parsed = updateProductStockSchema.safeParse(body.data);
   if (!parsed.success) {
-    return NextResponse.json(
-      { error: "Error de validación", issues: parsed.error.issues },
-      { status: 400 },
-    );
+    return validationErrorResponse(parsed.error);
   }
 
   if (process.env.DEMO_STOCK_500 === "true") {
@@ -50,8 +42,5 @@ export async function PATCH(request: Request, { params }: Context) {
     include: { category: true },
   });
 
-  return NextResponse.json(
-    { ...updated, price: updated.price.toString() },
-    { status: 200 },
-  );
+  return NextResponse.json(serializeProduct(updated), { status: 200 });
 }

@@ -55,6 +55,16 @@ const editProductFormSchema = createProductFormSchema.omit({ stock: true });
 type CreateProductFormValues = z.infer<typeof createProductFormSchema>;
 type EditProductFormValues = z.infer<typeof editProductFormSchema>;
 
+/** Campos compartidos entre crear y editar (stock solo en creación). */
+type ProductFormFieldValues = {
+  name: string;
+  description?: string;
+  sku?: string;
+  price: number;
+  categoryId: string;
+  stock?: number;
+};
+
 type ProductFormProps = {
   mode?: "create" | "edit";
   product?: Product;
@@ -98,14 +108,15 @@ function ProductFormCreate({ onDone }: { onDone?: () => void }) {
   }
 
   return (
-    <ProductFormFieldsCreate
-      form={form}
+    <ProductFormFields
+      form={form as UseFormReturn<ProductFormFieldValues>}
       categories={categories}
       fieldId={fieldId}
       pending={createMutation.isPending}
       apiError={createMutation.error}
       submitLabel="Crear producto"
-      onSubmit={onSubmit}
+      showStock
+      onSubmit={(values) => onSubmit(values as CreateProductFormValues)}
     />
   );
 }
@@ -162,37 +173,39 @@ function ProductFormEdit({
   }
 
   return (
-    <ProductFormFieldsEdit
-      form={form}
+    <ProductFormFields
+      form={form as UseFormReturn<ProductFormFieldValues>}
       categories={categories}
       fieldId={fieldId}
       pending={updateMutation.isPending}
       apiError={updateMutation.error}
       submitLabel="Guardar cambios"
-      onSubmit={onSubmit}
+      onSubmit={(values) => onSubmit(values as EditProductFormValues)}
     />
   );
 }
 
-type ProductFormFieldsCreateProps = {
-  form: UseFormReturn<CreateProductFormValues>;
+type ProductFormFieldsProps = {
+  form: UseFormReturn<ProductFormFieldValues>;
   categories: { id: string; name: string }[];
   fieldId: (name: string) => string;
   pending: boolean;
   apiError: Error | null;
   submitLabel: string;
-  onSubmit: (values: CreateProductFormValues) => void;
+  showStock?: boolean;
+  onSubmit: (values: ProductFormFieldValues) => void;
 };
 
-function ProductFormFieldsCreate({
+function ProductFormFields({
   form,
   categories,
   fieldId,
   pending,
   apiError,
   submitLabel,
+  showStock = false,
   onSubmit,
-}: ProductFormFieldsCreateProps) {
+}: ProductFormFieldsProps) {
   return (
     <form
       onSubmit={form.handleSubmit(onSubmit)}
@@ -307,170 +320,27 @@ function ProductFormFieldsCreate({
           }}
         />
 
-        <Controller
-          name="stock"
-          control={form.control}
-          render={({ field, fieldState }) => (
-            <Field data-invalid={!!fieldState.error}>
-              <FieldLabel htmlFor={fieldId("stock")}>Stock inicial</FieldLabel>
-              <FieldContent>
-                <Input
-                  id={fieldId("stock")}
-                  type="number"
-                  min={0}
-                  value={field.value}
-                  onChange={(e) => field.onChange(Number(e.target.value))}
-                />
-                <FieldError errors={[fieldState.error]} />
-              </FieldContent>
-            </Field>
-          )}
-        />
-      </FieldGroup>
-
-      {apiError ? (
-        <p className="text-sm text-destructive">{apiError.message}</p>
-      ) : null}
-
-      <Button type="submit" disabled={pending}>
-        {pending ? "Guardando…" : submitLabel}
-      </Button>
-    </form>
-  );
-}
-
-type ProductFormFieldsEditProps = {
-  form: UseFormReturn<EditProductFormValues>;
-  categories: { id: string; name: string }[];
-  fieldId: (name: string) => string;
-  pending: boolean;
-  apiError: Error | null;
-  submitLabel: string;
-  onSubmit: (values: EditProductFormValues) => void;
-};
-
-function ProductFormFieldsEdit({
-  form,
-  categories,
-  fieldId,
-  pending,
-  apiError,
-  submitLabel,
-  onSubmit,
-}: ProductFormFieldsEditProps) {
-  return (
-    <form
-      onSubmit={form.handleSubmit(onSubmit)}
-      className="space-y-4"
-    >
-      <FieldGroup>
-        <Controller
-          name="name"
-          control={form.control}
-          render={({ field, fieldState }) => (
-            <Field data-invalid={!!fieldState.error}>
-              <FieldLabel htmlFor={fieldId("name")}>Nombre</FieldLabel>
-              <FieldContent>
-                <Input id={fieldId("name")} {...field} />
-                <FieldError errors={[fieldState.error]} />
-              </FieldContent>
-            </Field>
-          )}
-        />
-
-        <Controller
-          name="description"
-          control={form.control}
-          render={({ field, fieldState }) => (
-            <Field data-invalid={!!fieldState.error}>
-              <FieldLabel htmlFor={fieldId("description")}>Descripción</FieldLabel>
-              <FieldContent>
-                <Textarea
-                  id={fieldId("description")}
-                  rows={3}
-                  {...field}
-                  value={field.value ?? ""}
-                />
-                <FieldError errors={[fieldState.error]} />
-              </FieldContent>
-            </Field>
-          )}
-        />
-
-        <Controller
-          name="sku"
-          control={form.control}
-          render={({ field, fieldState }) => (
-            <Field data-invalid={!!fieldState.error}>
-              <FieldLabel htmlFor={fieldId("sku")}>SKU</FieldLabel>
-              <FieldContent>
-                <Input
-                  id={fieldId("sku")}
-                  {...field}
-                  value={field.value ?? ""}
-                />
-                <FieldError errors={[fieldState.error]} />
-              </FieldContent>
-            </Field>
-          )}
-        />
-
-        <Controller
-          name="categoryId"
-          control={form.control}
-          render={({ field, fieldState }) => (
-            <Field data-invalid={!!fieldState.error}>
-              <FieldLabel>Categoría</FieldLabel>
-              <FieldContent>
-                <Select value={field.value} onValueChange={field.onChange}>
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Elige categoría" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {categories.map((c) => (
-                      <SelectItem key={c.id} value={c.id}>
-                        {c.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <FieldError errors={[fieldState.error]} />
-              </FieldContent>
-            </Field>
-          )}
-        />
-
-        <Controller
-          name="price"
-          control={form.control}
-          render={({ field, fieldState }) => {
-            const priceNum =
-              typeof field.value === "number"
-                ? field.value
-                : Number(field.value) || 0;
-
-            return (
+        {showStock ? (
+          <Controller
+            name="stock"
+            control={form.control}
+            render={({ field, fieldState }) => (
               <Field data-invalid={!!fieldState.error}>
-                <FieldLabel htmlFor={fieldId("price")}>Precio (€)</FieldLabel>
+                <FieldLabel htmlFor={fieldId("stock")}>Stock inicial</FieldLabel>
                 <FieldContent>
                   <Input
-                    id={fieldId("price")}
+                    id={fieldId("stock")}
                     type="number"
-                    step="0.01"
-                    min="0"
-                    value={priceNum === 0 ? "" : priceNum}
-                    onChange={(e) =>
-                      field.onChange(
-                        e.target.value === "" ? 0 : Number(e.target.value),
-                      )
-                    }
+                    min={0}
+                    value={field.value ?? 0}
+                    onChange={(e) => field.onChange(Number(e.target.value))}
                   />
                   <FieldError errors={[fieldState.error]} />
                 </FieldContent>
               </Field>
-            );
-          }}
-        />
+            )}
+          />
+        ) : null}
       </FieldGroup>
 
       {apiError ? (

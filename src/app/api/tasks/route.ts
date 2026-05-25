@@ -2,6 +2,10 @@ import { NextResponse } from "next/server";
 
 import { requireApiSession } from "@/lib/api-auth";
 import {
+  parseJsonBody,
+  validationErrorResponse,
+} from "@/lib/api-route-utils";
+import {
   createTaskInCookieStore,
   listTasksFromCookieStore,
 } from "@/lib/tasks-cookie-store";
@@ -19,22 +23,12 @@ export async function POST(request: Request) {
   const auth = await requireApiSession();
   if (!auth.ok) return auth.response;
 
-  let json: unknown;
-  try {
-    json = await request.json();
-  } catch {
-    return NextResponse.json(
-      { error: "Cuerpo JSON no válido" },
-      { status: 400 },
-    );
-  }
+  const body = await parseJsonBody(request);
+  if (!body.ok) return body.response;
 
-  const parsed = createTaskSchema.safeParse(json);
+  const parsed = createTaskSchema.safeParse(body.data);
   if (!parsed.success) {
-    return NextResponse.json(
-      { error: "Error de validación", issues: parsed.error.issues },
-      { status: 400 },
-    );
+    return validationErrorResponse(parsed.error);
   }
 
   const created = await createTaskInCookieStore(parsed.data);

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import QuickCompleteButton from "@/components/tasks/quick-complete-button";
 import StatusBadge from "@/components/tasks/status-badge";
+import { getTaskStats } from "@/lib/task-stats";
 import { listTasksFromCookieStore } from "@/lib/tasks-cookie-store";
 
 function formatRelativeDate(value: string) {
@@ -20,10 +21,7 @@ function formatRelativeDate(value: string) {
 export default async function DashboardPage() {
   const tasks = await listTasksFromCookieStore();
   const recentTasks = tasks.slice(0, 5);
-  const total = tasks.length;
-  const pending = tasks.filter((task) => task.status === "pending").length;
-  const inProgress = tasks.filter((task) => task.status === "in_progress").length;
-  const done = tasks.filter((task) => task.status === "done").length;
+  const { total, pending, inProgress, done } = getTaskStats(tasks);
 
   return (
     <main className="page-shell dashboard-shell">

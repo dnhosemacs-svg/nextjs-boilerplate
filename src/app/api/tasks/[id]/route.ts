@@ -2,21 +2,23 @@ import { NextResponse } from "next/server";
 
 import { requireApiSession } from "@/lib/api-auth";
 import {
+  type IdRouteContext,
+  parseJsonBody,
+  resolveRouteParams,
+  validationErrorResponse,
+} from "@/lib/api-route-utils";
+import {
   deleteTaskInCookieStore,
   getTaskByIdFromCookieStore,
   updateTaskInCookieStore,
 } from "@/lib/tasks-cookie-store";
 import { updateTaskSchema } from "@/lib/validators/task";
 
-type Context = {
-  params: { id: string } | Promise<{ id: string }>;
-};
-
-export async function GET(_request: Request, { params }: Context) {
+export async function GET(_request: Request, { params }: IdRouteContext) {
   const auth = await requireApiSession();
   if (!auth.ok) return auth.response;
 
-  const { id } = await Promise.resolve(params);
+  const { id } = await resolveRouteParams(params);
   const task = await getTaskByIdFromCookieStore(id);
   if (!task) {
     return NextResponse.json({ error: "No encontrado" }, { status: 404 });
@@ -24,27 +26,17 @@ export async function GET(_request: Request, { params }: Context) {
   return NextResponse.json(task, { status: 200 });
 }
 
-export async function PUT(request: Request, { params }: Context) {
+export async function PUT(request: Request, { params }: IdRouteContext) {
   const auth = await requireApiSession();
   if (!auth.ok) return auth.response;
 
-  const { id } = await Promise.resolve(params);
-  let json: unknown;
-  try {
-    json = await request.json();
-  } catch {
-    return NextResponse.json(
-      { error: "Cuerpo JSON no válido" },
-      { status: 400 },
-    );
-  }
+  const { id } = await resolveRouteParams(params);
+  const body = await parseJsonBody(request);
+  if (!body.ok) return body.response;
 
-  const parsed = updateTaskSchema.safeParse(json);
+  const parsed = updateTaskSchema.safeParse(body.data);
   if (!parsed.success) {
-    return NextResponse.json(
-      { error: "Error de validación", issues: parsed.error.issues },
-      { status: 400 },
-    );
+    return validationErrorResponse(parsed.error);
   }
 
   const updated = await updateTaskInCookieStore(id, parsed.data);
@@ -55,11 +47,11 @@ export async function PUT(request: Request, { params }: Context) {
   return NextResponse.json(updated, { status: 200 });
 }
 
-export async function DELETE(_request: Request, { params }: Context) {
+export async function DELETE(_request: Request, { params }: IdRouteContext) {
   const auth = await requireApiSession();
   if (!auth.ok) return auth.response;
 
-  const { id } = await Promise.resolve(params);
+  const { id } = await resolveRouteParams(params);
   const deleted = await deleteTaskInCookieStore(id);
   if (!deleted) {
     return NextResponse.json({ error: "No encontrado" }, { status: 404 });

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { cache } from "react";
 import { notFound } from "next/navigation";
 import DeleteTaskButton from "@/components/tasks/delete-task-button";
 import StatusBadge from "@/components/tasks/status-badge";
@@ -10,11 +11,15 @@ type TaskDetailPageProps = {
   params: Promise<{ id: string }>;
 };
 
+const getTaskByIdCached = cache(async (id: string) => {
+  return getTaskByIdFromCookieStore(id).catch(() => null);
+});
+
 export async function generateMetadata({
   params,
 }: TaskDetailPageProps): Promise<Metadata> {
   const { id } = await params;
-  const task = await getTaskByIdFromCookieStore(id).catch(() => null);
+  const task = await getTaskByIdCached(id);
 
   if (!task) {
     return {
@@ -33,7 +38,7 @@ export async function generateMetadata({
 
 export default async function TaskDetailPage({ params }: TaskDetailPageProps) {
   const { id } = await params;
-  const task = await getTaskByIdFromCookieStore(id).catch(() => null);
+  const task = await getTaskByIdCached(id);
   if (!task) {
     notFound();
   }

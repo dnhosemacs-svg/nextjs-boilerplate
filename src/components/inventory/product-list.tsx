@@ -1,13 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   useDeleteProductMutation,
   useProductsQuery,
 } from "@/hooks/inventory";
 import type { Product } from "@/types/inventory";
+import { QueryErrorState } from "./query-error-state";
 import { ConfirmDialog } from "./confirm-dialog";
 import { ProductCard } from "./product-card";
 import { ProductForm } from "./product-form";
@@ -33,14 +33,12 @@ export function ProductList() {
 
   if (isError) {
     return (
-      <div className="rounded-xl border border-destructive/30 bg-destructive/10 p-4">
-        <p className="text-sm text-destructive">
-          {error instanceof Error ? error.message : "Error al cargar productos"}
-        </p>
-        <Button className="mt-3" variant="outline" onClick={() => refetch()}>
-          Reintentar
-        </Button>
-      </div>
+      <QueryErrorState
+        error={error}
+        fallbackMessage="Error al cargar productos"
+        onRetry={() => refetch()}
+        className="rounded-xl border border-destructive/30 bg-destructive/10 p-4"
+      />
     );
   }
 

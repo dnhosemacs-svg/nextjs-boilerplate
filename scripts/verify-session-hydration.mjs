@@ -67,8 +67,8 @@ assert(
 assert(siteNavbar.includes("useSession"), "site-navbar.tsx: debe usar useSession()");
 assert(siteNavbar.includes("signOut"), "site-navbar.tsx: logout debe usar signOut()");
 assert(
-  !siteNavbar.includes("isAuthenticated:"),
-  "site-navbar.tsx: no debe depender de prop isAuthenticated",
+  !/export default function SiteNavbar\s*\(\s*\{[^}]*isAuthenticated/.test(siteNavbar),
+  "site-navbar.tsx: SiteNavbar no debe recibir prop isAuthenticated del layout",
 );
 assert(
   siteNavbar.includes('status === "loading"'),

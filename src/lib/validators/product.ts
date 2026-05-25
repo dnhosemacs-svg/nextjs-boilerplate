@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+import { nonEmptyUpdateSchema } from "@/lib/validators/common";
+
 /** Campos permitidos en `orderBy` del listado de productos (GET). */
 export const productSortBySchema = z.enum([
   "name",
@@ -62,36 +64,32 @@ export const createProductSchema = z.object({
 export type CreateProductInput = z.infer<typeof createProductSchema>;
 
 /** PATCH /api/products/[id] — el stock se actualiza solo en /api/products/[id]/stock */
-export const updateProductSchema = z
-  .object({
-    name: z
-      .string()
-      .trim()
-      .min(1, "El nombre no puede estar vacío")
-      .max(200, "El nombre es demasiado largo")
-      .optional(),
-    description: z
-      .union([
-        z.string().trim().max(5000, "La descripción es demasiado larga"),
-        z.null(),
-      ])
-      .optional(),
-    sku: z
-      .union([
-        z
-          .string()
-          .trim()
-          .min(1, "El SKU no puede estar vacío")
-          .max(80, "El SKU es demasiado largo"),
-        z.null(),
-      ])
-      .optional(),
-    price: z.coerce.number().positive("El precio debe ser mayor que cero").finite().optional(),
-    categoryId: z.string().trim().min(1, "La categoría no puede estar vacía").optional(),
-  })
-  .refine((data) => Object.keys(data).length > 0, {
-    message: "Debes enviar al menos un campo para actualizar",
-  });
+export const updateProductSchema = nonEmptyUpdateSchema({
+  name: z
+    .string()
+    .trim()
+    .min(1, "El nombre no puede estar vacío")
+    .max(200, "El nombre es demasiado largo")
+    .optional(),
+  description: z
+    .union([
+      z.string().trim().max(5000, "La descripción es demasiado larga"),
+      z.null(),
+    ])
+    .optional(),
+  sku: z
+    .union([
+      z
+        .string()
+        .trim()
+        .min(1, "El SKU no puede estar vacío")
+        .max(80, "El SKU es demasiado largo"),
+      z.null(),
+    ])
+    .optional(),
+  price: z.coerce.number().positive("El precio debe ser mayor que cero").finite().optional(),
+  categoryId: z.string().trim().min(1, "La categoría no puede estar vacía").optional(),
+});
 
 export type UpdateProductInput = z.infer<typeof updateProductSchema>;
 

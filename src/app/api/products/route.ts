@@ -2,7 +2,13 @@ import { NextResponse } from "next/server";
 
 import { Prisma } from "@/generated/prisma/client";
 import { requireApiSession } from "@/lib/api-auth";
+import {
+  parseJsonBody,
+  validationErrorResponse,
+} from "@/lib/api-route-utils";
 import { db } from "@/lib/db";
+import { handlePrismaWriteError } from "@/lib/prisma-errors";
+import { serializeProduct } from "@/lib/serializers/product";
 import {
   createProductSchema,
   productListQuerySchema,
@@ -43,10 +49,7 @@ export async function GET(request: Request) {
 
   const parsed = productListQuerySchema.safeParse(queryRaw);
   if (!parsed.success) {
-    return NextResponse.json(
-      { error: "Error de validación", issues: parsed.error.issues },
-      { status: 400 },
-    );
+    return validationErrorResponse(parsed.error);
   }
 
   const query = parsed.data;
@@ -68,34 +71,19 @@ export async function GET(request: Request) {
     include: { category: true },
   });
 
-  const body = products.map((p) => ({
-    ...p,
-    price: p.price.toString(),
-  }));
-
-  return NextResponse.json(body, { status: 200 });
+  return NextResponse.json(products.map(serializeProduct), { status: 200 });
 }
 
 export async function POST(request: Request) {
   const auth = await requireApiSession();
   if (!auth.ok) return auth.response;
 
-  let json: unknown;
-  try {
-    json = await request.json();
-  } catch {
-    return NextResponse.json(
-      { error: "Cuerpo JSON no válido" },
-      { status: 400 },
-    );
-  }
+  const body = await parseJsonBody(request);
+  if (!body.ok) return body.response;
 
-  const parsed = createProductSchema.safeParse(json);
+  const parsed = createProductSchema.safeParse(body.data);
   if (!parsed.success) {
-    return NextResponse.json(
-      { error: "Error de validación", issues: parsed.error.issues },
-      { status: 400 },
-    );
+    return validationErrorResponse(parsed.error);
   }
 
   const { name, description, sku, price, stock, categoryId } = parsed.data;
@@ -113,25 +101,13 @@ export async function POST(request: Request) {
       include: { category: true },
     });
 
-    return NextResponse.json(
-      { ...created, price: created.price.toString() },
-      { status: 201 },
-    );
-  } catch (e) {
-    if (e instanceof Prisma.PrismaClientKnownRequestError) {
-      if (e.code === "P2002") {
-        return NextResponse.json(
-          { error: "Ya existe un producto con ese SKU" },
-          { status: 409 },
-        );
-      }
-      if (e.code === "P2003") {
-        return NextResponse.json(
-          { error: "La categoría indicada no existe" },
-          { status: 400 },
-        );
-      }
-    }
-    throw e;
+    return NextResponse.json(serializeProduct(created), { status: 201 });
+  } catch (error) {
+    const prismaError = handlePrismaWriteError(error, {
+      unique: "Ya existe un producto con ese SKU",
+      foreignKey: "La categoría indicada no existe",
+    });
+    if (prismaError) return prismaError;
+    throw error;
   }
 }

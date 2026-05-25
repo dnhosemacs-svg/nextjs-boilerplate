@@ -6,6 +6,10 @@ export const TASK_STATUS_LABEL: Record<TaskStatus, string> = {
   done: "Completada",
 };
 
+export const TASK_STATUS_OPTIONS = (
+  Object.entries(TASK_STATUS_LABEL) as [TaskStatus, string][]
+).map(([value, label]) => ({ value, label }));
+
 export function formatTaskStatus(status: TaskStatus) {
   return TASK_STATUS_LABEL[status];
 }
