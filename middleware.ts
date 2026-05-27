@@ -50,7 +50,9 @@ async function handleProtectedApi(request: NextRequest) {
   }
 
   const isInventoryApi =
-    pathname.startsWith("/api/products") || pathname.startsWith("/api/categories");
+    pathname.startsWith("/api/products") ||
+    pathname.startsWith("/api/categories") ||
+    pathname.startsWith("/api/materials");
   if (isInventoryApi) {
     const role = getTokenRole(token);
     if (!canAccessWarehousePage(role)) {
@@ -155,6 +157,7 @@ export const config = {
     "/api/tasks/:path*",
     "/api/products/:path*",
     "/api/categories/:path*",
+    "/api/materials/:path*",
     "/api/users",
     "/api/users/:path*",
     "/login",
