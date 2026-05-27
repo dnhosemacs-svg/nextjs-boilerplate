@@ -3,7 +3,9 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import GitHubProvider from "next-auth/providers/github";
 import { CREDENTIALS_SIGN_IN_ERROR_CODES } from "@/lib/credentials-sign-in-errors";
 import { signInWithPassword } from "@/lib/firebase-auth-rest";
+import { getUserRoleById, upsertUserFromAuth } from "@/lib/users";
 import { getAuthSecret } from "@/lib/server-env";
+import { UserRole } from "@/types/user-role";
 
 export const authOptions = {
   secret: getAuthSecret(),
@@ -20,6 +22,12 @@ export const authOptions = {
         token.sub = user.id;
         token.email = user.email;
         token.name = user.name;
+        token.role = user.role;
+      } else if (token.sub && !token.role) {
+        const role = await getUserRoleById(token.sub);
+        if (role) {
+          token.role = role;
+        }
       }
       return token;
     },
@@ -28,6 +36,7 @@ export const authOptions = {
         session.user.id = token.sub ?? "";
         session.user.email = token.email ?? session.user.email;
         session.user.name = token.name ?? session.user.name;
+        session.user.role = token.role ?? UserRole.CLIENT;
       }
       return session;
     },
@@ -70,10 +79,17 @@ export const authOptions = {
         }
 
         const { user } = result;
-        return {
+        const dbUser = await upsertUserFromAuth({
           id: user.localId,
           email: user.email,
           name: user.displayName ?? user.email.split("@")[0] ?? user.email,
+        });
+
+        return {
+          id: dbUser.id,
+          email: dbUser.email,
+          name: dbUser.name ?? undefined,
+          role: dbUser.role,
         };
       },
     }),
