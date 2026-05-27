@@ -2,6 +2,13 @@ import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import { getToken } from "next-auth/jwt";
 import { isProtectedApiPath } from "@/lib/protected-api-routes";
+import {
+  canAccessAdminPage,
+  canAccessWarehousePage,
+  getTokenRole,
+  isAdminPage,
+  isWarehousePage,
+} from "@/lib/route-access";
 import { getPostLoginDestination } from "@/lib/safe-redirect";
 import { getAuthSecret } from "@/lib/server-env";
 
@@ -24,6 +31,7 @@ function isProtectedPage(pathname: string): boolean {
   if (pathname === "/tasks" || pathname.startsWith("/tasks/")) return true;
   if (pathname === "/products" || pathname.startsWith("/products/")) return true;
   if (pathname === "/categories" || pathname.startsWith("/categories/")) return true;
+  if (pathname === "/admin" || pathname.startsWith("/admin/")) return true;
   return false;
 }
 
@@ -39,6 +47,15 @@ async function handleProtectedApi(request: NextRequest) {
   const token = await getToken({ req: request, secret: authSecret });
   if (!hasValidToken(token)) {
     return NextResponse.json({ error: "No autenticado" }, { status: 401 });
+  }
+
+  const isInventoryApi =
+    pathname.startsWith("/api/products") || pathname.startsWith("/api/categories");
+  if (isInventoryApi) {
+    const role = getTokenRole(token);
+    if (!canAccessWarehousePage(role)) {
+      return NextResponse.json({ error: "Prohibido" }, { status: 403 });
+    }
   }
 
   return NextResponse.next();
@@ -58,6 +75,14 @@ async function handleProtectedPage(request: NextRequest) {
     const signIn = new URL("/login", request.url);
     signIn.searchParams.set("callbackUrl", `${pathname}${search}`);
     return NextResponse.redirect(signIn);
+  }
+
+  const role = getTokenRole(token);
+  if (isAdminPage(pathname) && !canAccessAdminPage(role)) {
+    return NextResponse.redirect(new URL("/dashboard", request.url));
+  }
+  if (isWarehousePage(pathname) && !canAccessWarehousePage(role)) {
+    return NextResponse.redirect(new URL("/dashboard", request.url));
   }
 
   return NextResponse.next();
@@ -104,6 +129,8 @@ export const config = {
     "/products/:path*",
     "/categories",
     "/categories/:path*",
+    "/admin",
+    "/admin/:path*",
     "/api/tasks/:path*",
     "/api/products/:path*",
     "/api/categories/:path*",

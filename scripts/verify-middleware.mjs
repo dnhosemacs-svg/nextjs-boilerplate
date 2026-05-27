@@ -68,6 +68,8 @@ const matcherRoutes = [
   '"/products/:path*"',
   '"/categories"',
   '"/categories/:path*"',
+  '"/admin"',
+  '"/admin/:path*"',
   '"/api/tasks/:path*"',
   '"/login"',
   '"/register"',
