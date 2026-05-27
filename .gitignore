@@ -23,6 +23,7 @@
 # misc
 .DS_Store
 *.pem
+nextjs-boilerplate-f1ed3-firebase-adminsdk-fbsvc-9a1dc4b305.json
 
 # debug
 npm-debug.log*
