@@ -10,7 +10,7 @@ import {
   isWarehousePage,
 } from "@/lib/route-access";
 import { getPostLoginDestination } from "@/lib/safe-redirect";
-import { getAuthSecret } from "@/lib/server-env";
+import { getAuthSecret, isPublicRegistrationEnabled } from "@/lib/server-env";
 
 const authSecret = getAuthSecret();
 
@@ -89,6 +89,17 @@ async function handleProtectedPage(request: NextRequest) {
 }
 
 /**
+ * /register desactivado por env → login.
+ */
+function handleRegisterDisabled(request: NextRequest) {
+  const { pathname } = request.nextUrl;
+  if (pathname !== "/register" || isPublicRegistrationEnabled()) {
+    return null;
+  }
+  return NextResponse.redirect(new URL("/login", request.url));
+}
+
+/**
  * Login/register con sesión activa → destino post-login.
  */
 async function handleAuthPages(request: NextRequest) {
@@ -107,6 +118,9 @@ async function handleAuthPages(request: NextRequest) {
 }
 
 export async function middleware(request: NextRequest) {
+  const registerDisabled = handleRegisterDisabled(request);
+  if (registerDisabled) return registerDisabled;
+
   const apiResult = await handleProtectedApi(request);
   if (apiResult) return apiResult;
 

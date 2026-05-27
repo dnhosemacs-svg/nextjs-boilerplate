@@ -75,6 +75,15 @@ function assertFirebaseApiKey(): void {
   );
 }
 
+/**
+ * Registro público en /register (Firebase en cliente).
+ * `PUBLIC_REGISTRATION_ENABLED=false` → solo admin podrá dar de alta usuarios (pasos posteriores).
+ */
+export function isPublicRegistrationEnabled(): boolean {
+  const raw = process.env.PUBLIC_REGISTRATION_ENABLED?.trim().toLowerCase();
+  return raw !== "false";
+}
+
 /** Comprueba variables críticas antes de build o arranque en producción. */
 export function assertServerEnv(): void {
   assertGithubPair();

@@ -17,12 +17,27 @@ export const authOptions = {
     maxAge: 8 * 60 * 60,
   },
   callbacks: {
+    async signIn({ user, account }) {
+      if (account?.provider === "github" && user.id && user.email) {
+        await upsertUserFromAuth({
+          id: user.id,
+          email: user.email,
+          name: user.name ?? null,
+        });
+      }
+      return true;
+    },
     async jwt({ token, user }) {
       if (user) {
         token.sub = user.id;
         token.email = user.email;
         token.name = user.name;
-        token.role = user.role;
+        if (user.role) {
+          token.role = user.role;
+        } else {
+          const role = await getUserRoleById(user.id);
+          token.role = role ?? UserRole.CLIENT;
+        }
       } else if (token.sub && !token.role) {
         const role = await getUserRoleById(token.sub);
         if (role) {

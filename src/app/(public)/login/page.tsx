@@ -5,7 +5,10 @@ import { getServerSession } from "next-auth";
 import AuthLoginForm from "@/components/auth-login-form";
 import { authOptions } from "@/lib/auth";
 import { getPostLoginDestination } from "@/lib/safe-redirect";
-import { isGithubOAuthConfigured } from "@/lib/server-env";
+import {
+  isGithubOAuthConfigured,
+  isPublicRegistrationEnabled,
+} from "@/lib/server-env";
 
 type LoginPageProps = {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
@@ -23,6 +26,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
   }
 
   const githubOAuthEnabled = isGithubOAuthConfigured();
+  const publicRegistrationEnabled = isPublicRegistrationEnabled();
   return (
     <main className="page-shell login-page max-w-4xl justify-center">
       <div className="login-page-form w-full max-w-xl">
@@ -40,9 +44,11 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
           </div>
 
           <div className="login-actions flex flex-wrap gap-3">
-            <Link href="/register" className="ui-pill ui-pill-secondary">
-              Crear cuenta
-            </Link>
+            {publicRegistrationEnabled ? (
+              <Link href="/register" className="ui-pill ui-pill-secondary">
+                Crear cuenta
+              </Link>
+            ) : null}
             <Link href="/" className="ui-pill ui-pill-secondary">
               Volver al inicio
             </Link>

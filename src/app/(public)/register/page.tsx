@@ -5,12 +5,17 @@ import { getServerSession } from "next-auth";
 import AuthRegisterForm from "@/components/auth-register-form";
 import { authOptions } from "@/lib/auth";
 import { getPostLoginDestination } from "@/lib/safe-redirect";
+import { isPublicRegistrationEnabled } from "@/lib/server-env";
 
 type RegisterPageProps = {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 };
 
 export default async function RegisterPage({ searchParams }: RegisterPageProps) {
+  if (!isPublicRegistrationEnabled()) {
+    redirect("/login");
+  }
+
   const session = await getServerSession(authOptions);
   if (session?.user) {
     const query = await searchParams;
