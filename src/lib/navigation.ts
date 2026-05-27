@@ -9,6 +9,8 @@ export const INVENTORY_NAV_ITEMS = [
   { href: "/categories", label: "Categorías" },
 ] as const;
 
+export const ADMIN_NAV_ITEMS = [{ href: "/admin/users", label: "Usuarios" }] as const;
+
 export type NavItem = { href: string; label: string };
 
 export function isActivePath(

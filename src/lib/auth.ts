@@ -27,7 +27,7 @@ export const authOptions = {
       }
       return true;
     },
-    async jwt({ token, user }) {
+    async jwt({ token, user, trigger }) {
       if (user) {
         token.sub = user.id;
         token.email = user.email;
@@ -37,6 +37,11 @@ export const authOptions = {
         } else {
           const role = await getUserRoleById(user.id);
           token.role = role ?? UserRole.CLIENT;
+        }
+      } else if (trigger === "update" && token.sub) {
+        const role = await getUserRoleById(token.sub);
+        if (role) {
+          token.role = role;
         }
       } else if (token.sub && !token.role) {
         const role = await getUserRoleById(token.sub);

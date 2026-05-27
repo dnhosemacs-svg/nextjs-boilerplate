@@ -264,6 +264,16 @@ const httpCases = [
       }),
   },
   {
+    name: "PATCH /api/users/fake-id sin sesión → 401 JSON",
+    run: () =>
+      probe("/api/users/test-id", {
+        method: "PATCH",
+        expectStatus: 401,
+        bodyIncludes: "No autenticado",
+        notRedirect: true,
+      }),
+  },
+  {
     name: "GET /api/auth/session sin sesión → público (200)",
     run: () => probe("/api/auth/session", { expectStatus: 200, notRedirect: true }),
   },
