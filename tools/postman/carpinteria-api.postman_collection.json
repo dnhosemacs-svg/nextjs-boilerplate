@@ -11,7 +11,9 @@
     { "key": "categoryId", "value": "" },
     { "key": "categoryIdWithProducts", "value": "" },
     { "key": "productId", "value": "" },
-    { "key": "fakeId", "value": "00000000-0000-0000-0000-000000000000" }
+    { "key": "fakeId", "value": "00000000-0000-0000-0000-000000000000" },
+    { "key": "materialId", "value": "" },
+    { "key": "orderId", "value": "" }
   ],
   "item": [
     {
@@ -435,6 +437,148 @@
             "url": "{{baseUrl}}/api/products/{{fakeId}}"
           },
           "response": []
+        }
+      ]
+    },
+    {
+      "name": "06 — Materials stock (2.1)",
+      "item": [
+        {
+          "name": "felices",
+          "item": [
+            {
+              "name": "200 — GET material stock",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "if (pm.response.code === 200) {",
+                      "  const body = pm.response.json();",
+                      "  pm.collectionVariables.set('stockPhysicalBefore', body.physical);",
+                      "}"
+                    ],
+                    "type": "text/javascript"
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [
+                  { "key": "Cookie", "value": "{{cookie}}" }
+                ],
+                "url": "{{baseUrl}}/api/materials/{{materialId}}/stock"
+              },
+              "response": []
+            },
+            {
+              "name": "201 — POST movement IN (+5)",
+              "request": {
+                "method": "POST",
+                "header": [
+                  { "key": "Cookie", "value": "{{cookie}}" },
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"type\": \"IN\",\n  \"quantity\": 5\n}"
+                },
+                "url": "{{baseUrl}}/api/materials/{{materialId}}/movements"
+              },
+              "response": []
+            },
+            {
+              "name": "200 — GET material stock (tras IN)",
+              "request": {
+                "method": "GET",
+                "header": [
+                  { "key": "Cookie", "value": "{{cookie}}" }
+                ],
+                "url": "{{baseUrl}}/api/materials/{{materialId}}/stock"
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "errores",
+          "item": [
+            {
+              "name": "404 — GET stock material inexistente",
+              "request": {
+                "method": "GET",
+                "header": [
+                  { "key": "Cookie", "value": "{{cookie}}" }
+                ],
+                "url": "{{baseUrl}}/api/materials/{{fakeId}}/stock"
+              },
+              "response": []
+            },
+            {
+              "name": "400 — POST ADJUST sin reason",
+              "request": {
+                "method": "POST",
+                "header": [
+                  { "key": "Cookie", "value": "{{cookie}}" },
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"type\": \"ADJUST\",\n  \"quantity\": 1\n}"
+                },
+                "url": "{{baseUrl}}/api/materials/{{materialId}}/movements"
+              },
+              "response": []
+            },
+            {
+              "name": "400 — POST OUT sin orderId",
+              "request": {
+                "method": "POST",
+                "header": [
+                  { "key": "Cookie", "value": "{{cookie}}" },
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"type\": \"OUT\",\n  \"quantity\": 1\n}"
+                },
+                "url": "{{baseUrl}}/api/materials/{{materialId}}/movements"
+              },
+              "response": []
+            },
+            {
+              "name": "404 — POST OUT pedido inexistente",
+              "request": {
+                "method": "POST",
+                "header": [
+                  { "key": "Cookie", "value": "{{cookie}}" },
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"type\": \"OUT\",\n  \"quantity\": 1,\n  \"orderId\": \"{{fakeId}}\"\n}"
+                },
+                "url": "{{baseUrl}}/api/materials/{{materialId}}/movements"
+              },
+              "response": []
+            },
+            {
+              "name": "409 — POST OUT cantidad excesiva",
+              "request": {
+                "method": "POST",
+                "header": [
+                  { "key": "Cookie", "value": "{{cookie}}" },
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"type\": \"OUT\",\n  \"quantity\": 999999,\n  \"orderId\": \"{{orderId}}\"\n}"
+                },
+                "url": "{{baseUrl}}/api/materials/{{materialId}}/movements"
+              },
+              "response": []
+            }
+          ]
         }
       ]
     },

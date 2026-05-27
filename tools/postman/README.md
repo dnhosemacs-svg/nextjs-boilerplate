@@ -11,6 +11,8 @@ Archivos para importar en **Postman** o **Thunder Client** (ambos admiten import
 
 Sigue el checklist paso a paso: [CHECKLIST.md](CHECKLIST.md) (21 requests; cubre **401**, felices, **400**, **404** y **409**).
 
+**Stock / libro mayor (tarjeta 2.1):** [CHECKLIST-STOCK.md](CHECKLIST-STOCK.md) — carpeta `06 — Materials stock (2.1)`. Necesitas `materialId` (Prisma Studio) y, para OUT con pedido real, `orderId`.
+
 ## Sesión (obligatorio)
 
 1. `npm run dev` e inicia sesión en `http://localhost:3000/login`.
@@ -29,6 +31,7 @@ Sigue el checklist paso a paso: [CHECKLIST.md](CHECKLIST.md) (21 requests; cubre
 | `03 — Products (felices)` | CRUD + stock |
 | `04 — Products (errores)` | **400** query/body; **404** PATCH |
 | `05 — Tasks (muestra auth)` | **200** con cookie; **401** sin cookie |
+| `06 — Materials stock (2.1)` | GET stock; POST IN/OUT/ADJUST; **400** / **404** / **409** |
 
 Las subcarpetas **409** deben ejecutarse **en orden** (1 → 2 → 3). Algunos requests guardan `categoryId` / `productId` en variables con scripts de test.
 
