@@ -18,6 +18,21 @@ export function canWriteStock(role: UserRole): boolean {
   return role === R.ADMIN || role === R.WORKER;
 }
 
+/** Entradas manuales y salidas de almacén. */
+export function canRecordStockInOut(role: UserRole): boolean {
+  return role === R.ADMIN || role === R.WORKER;
+}
+
+/** Salidas vinculadas a pedido (operativa de taller). */
+export function canRecordStockOut(role: UserRole): boolean {
+  return role === R.ADMIN || role === R.WORKER;
+}
+
+/** Ajustes de inventario: por defecto solo ADMIN. */
+export function canRecordStockAdjust(role: UserRole): boolean {
+  return role === R.ADMIN;
+}
+
 /** Cambio de estado del pedido (ownership del cliente se valida en la API). */
 export function canChangeOrderStatus(
   role: UserRole,
