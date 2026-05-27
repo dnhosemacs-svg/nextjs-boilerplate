@@ -194,6 +194,14 @@ async function main() {
       },
     ],
   });
+
+  const [categoryCount, materialCount] = await Promise.all([
+    prisma.category.count(),
+    prisma.material.count(),
+  ]);
+  console.log(
+    `[seed] OK: ${categoryCount} categorías, ${materialCount} materiales.`,
+  );
 }
 
 main()
