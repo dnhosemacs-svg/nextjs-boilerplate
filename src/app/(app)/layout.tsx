@@ -27,5 +27,5 @@ export default async function AppLayout({
     redirect("/login");
   }
 
-  return <PrivateShell>{children}</PrivateShell>;
+  return <PrivateShell role={session.user.role}>{children}</PrivateShell>;
 }

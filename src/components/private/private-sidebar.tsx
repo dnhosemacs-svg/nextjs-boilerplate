@@ -9,10 +9,13 @@ import {
   ORDER_NAV_ITEMS,
   type NavItem,
 } from "@/lib/navigation";
+import { canAccessInventory } from "@/lib/permissions";
+import type { UserRole } from "@/types/user-role";
 
 type PrivateSidebarProps = {
   open: boolean;
   onClose: () => void;
+  role: UserRole;
 };
 
 function NavLinkList({
@@ -45,8 +48,13 @@ function NavLinkList({
   );
 }
 
-export default function PrivateSidebar({ open, onClose }: PrivateSidebarProps) {
+export default function PrivateSidebar({
+  open,
+  onClose,
+  role,
+}: PrivateSidebarProps) {
   const pathname = usePathname();
+  const showInventory = canAccessInventory(role);
 
   return (
     <>
@@ -65,10 +73,16 @@ export default function PrivateSidebar({ open, onClose }: PrivateSidebarProps) {
           <h2 className="section-heading text-3xl">Taller</h2>
         </div>
 
-        <nav aria-label="Inventario">
-          <p className="eyebrow mb-2 mt-4">Inventario</p>
-          <NavLinkList items={[...INVENTORY_NAV_ITEMS]} pathname={pathname} onClose={onClose} />
-        </nav>
+        {showInventory ? (
+          <nav aria-label="Inventario">
+            <p className="eyebrow mb-2 mt-4">Inventario</p>
+            <NavLinkList
+              items={[...INVENTORY_NAV_ITEMS]}
+              pathname={pathname}
+              onClose={onClose}
+            />
+          </nav>
+        ) : null}
 
         <nav aria-label="Pedidos" className="mt-6">
           <p className="eyebrow mb-2">Pedidos</p>

@@ -3,8 +3,15 @@
 import PrivateHeader from "./private-header";
 import PrivateSidebar from "./private-sidebar";
 import { useUiStore } from "@/stores/ui-store";
+import type { UserRole } from "@/types/user-role";
 
-export default function PrivateShell({ children }: { children: React.ReactNode }) {
+export default function PrivateShell({
+  children,
+  role,
+}: {
+  children: React.ReactNode;
+  role: UserRole;
+}) {
   const sidebarOpen = useUiStore((s) => s.sidebarOpen);
   const setSidebarOpen = useUiStore((s) => s.setSidebarOpen);
 
@@ -13,6 +20,7 @@ export default function PrivateShell({ children }: { children: React.ReactNode }
       <PrivateSidebar
         open={sidebarOpen}
         onClose={() => setSidebarOpen(false)}
+        role={role}
       />
       <div className="private-main">
         <PrivateHeader onOpenSidebar={() => setSidebarOpen(true)} />
