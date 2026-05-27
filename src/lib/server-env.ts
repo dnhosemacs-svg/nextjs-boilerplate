@@ -75,6 +75,46 @@ function assertFirebaseApiKey(): void {
   );
 }
 
+/** Cuenta de servicio Firebase Admin (crear usuarios desde el servidor). */
+export function isFirebaseAdminConfigured(): boolean {
+  const projectId = getFirebaseProjectId();
+  const clientEmail = process.env.FIREBASE_CLIENT_EMAIL?.trim() ?? "";
+  const privateKey = process.env.FIREBASE_PRIVATE_KEY?.trim() ?? "";
+  return (
+    projectId.length > 0 && clientEmail.length > 0 && privateKey.length > 0
+  );
+}
+
+export function getFirebaseProjectId(): string {
+  return (
+    process.env.FIREBASE_PROJECT_ID?.trim() ??
+    process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID?.trim() ??
+    ""
+  );
+}
+
+/** Credencial para `firebase-admin` (solo servidor). */
+export function getFirebaseAdminCredential(): {
+  projectId: string;
+  clientEmail: string;
+  privateKey: string;
+} {
+  const projectId = getFirebaseProjectId();
+  const clientEmail = process.env.FIREBASE_CLIENT_EMAIL?.trim() ?? "";
+  const privateKey = (process.env.FIREBASE_PRIVATE_KEY ?? "")
+    .replace(/\\n/g, "\n")
+    .trim();
+
+  if (!projectId || !clientEmail || !privateKey) {
+    throw new Error(
+      "[env] Firebase Admin incompleto: define FIREBASE_PROJECT_ID (o NEXT_PUBLIC_FIREBASE_PROJECT_ID), " +
+        "FIREBASE_CLIENT_EMAIL y FIREBASE_PRIVATE_KEY.",
+    );
+  }
+
+  return { projectId, clientEmail, privateKey };
+}
+
 /**
  * Registro público en /register (Firebase en cliente).
  * `PUBLIC_REGISTRATION_ENABLED=false` → solo admin podrá dar de alta usuarios (pasos posteriores).

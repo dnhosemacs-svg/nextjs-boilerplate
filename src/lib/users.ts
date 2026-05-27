@@ -36,3 +36,62 @@ export async function getUserRoleById(id: string): Promise<UserRole | null> {
   if (!user) return null;
   return user.role as UserRole;
 }
+
+const adminUserListSelect = {
+  id: true,
+  email: true,
+  name: true,
+  role: true,
+  createdAt: true,
+} as const;
+
+export type AdminUserListItem = {
+  id: string;
+  email: string;
+  name: string | null;
+  role: UserRole;
+  createdAt: Date;
+};
+
+export async function listUsersForAdmin(): Promise<AdminUserListItem[]> {
+  const users = await db.user.findMany({
+    orderBy: { createdAt: "desc" },
+    select: adminUserListSelect,
+  });
+  return users.map((user) => ({
+    ...user,
+    role: user.role as UserRole,
+  }));
+}
+
+export async function findUserById(id: string) {
+  return db.user.findUnique({
+    where: { id },
+    select: adminUserListSelect,
+  });
+}
+
+export async function createAppUser(input: {
+  id: string;
+  email: string;
+  name?: string | null;
+  role: UserRole;
+}) {
+  return db.user.create({
+    data: {
+      id: input.id,
+      email: input.email.toLowerCase(),
+      name: input.name ?? null,
+      role: input.role,
+    },
+    select: adminUserListSelect,
+  });
+}
+
+export async function updateUserRole(id: string, role: UserRole) {
+  return db.user.update({
+    where: { id },
+    data: { role },
+    select: adminUserListSelect,
+  });
+}
