@@ -65,6 +65,10 @@ assert(
   "api-auth.ts: debe exportar requireApiSession",
 );
 assert(
+  apiAuth.includes("requireRole"),
+  "api-auth.ts: debe exportar requireRole",
+);
+assert(
   apiAuth.includes('"No autenticado"'),
   "api-auth.ts: mensaje 401 unificado",
 );
@@ -102,8 +106,10 @@ for (const file of routeFiles) {
       content.indexOf(`export async function ${method}`),
       content.indexOf(`export async function ${method}`) + 400,
     );
-    if (!chunk.includes("requireApiSession")) {
-      failures.push(`${rel}: ${method} debe llamar a requireApiSession()`);
+    if (!chunk.includes("requireApiSession") && !chunk.includes("requireRole")) {
+      failures.push(
+        `${rel}: ${method} debe llamar a requireApiSession() o requireRole()`,
+      );
     }
   }
 }

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
-import { requireApiSession } from "@/lib/api-auth";
+import { requireRole } from "@/lib/api-auth";
+import { UserRole } from "@/types/user-role";
 import {
   parseJsonBody,
   validationErrorResponse,
@@ -10,7 +11,7 @@ import { handlePrismaWriteError } from "@/lib/prisma-errors";
 import { createCategorySchema } from "@/lib/validators/category";
 
 export async function GET() {
-  const auth = await requireApiSession();
+  const auth = await requireRole(UserRole.ADMIN, UserRole.WORKER);
   if (!auth.ok) return auth.response;
 
   const categories = await db.category.findMany({
@@ -20,7 +21,7 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
-  const auth = await requireApiSession();
+  const auth = await requireRole(UserRole.ADMIN);
   if (!auth.ok) return auth.response;
 
   const body = await parseJsonBody(request);

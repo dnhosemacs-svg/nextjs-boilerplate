@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
-import { requireApiSession } from "@/lib/api-auth";
+import { requireRole } from "@/lib/api-auth";
+import { UserRole } from "@/types/user-role";
 import {
   type IdRouteContext,
   parseJsonBody,
@@ -13,7 +14,7 @@ import { serializeProduct } from "@/lib/serializers/product";
 import { updateProductSchema } from "@/lib/validators/product";
 
 export async function PATCH(request: Request, { params }: IdRouteContext) {
-  const auth = await requireApiSession();
+  const auth = await requireRole(UserRole.ADMIN);
   if (!auth.ok) return auth.response;
 
   const { id } = await resolveRouteParams(params);
@@ -48,7 +49,7 @@ export async function PATCH(request: Request, { params }: IdRouteContext) {
 }
 
 export async function DELETE(_request: Request, { params }: IdRouteContext) {
-  const auth = await requireApiSession();
+  const auth = await requireRole(UserRole.ADMIN);
   if (!auth.ok) return auth.response;
 
   const { id } = await resolveRouteParams(params);
