@@ -195,12 +195,26 @@ async function main() {
     ],
   });
 
-  const [categoryCount, materialCount] = await Promise.all([
+  const materials = await prisma.material.findMany({
+    select: { id: true, stock: true },
+  });
+
+  await prisma.stockMovement.createMany({
+    data: materials.map((material) => ({
+      type: "IN",
+      quantity: material.stock,
+      reason: "Stock inicial (seed)",
+      materialId: material.id,
+    })),
+  });
+
+  const [categoryCount, materialCount, movementCount] = await Promise.all([
     prisma.category.count(),
     prisma.material.count(),
+    prisma.stockMovement.count(),
   ]);
   console.log(
-    `[seed] OK: ${categoryCount} categorías, ${materialCount} materiales.`,
+    `[seed] OK: ${categoryCount} categorías, ${materialCount} materiales, ${movementCount} movimientos.`,
   );
 }
 
