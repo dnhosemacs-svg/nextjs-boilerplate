@@ -1,0 +1,34 @@
+-- Flujo de estados: DRAFT → PENDING → APPROVED → IN_PRODUCTION → READY → DELIVERED | CANCELLED
+
+ALTER TYPE "OrderStatus" RENAME TO "OrderStatus_old";
+
+CREATE TYPE "OrderStatus" AS ENUM (
+  'DRAFT',
+  'PENDING',
+  'APPROVED',
+  'IN_PRODUCTION',
+  'READY',
+  'DELIVERED',
+  'CANCELLED'
+);
+
+ALTER TABLE "orders"
+  ALTER COLUMN "status" DROP DEFAULT;
+
+ALTER TABLE "orders"
+  ALTER COLUMN "status" TYPE "OrderStatus"
+  USING (
+    CASE "status"::text
+      WHEN 'DRAFT' THEN 'DRAFT'
+      WHEN 'CONFIRMED' THEN 'PENDING'
+      WHEN 'IN_PROGRESS' THEN 'IN_PRODUCTION'
+      WHEN 'DONE' THEN 'DELIVERED'
+      WHEN 'CANCELLED' THEN 'CANCELLED'
+      ELSE 'DRAFT'
+    END
+  )::"OrderStatus";
+
+ALTER TABLE "orders"
+  ALTER COLUMN "status" SET DEFAULT 'DRAFT';
+
+DROP TYPE "OrderStatus_old";
