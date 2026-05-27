@@ -58,6 +58,13 @@ async function handleProtectedApi(request: NextRequest) {
     }
   }
 
+  if (pathname.startsWith("/api/users")) {
+    const role = getTokenRole(token);
+    if (!canAccessAdminPage(role)) {
+      return NextResponse.json({ error: "Prohibido" }, { status: 403 });
+    }
+  }
+
   return NextResponse.next();
 }
 
@@ -148,6 +155,8 @@ export const config = {
     "/api/tasks/:path*",
     "/api/products/:path*",
     "/api/categories/:path*",
+    "/api/users",
+    "/api/users/:path*",
     "/login",
     "/register",
   ],

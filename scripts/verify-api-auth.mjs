@@ -36,7 +36,9 @@ function isCatalogProtectedApiRoute(rel) {
     rel.includes("/api/categories/") ||
     rel.endsWith("api/categories/route.ts") ||
     rel.includes("/api/products/") ||
-    rel.endsWith("api/products/route.ts")
+    rel.endsWith("api/products/route.ts") ||
+    rel.includes("/api/users/") ||
+    rel.endsWith("api/users/route.ts")
   );
 }
 
@@ -55,6 +57,10 @@ assert(
 assert(
   protectedRoutes.includes('"/api/products"'),
   "protected-api-routes.ts: debe listar /api/products",
+);
+assert(
+  protectedRoutes.includes('"/api/users"'),
+  "protected-api-routes.ts: debe listar /api/users",
 );
 assert(
   middleware.includes("isProtectedApiPath"),
@@ -233,6 +239,25 @@ const httpCases = [
     run: () =>
       probe("/api/products/test-id", {
         method: "PATCH",
+        expectStatus: 401,
+        bodyIncludes: "No autenticado",
+        notRedirect: true,
+      }),
+  },
+  {
+    name: "GET /api/users sin sesión → 401 JSON",
+    run: () =>
+      probe("/api/users", {
+        expectStatus: 401,
+        bodyIncludes: "No autenticado",
+        notRedirect: true,
+      }),
+  },
+  {
+    name: "POST /api/users sin sesión → 401 JSON",
+    run: () =>
+      probe("/api/users", {
+        method: "POST",
         expectStatus: 401,
         bodyIncludes: "No autenticado",
         notRedirect: true,
