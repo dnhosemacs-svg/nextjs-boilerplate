@@ -31,7 +31,7 @@ export const orderParametersSchema = z.record(z.string(), z.unknown());
 export const createOrderSchema = z.object({
   clientId: z.string().trim().min(1, "El cliente es obligatorio"),
   furnitureType: furnitureTypeSchema,
-  parameters: orderParametersSchema,
+  params: orderParametersSchema,
   notes: z
     .string()
     .trim()
@@ -44,7 +44,7 @@ export type CreateOrderInput = z.infer<typeof createOrderSchema>;
 /** Solo editable en DRAFT (y opcionalmente PENDING si taller corrige) */
 export const updateOrderDraftSchema = nonEmptyUpdateSchema({
   furnitureType: furnitureTypeSchema.optional(),
-  parameters: orderParametersSchema.optional(),
+  params: orderParametersSchema.optional(),
   notes: z
     .union([
       z.string().trim().max(4000, "Las notas son demasiado largas"),
@@ -130,9 +130,9 @@ export type SetLaborAmountInput = z.infer<typeof setLaborAmountSchema>;
 /** Campos editables por estado (referencia para handlers) */
 export const ORDER_EDITABLE_FIELDS_BY_STATUS: Record<
   OrderStatus,
-  readonly ("furnitureType" | "parameters" | "notes" | "laborAmount" | "lines")[]
+  readonly ("furnitureType" | "params" | "notes" | "laborAmount" | "lines")[]
 > = {
-  DRAFT: ["furnitureType", "parameters", "notes", "lines"],
+  DRAFT: ["furnitureType", "params", "notes", "lines"],
   PENDING: ["notes", "lines"],
   APPROVED: ["lines"],
   IN_PRODUCTION: ["lines"],
