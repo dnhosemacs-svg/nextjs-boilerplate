@@ -1,6 +1,6 @@
-# Arquitectura del sistema de inventario (v1.1)
+# Arquitectura del sistema de inventario (v1.3)
 
-> Documento de diseño — Evoluciona desde día 1. Incluye capas acordadas, modelo de datos (Category / Product) y uso de Postgres vía Prisma.
+> Documento de diseño — Evoluciona desde día 1. Incluye capas acordadas, modelo de datos (Category / Material) y uso de Postgres vía Prisma.
 
 ## Visión general
 
@@ -17,7 +17,7 @@ Sistema de inventario para el taller de carpintería. Tres capas:
 │  NAVEGADOR (React — Client Components)                      │
 │  ┌─────────────────────┐  ┌──────────────────────────────┐  │
 │  │ Zustand             │  │ TanStack Query               │  │
-│  │ · filtros           │  │ · productos, categorías      │  │
+│  │ · filtros           │  │ · materiales, categorías     │  │
 │  │ · búsqueda          │  │ · cache, refetch, loading    │  │
 │  │ · panel activo      │  │ · mutaciones → invalidar     │  │
 │  └─────────────────────┘  └──────────────────────────────┘  │
@@ -29,7 +29,7 @@ Sistema de inventario para el taller de carpintería. Tres capas:
 │  NEXT.JS (mismo despliegue — Vercel)                        │
 │  ┌─────────────────────┐  ┌──────────────────────────────┐  │
 │  │ RSC + layouts       │  │ Route Handlers               │  │
-│  │ · páginas servidor  │  │ GET/POST /api/products       │  │
+│  │ · páginas servidor  │  │ GET/POST /api/materials      │  │
 │  │ · sesión (NextAuth) │  │ GET/POST /api/categories     │  │
 │  │ · middleware        │  │ · Zod + requireApiSession()  │  │
 │  └─────────────────────┘  └──────────────────────────────┘  │
@@ -40,15 +40,15 @@ Sistema de inventario para el taller de carpintería. Tres capas:
                              ▼
 ┌─────────────────────────────────────────────────────────────┐
 │  POSTGRESQL (Neon)                                          │
-│  · tablas Category, Product (y relaciones)                  │
+│  · tablas Category, Material (y relaciones)                 │
 └─────────────────────────────────────────────────────────────┘
 ```
 
-### Flujo de una lectura de productos (objetivo)
+### Flujo de una lectura de materiales (objetivo)
 
-1. El usuario abre `/products` (página protegida por middleware).
-2. Un Client Component monta TanStack Query con clave `['products']`.
-3. Query hace `GET /api/products` (cookie de sesión NextAuth).
+1. El usuario abre `/products` (página protegida por middleware; UI de materiales).
+2. Un Client Component monta TanStack Query con clave `['materials']`.
+3. Query hace `GET /api/materials` (cookie de sesión NextAuth).
 4. El Route Handler valida sesión, consulta Prisma y devuelve JSON.
 5. TanStack Query guarda el resultado; Zustand solo guarda filtros/UI (no duplica la lista en servidor).
 
@@ -74,7 +74,7 @@ El enunciado mínimo puede asumir solo “usuario logueado”. En este proyecto:
 | **GitHub OAuth** | Opcional vía `GITHUB_ID` / `GITHUB_SECRET` | Login social |
 | **Protección** | `middleware.ts`, `src/lib/protected-api-routes.ts` | Redirect a `/login` y `401` en APIs |
 
-**UI:** Carbon Design System en `/login` y `/register` (`@carbon/react` en `auth-login-form.tsx`). Inventario usará shadcn (día 1–2), sin mezclar Carbon en el módulo privado de productos.
+**UI:** Carbon Design System en `/login` y `/register` (`@carbon/react` en `auth-login-form.tsx`). Inventario usa shadcn, sin mezclar Carbon en el módulo privado de almacén.
 
 Variables de entorno: ver `.env.example` y `README.md`.
 
@@ -84,11 +84,11 @@ Variables de entorno: ver `.env.example` y `README.md`.
 |----------|--------|
 | `npm run dev` | Script en `package.json` |
 | Login + middleware | Implementado (NextAuth + Firebase + GitHub opcional) |
-| Sidebar → `/products`, `/categories` | UI de inventario (shadcn + TanStack Query) |
+| Sidebar → `/products`, `/categories` | UI de almacén (Materiales/Categorías) |
 | Carbon en `/login` | `Button`, `TextInput`, `PasswordInput` de Carbon |
 | Zustand / TanStack Query | Implementado — ver [state-management.md](./state-management.md) |
 | PostgreSQL / Prisma (Neon) | Implementado — `prisma/schema.prisma`, `src/lib/db.ts` |
-| APIs inventario | `GET/POST/PATCH/DELETE` en `/api/categories`, `/api/products`, stock en `/api/products/:id/stock` |
+| APIs inventario | `GET/POST/PATCH/DELETE` en `/api/categories`, `/api/materials`, stock en `/api/materials/:id/stock`, movimientos en `/api/materials/:id/movements` |
 | Pedidos (`Task`) | Cookie `taskflow_tasks` (legacy del boilerplate; no es inventario) |
 
 Documentación del módulo inventario:
@@ -105,28 +105,28 @@ Documentación de auth y navegación:
 
 ## Modelo de datos (PostgreSQL / Prisma)
 
-Esquema en `prisma/schema.prisma`. En base de datos las tablas se mapean a `categories` y `products` (`@@map`).
+Esquema en `prisma/schema.prisma`. En base de datos las tablas se mapean a `categories` y `materials` (`@@map`).
 
-### Diagrama relación Category ↔ Product
+### Diagrama relación Category ↔ Material
 
-Relación **uno a muchos**: cada categoría tiene cero o más productos; cada producto tiene exactamente una categoría. La FK lleva `onDelete: Restrict` (no se puede borrar una categoría si aún tiene productos).
+Relación **uno a muchos**: cada categoría tiene cero o más materiales; cada material tiene exactamente una categoría. La FK lleva `onDelete: Restrict` (no se puede borrar una categoría si aún tiene materiales).
 
 ```
 ┌─────────────────────┐         ┌──────────────────────────────┐
-│ categories          │         │ products                     │
+│ categories          │         │ materials                    │
 ├─────────────────────┤         ├──────────────────────────────┤
 │ id           (PK)   │◄────────│ categoryId (FK) → categories │
 │ name         UNIQUE │    1  N │ id                   (PK)    │
-│ createdAt           │         │ name, description?, sku?     │
-│ updatedAt           │         │ price  NUMERIC(10,2)         │
-└─────────────────────┘         │ stock                         │
+│ createdAt           │         │ name, sku?, unit             │
+│ updatedAt           │         │ unitCost NUMERIC(10,2)       │
+└─────────────────────┘         │ stock, minStock, location?   │
                                │ createdAt, updatedAt          │
                                └──────────────────────────────┘
 ```
 
 ```mermaid
 erDiagram
-  Category ||--o{ Product : "tiene"
+  Category ||--o{ Material : "tiene"
 
   Category {
     string id PK
@@ -135,13 +135,15 @@ erDiagram
     datetime updatedAt
   }
 
-  Product {
+  Material {
     string id PK
     string name
-    string description "nullable"
     string sku "nullable UK"
-    decimal price "Decimal(10,2)"
-    int stock
+    enum unit "M|M2|UD|L|KG"
+    decimal unitCost "Decimal(10,2)"
+    decimal stock "Decimal(12,3)"
+    decimal minStock "Decimal(12,3)"
+    string location "nullable"
     string categoryId FK
     datetime createdAt
     datetime updatedAt
@@ -156,16 +158,19 @@ erDiagram
 - `name` — único
 - `createdAt`, `updatedAt`
 
-**Product**
+**Material**
 
 - `id` — `String` @ `cuid()`
-- `name`, `description?`, `sku?` (opcional, único si existe)
-- `price` — ver siguiente apartado
-- `stock` — entero ≥ 0 (default `0`)
+- `name`, `sku?` (opcional, único si existe)
+- `unit` — enum (`M`, `M2`, `UD`, `L`, `KG`)
+- `unitCost` — ver siguiente apartado
+- `stock` — decimal físico ≥ 0 (default `0`)
+- `minStock` — decimal mínimo ≥ 0 (default `0`)
+- `location?` — texto opcional de ubicación en almacén
 - `categoryId` → FK a `Category`, índice en `categoryId`
 - `createdAt`, `updatedAt`
 
-### Decimal vs Float en precios
+### Decimal vs Float en costes y stock
 
 En inventario y dinero se usa **precisión decimal fija**, no coma flotante binaria.
 
@@ -174,7 +179,20 @@ En inventario y dinero se usa **precisión decimal fija**, no coma flotante bina
 | **Float / `double precision` en SQL** | Representación binaria: valores como `0.1 + 0.2` no son exactos; sumas e IVA acumulan errores. |
 | **Decimal / `NUMERIC` en PostgreSQL** | Almacena escala y precisión de forma exacta; adecuado para moneda y listas de precios. |
 
-En este proyecto, `price` es `Decimal` en Prisma con `@db.Decimal(10, 2)` (hasta 10 dígitos en total, 2 decimales). En runtime el cliente Prisma expone `Decimal` (no un `number` de JS crudo); conviene serializar/formatar en capa API o UI según necesidad.
+En este proyecto, `unitCost` es `Decimal` en Prisma con `@db.Decimal(10, 2)` y `stock`/`minStock` son `Decimal(12,3)`. En runtime el cliente Prisma expone `Decimal` (no un `number` de JS crudo); conviene serializar/formatar en capa API o UI según necesidad.
+
+### Stock de almacén (disponible, reservado, físico, mínimo)
+
+En la UI de almacén se visualizan cuatro magnitudes:
+
+- **Físico**: stock actual calculado por movimientos (`IN`, `OUT`, `ADJUST`) y persistido en `materials.stock`.
+- **Reservado**: suma activa de reservas por pedido (`order_reservations`).
+- **Disponible**: `físico - reservado`.
+- **Mínimo**: umbral de reposición (`materials.minStock`).
+
+Regla de aviso:
+
+- **Stock bajo** cuando `disponible < mínimo`.
 
 ### DATABASE_URL (pooled) vs DIRECT_URL (migraciones)
 
@@ -202,7 +220,7 @@ Marcar cuando todo pase:
 
 - [x] `npm run dev` arranca sin error en `http://localhost:3000`
 - [x] Login con email/contraseña (Firebase) llega a `/dashboard`
-- [x] Sidebar: **Productos** → `/products` muestra listado y CRUD
+- [x] Sidebar: **Materiales** → `/products` muestra listado y CRUD
 - [x] Sidebar: **Categorías** → `/categories` muestra listado y CRUD
 - [x] `/login` muestra controles Carbon
 - [x] Sin sesión, `/products` redirige a `/login`
@@ -211,7 +229,7 @@ Marcar cuando todo pase:
 
 ## Checklist tarjeta 4.6
 
-- [x] `docs/arquitectura.md` — capas, modelo Category/Product, Neon `DATABASE_URL` / `DIRECT_URL`
+- [x] `docs/arquitectura.md` — capas, modelo Category/Material, Neon `DATABASE_URL` / `DIRECT_URL`
 - [x] `docs/api.md` — endpoints inventario + stock separado
 - [x] `docs/state-management.md` — Query + Zustand
 - [x] README actualizado
@@ -222,3 +240,4 @@ Marcar cuando todo pase:
 - **v1** — Día 1: arquitectura documentada; BD y Query/Zustand en implementación posterior.
 - **v1.1** — Modelo de datos en docs: diagrama Category–Product, precios Decimal, `DATABASE_URL` vs `DIRECT_URL`.
 - **v1.2** — Entrega: estado del repo alineado con inventario implementado; checklists 4.6 y gate de entrega.
+- **v1.3** — Migración UI de inventario a almacén: Product → Material, stock derivado y movimientos por material.
