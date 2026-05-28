@@ -1,10 +1,16 @@
 export { useProductsQuery } from "./use-products-query";
+export { useMaterialsQuery } from "./use-materials-query";
 export { useCategoriesQuery } from "./use-categories-query";
 export {
   useCreateProductMutation,
   useUpdateProductMutation,
   useDeleteProductMutation,
 } from "./use-product-mutations";
+export {
+  useCreateMaterialMutation,
+  useUpdateMaterialMutation,
+  useDeleteMaterialMutation,
+} from "./use-material-mutations";
 export {
   useCreateCategoryMutation,
   useUpdateCategoryMutation,

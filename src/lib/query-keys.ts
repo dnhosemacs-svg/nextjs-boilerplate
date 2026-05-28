@@ -1,4 +1,5 @@
 import type { ProductListQuery } from "@/lib/validators/product";
+import type { MaterialListQuery } from "@/lib/validators/material";
 
 export const queryKeys = {
   products: {
@@ -6,6 +7,12 @@ export const queryKeys = {
     lists: () => [...queryKeys.products.all, "list"] as const,
     list: (filters: ProductListQuery) =>
       [...queryKeys.products.lists(), filters] as const,
+  },
+  materials: {
+    all: ["materials"] as const,
+    lists: () => [...queryKeys.materials.all, "list"] as const,
+    list: (filters: MaterialListQuery) =>
+      [...queryKeys.materials.lists(), filters] as const,
   },
   categories: {
     all: ["categories"] as const,
