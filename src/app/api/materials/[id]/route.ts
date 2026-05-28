@@ -13,6 +13,24 @@ import { handlePrismaWriteError } from "@/lib/prisma-errors";
 import { serializeMaterial } from "@/lib/serializers/material";
 import { updateMaterialSchema } from "@/lib/validators/material";
 
+export async function GET(_request: Request, { params }: IdRouteContext) {
+  const auth = await requireRole(UserRole.ADMIN, UserRole.WORKER);
+  if (!auth.ok) return auth.response;
+
+  const { id } = await resolveRouteParams(params);
+
+  const material = await db.material.findUnique({
+    where: { id },
+    include: { category: true },
+  });
+
+  if (!material) {
+    return NextResponse.json({ error: "No encontrado" }, { status: 404 });
+  }
+
+  return NextResponse.json(serializeMaterial(material), { status: 200 });
+}
+
 export async function PATCH(request: Request, { params }: IdRouteContext) {
   const auth = await requireRole(UserRole.ADMIN);
   if (!auth.ok) return auth.response;
