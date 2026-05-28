@@ -1,5 +1,7 @@
 import type { FurnitureType } from "@/lib/validators/order";
 
+export const BOARD_WASTE_FACTOR = 0.1;
+
 export type BomTemplateParams = {
   ancho: number; // cm
   alto: number; // cm
@@ -36,6 +38,10 @@ function baseBoardM2(params: BomTemplateParams): number {
   return anchoM * fondoM;
 }
 
+function withBoardWaste(boardM2: number): number {
+  return boardM2 * (1 + BOARD_WASTE_FACTOR);
+}
+
 function basePerimeterM(params: BomTemplateParams): number {
   const anchoM = toMeters(safeNumber(params.ancho));
   const fondoM = toMeters(safeNumber(params.fondo));
@@ -44,7 +50,7 @@ function basePerimeterM(params: BomTemplateParams): number {
 
 function computeMesa(params: BomTemplateParams): BomTemplateQuantities {
   return {
-    tableroM2: baseBoardM2(params) * 1.1,
+    tableroM2: withBoardWaste(baseBoardM2(params)),
     listonM: basePerimeterM(params) * 1.2,
     herrajesUd: 24,
   };
@@ -53,7 +59,7 @@ function computeMesa(params: BomTemplateParams): BomTemplateQuantities {
 function computeArmario(params: BomTemplateParams): BomTemplateQuantities {
   const puertas = Math.max(1, safeNumber(params.puertas));
   return {
-    tableroM2: baseBoardM2(params) * 2.8,
+    tableroM2: withBoardWaste(baseBoardM2(params) * 2.5),
     listonM: basePerimeterM(params) * 1.6,
     herrajesUd: puertas * 4 + 12,
   };
@@ -62,7 +68,7 @@ function computeArmario(params: BomTemplateParams): BomTemplateQuantities {
 function computeEstanteria(params: BomTemplateParams): BomTemplateQuantities {
   const baldas = Math.max(1, safeNumber(params.baldas));
   return {
-    tableroM2: baseBoardM2(params) * (1.4 + baldas * 0.2),
+    tableroM2: withBoardWaste(baseBoardM2(params) * (1.3 + baldas * 0.15)),
     listonM: basePerimeterM(params) * 1.1,
     herrajesUd: baldas * 4 + 8,
   };
@@ -71,7 +77,7 @@ function computeEstanteria(params: BomTemplateParams): BomTemplateQuantities {
 function computeCajonera(params: BomTemplateParams): BomTemplateQuantities {
   const cajones = Math.max(1, safeNumber(params.cajones));
   return {
-    tableroM2: baseBoardM2(params) * (1.5 + cajones * 0.25),
+    tableroM2: withBoardWaste(baseBoardM2(params) * (1.4 + cajones * 0.2)),
     listonM: basePerimeterM(params) * 1.3,
     herrajesUd: cajones * 6 + 12,
   };
@@ -79,7 +85,7 @@ function computeCajonera(params: BomTemplateParams): BomTemplateQuantities {
 
 function computeMesita(params: BomTemplateParams): BomTemplateQuantities {
   return {
-    tableroM2: baseBoardM2(params) * 1.3,
+    tableroM2: withBoardWaste(baseBoardM2(params) * 1.2),
     listonM: basePerimeterM(params) * 1.1,
     herrajesUd: 16,
   };
@@ -90,7 +96,7 @@ function computePuerta(params: BomTemplateParams): BomTemplateQuantities {
   const altoM = toMeters(safeNumber(params.alto));
   const area = anchoM * altoM;
   return {
-    tableroM2: area * 1.2,
+    tableroM2: withBoardWaste(area),
     listonM: 2 * (anchoM + altoM),
     herrajesUd: 6,
   };
@@ -98,7 +104,7 @@ function computePuerta(params: BomTemplateParams): BomTemplateQuantities {
 
 function computeEncimera(params: BomTemplateParams): BomTemplateQuantities {
   return {
-    tableroM2: baseBoardM2(params) * 1.15,
+    tableroM2: withBoardWaste(baseBoardM2(params) * 1.05),
     listonM: basePerimeterM(params),
     herrajesUd: 10,
   };
@@ -107,7 +113,7 @@ function computeEncimera(params: BomTemplateParams): BomTemplateQuantities {
 function computeZapatero(params: BomTemplateParams): BomTemplateQuantities {
   const baldas = Math.max(1, safeNumber(params.baldas));
   return {
-    tableroM2: baseBoardM2(params) * (1.3 + baldas * 0.15),
+    tableroM2: withBoardWaste(baseBoardM2(params) * (1.2 + baldas * 0.12)),
     listonM: basePerimeterM(params) * 1.1,
     herrajesUd: baldas * 3 + 10,
   };
