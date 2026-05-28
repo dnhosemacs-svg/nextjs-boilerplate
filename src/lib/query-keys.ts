@@ -1,5 +1,12 @@
 import type { ProductListQuery } from "@/lib/validators/product";
 import type { MaterialListQuery } from "@/lib/validators/material";
+import type { OrderStatus } from "@/types/order-status";
+
+export type OrderListQuery = Partial<{
+  status: OrderStatus;
+  furnitureType: string;
+  clientId: string;
+}>;
 
 export const queryKeys = {
   products: {
@@ -21,5 +28,11 @@ export const queryKeys = {
   users: {
     all: ["users"] as const,
     list: () => [...queryKeys.users.all, "list"] as const,
+  },
+  orders: {
+    all: ["orders"] as const,
+    lists: () => [...queryKeys.orders.all, "list"] as const,
+    list: (filters: OrderListQuery) => [...queryKeys.orders.lists(), filters] as const,
+    detail: (id: string) => [...queryKeys.orders.all, "detail", id] as const,
   },
 };

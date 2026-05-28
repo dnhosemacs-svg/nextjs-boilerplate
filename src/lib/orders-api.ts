@@ -1,0 +1,49 @@
+import { parseResponse } from "@/lib/http/parse-response";
+import type { OrderListQuery } from "@/lib/query-keys";
+import type { CreateOrderPayload, OrderDto, UpdateOrderPayload } from "@/types/order";
+
+function ordersUrl(query?: OrderListQuery) {
+  const params = new URLSearchParams();
+  if (query?.status) params.set("status", query.status);
+  if (query?.furnitureType) params.set("furnitureType", query.furnitureType);
+  if (query?.clientId) params.set("clientId", query.clientId);
+  const qs = params.toString();
+  return qs ? `/api/orders?${qs}` : "/api/orders";
+}
+
+export async function getOrders(query?: OrderListQuery): Promise<OrderDto[]> {
+  const response = await fetch(ordersUrl(query), {
+    method: "GET",
+    cache: "no-store",
+  });
+  return parseResponse<OrderDto[]>(response);
+}
+
+export async function getOrderById(id: string): Promise<OrderDto> {
+  const response = await fetch(`/api/orders/${id}`, {
+    method: "GET",
+    cache: "no-store",
+  });
+  return parseResponse<OrderDto>(response);
+}
+
+export async function createOrder(input: CreateOrderPayload): Promise<OrderDto> {
+  const response = await fetch("/api/orders", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(input),
+  });
+  return parseResponse<OrderDto>(response);
+}
+
+export async function updateOrder(
+  id: string,
+  input: UpdateOrderPayload,
+): Promise<OrderDto> {
+  const response = await fetch(`/api/orders/${id}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(input),
+  });
+  return parseResponse<OrderDto>(response);
+}
