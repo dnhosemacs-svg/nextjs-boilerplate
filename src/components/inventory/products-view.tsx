@@ -13,8 +13,8 @@ export function ProductsView() {
       <div className="inventory-warm-layout inventory-products-layout">
         <InventoryPageHeader
           variant="warm"
-          title="Productos"
-          description="Listado, filtros, alta, edición y eliminación."
+          title="Materiales"
+          description="Listado, filtros, alta, edición y eliminación de materiales."
         />
 
         <section className="inventory-products-list-panel">
@@ -29,7 +29,7 @@ export function ProductsView() {
         </section>
 
         <section className="inventory-products-form-panel">
-          <h2 className="inventory-warm-subtitle">Nuevo producto</h2>
+          <h2 className="inventory-warm-subtitle">Nuevo material</h2>
           <ProductForm />
         </section>
       </div>
