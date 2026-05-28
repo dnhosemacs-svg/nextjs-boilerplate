@@ -15,6 +15,7 @@ import { UserRole } from "@/types/user-role";
 export async function GET(_request: Request, { params }: IdRouteContext) {
   const auth = await requireRole(UserRole.ADMIN, UserRole.WORKER, UserRole.CLIENT);
   if (!auth.ok) return auth.response;
+  const audience = auth.session.user.role === UserRole.CLIENT ? "client" : "internal";
 
   const { id } = await resolveRouteParams(params);
 
@@ -35,7 +36,7 @@ export async function GET(_request: Request, { params }: IdRouteContext) {
     return NextResponse.json({ error: "No encontrado" }, { status: 404 });
   }
 
-  return NextResponse.json(serializeOrder(order), { status: 200 });
+  return NextResponse.json(serializeOrder(order, { audience }), { status: 200 });
 }
 
 export async function PATCH(request: Request, { params }: IdRouteContext) {

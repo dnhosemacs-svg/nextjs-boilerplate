@@ -1,6 +1,8 @@
 import type { OrderDto } from "@/types/order";
 
 type DecimalLike = { toString(): string };
+type SerializeAudience = "internal" | "client";
+type SerializeOrderOptions = { audience?: SerializeAudience };
 
 type OrderWithSerializableFields = {
   id: string;
@@ -29,7 +31,12 @@ function toNumber(value: DecimalLike): number {
   return Number(value.toString());
 }
 
-export function serializeOrder(order: OrderWithSerializableFields): OrderDto {
+export function serializeOrder(
+  order: OrderWithSerializableFields,
+  options?: SerializeOrderOptions,
+): OrderDto {
+  const audience = options?.audience ?? "internal";
+  const isClientAudience = audience === "client";
   const materialLines = (order.materialLines ?? []).map((line) => ({
     id: line.id,
     materialId: line.materialId,
@@ -54,10 +61,10 @@ export function serializeOrder(order: OrderWithSerializableFields): OrderDto {
         ? (order.parameters as Record<string, unknown>)
         : {},
     notes: order.notes,
-    hasShortages: order.hasShortages,
-    shortages: order.shortages,
+    hasShortages: isClientAudience ? false : order.hasShortages,
+    shortages: isClientAudience ? null : order.shortages,
     laborAmount: order.laborAmount?.toString() ?? null,
-    materialLines,
+    materialLines: isClientAudience ? [] : materialLines,
     materialsSubtotal,
     createdAt: order.createdAt.toISOString(),
     updatedAt: order.updatedAt.toISOString(),

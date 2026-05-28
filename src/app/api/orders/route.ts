@@ -40,6 +40,7 @@ export async function POST(request: Request) {
 export async function GET(request: Request) {
   const auth = await requireRole(UserRole.ADMIN, UserRole.WORKER, UserRole.CLIENT);
   if (!auth.ok) return auth.response;
+  const audience = auth.session.user.role === UserRole.CLIENT ? "client" : "internal";
 
   const url = new URL(request.url);
   const status = url.searchParams.get("status");
@@ -62,5 +63,8 @@ export async function GET(request: Request) {
     orderBy: { createdAt: "desc" },
   });
 
-  return NextResponse.json(orders.map(serializeOrder), { status: 200 });
+  return NextResponse.json(
+    orders.map((order) => serializeOrder(order, { audience })),
+    { status: 200 },
+  );
 }
