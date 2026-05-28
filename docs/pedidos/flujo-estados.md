@@ -10,7 +10,9 @@ Tarjeta **1.3**: máquina de estados, roles y validadores. Implementación en c�
 | Transiciones + roles | `src/lib/order-transitions.ts` |
 | Validadores Zod | `src/lib/validators/order.ts` |
 | Permiso en UI/API | `src/lib/permissions.ts` → `canChangeOrderStatus` |
-| Cancelar → reservas | `src/lib/order-reservations.ts` → `markReservationsForRelease` |
+| Aprobar / cancelar | `src/lib/order-workflow.ts` |
+| Reservas de pedido | `src/lib/order-reservations.ts` |
+| API estado pedido | `src/app/api/orders/[id]/status/route.ts` |
 
 Ver también: [Matriz de permisos](../seguridad/roles-permisos.md).
 
@@ -62,14 +64,14 @@ flowchart LR
 | De → A | CLIENT | WORKER | ADMIN | Notas |
 |--------|:------:|:------:|:-----:|-------|
 | DRAFT → PENDING | ✓* | ✓ | ✓ | Enviar presupuesto |
-| PENDING → APPROVED | — | ✓ | ✓ | Reservas: tarjeta 2.2 |
+| PENDING → APPROVED | — | ✓ | ✓ | Reserva por `plannedQty`; no bloquea por faltantes |
 | APPROVED → IN_PRODUCTION | — | ✓ | ✓ | |
 | IN_PRODUCTION → READY | — | ✓ | ✓ | |
 | READY → DELIVERED | — | ✓ | ✓ | |
 | DRAFT → CANCELLED | ✓* | ✓ | ✓ | |
 | PENDING → CANCELLED | ✓* | ✓ | ✓ | |
-| APPROVED → CANCELLED | — | ✓ | ✓ | Marcar reservas |
-| IN_PRODUCTION → CANCELLED | — | ✓ | ✓ | Marcar reservas |
+| APPROVED → CANCELLED | — | ✓ | ✓ | Crea `RELEASE` y desactiva reservas activas |
+| IN_PRODUCTION → CANCELLED | — | ✓ | ✓ | Crea `RELEASE` y desactiva reservas activas |
 
 \* **CLIENT** solo en pedidos propios (`clientId === session.user.id`); se validará en la API (tarjeta 3.1).
 
@@ -77,12 +79,29 @@ No hay transiciones desde `READY`, `DELIVERED` ni `CANCELLED`.
 
 ---
 
+## Aprobación: reservas y faltantes
+
+Al pasar a **`APPROVED`**:
+
+1. Se leen líneas `OrderMaterialLine.plannedQty`.
+2. Por cada línea se crea:
+   - `OrderReservation` activa (`active = true`),
+   - `StockMovement` tipo `RESERVE`.
+3. Si `available < plannedQty`, el pedido se marca con:
+   - `hasShortages = true`
+   - `shortages` con detalle por material.
+
+**Política aplicada:** aprobación con aviso (no bloquea por faltantes).
+
+---
+
 ## Cancelación y reservas
 
 Al pasar a **`CANCELLED`**:
 
-1. **Tarjeta 1.3 (ahora):** `markReservationsForRelease(orderId)` pone `active = false` en `OrderReservation`.
-2. **Tarjeta 2.2 (día 2):** movimientos `StockMovement` tipo `RELEASE` y recálculo de stock disponible.
+1. Se crean movimientos `StockMovement` tipo `RELEASE` para cada reserva activa del pedido.
+2. Se desactivan reservas (`OrderReservation.active = false`).
+3. `markReservationsForRelease(orderId)` se mantiene por compatibilidad y delega en la liberación completa.
 
 ---
 
@@ -101,21 +120,16 @@ Referencia en `ORDER_EDITABLE_FIELDS_BY_STATUS` (`src/lib/validators/order.ts`):
 
 ---
 
-## Uso en API (futuro)
+## Uso en API
 
 ```ts
-import { parseOrderTransition } from "@/lib/validators/order";
-import { markReservationsForRelease } from "@/lib/order-reservations";
+import { approveOrder, cancelOrder } from "@/lib/order-workflow";
 
-const transition = parseOrderTransition(order.status, body, session.user.role);
-if (!transition.success) return 400;
-
-if (transition.data.to === "CANCELLED") {
-  await markReservationsForRelease(order.id);
+if (body.status === "APPROVED") {
+  await approveOrder(order.id, session.user.role, session.user.id);
 }
 
-await db.order.update({
-  where: { id: order.id },
-  data: { status: transition.data.to },
-});
+if (body.status === "CANCELLED") {
+  await cancelOrder(order.id, session.user.role, session.user.id);
+}
 ```
