@@ -2,11 +2,13 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useCreateOrderMutation, useUpdateOrderMutation } from "@/hooks/orders/use-order-mutations";
 import type { OrderDto } from "@/types/order";
+import { UserRole } from "@/types/user-role";
 
 type OrderFormProps = {
   mode: "create" | "edit";
@@ -15,6 +17,7 @@ type OrderFormProps = {
 
 export function OrderForm({ mode, order }: OrderFormProps) {
   const router = useRouter();
+  const { data: session } = useSession();
   const createMutation = useCreateOrderMutation();
   const updateMutation = useUpdateOrderMutation();
 
@@ -52,7 +55,7 @@ export function OrderForm({ mode, order }: OrderFormProps) {
           furnitureType: furnitureType.trim().toUpperCase(),
           params,
           notes: notes.trim() || undefined,
-          clientId: clientId.trim() || undefined,
+          clientId: canSetClientId ? (clientId.trim() || undefined) : undefined,
         },
         {
           onSuccess: (created) => {
@@ -84,6 +87,8 @@ export function OrderForm({ mode, order }: OrderFormProps) {
 
   const mutationError = createMutation.error?.message ?? updateMutation.error?.message ?? null;
   const isPending = createMutation.isPending || updateMutation.isPending;
+  const canSetClientId =
+    session?.user?.role === UserRole.ADMIN || session?.user?.role === UserRole.WORKER;
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
@@ -95,7 +100,7 @@ export function OrderForm({ mode, order }: OrderFormProps) {
       <p className="-mt-2 text-xs text-[var(--muted)]">
         Usa tipos válidos como MESA, ARMARIO, ESTANTERIA o CAJONERA.
       </p>
-      {mode === "create" ? (
+      {mode === "create" && canSetClientId ? (
         <Input
           placeholder="clientId (opcional para ADMIN/WORKER)"
           value={clientId}

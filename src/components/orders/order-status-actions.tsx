@@ -1,7 +1,9 @@
 "use client";
 
+import { useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import { useTransitionOrderStatusMutation } from "@/hooks/orders/use-order-mutations";
+import { canChangeOrderStatus } from "@/lib/permissions";
 import type { OrderDto } from "@/types/order";
 import type { OrderStatus } from "@/types/order-status";
 
@@ -45,8 +47,14 @@ function availableActions(order: OrderDto): OrderStatusAction[] {
 }
 
 export function OrderStatusActions({ order }: OrderStatusActionsProps) {
+  const { data: session } = useSession();
   const mutation = useTransitionOrderStatusMutation();
-  const actions = availableActions(order);
+  const userRole = session?.user?.role;
+  const actions = userRole
+    ? availableActions(order).filter((action) =>
+        canChangeOrderStatus(userRole, order.status, action.status),
+      )
+    : [];
 
   if (actions.length === 0) {
     return (
