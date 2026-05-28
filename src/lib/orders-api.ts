@@ -1,6 +1,7 @@
 import { parseResponse } from "@/lib/http/parse-response";
 import type { OrderListQuery } from "@/lib/query-keys";
 import type {
+  ConfirmOrderActualConsumptionPayload,
   CreateOrderPayload,
   OrderDto,
   SetOrderMaterialLinesPayload,
@@ -74,6 +75,18 @@ export async function transitionOrderStatus(
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ status }),
+  });
+  return parseResponse<OrderDto>(response);
+}
+
+export async function confirmOrderActualConsumption(
+  id: string,
+  input: ConfirmOrderActualConsumptionPayload,
+): Promise<OrderDto> {
+  const response = await fetch(`/api/orders/${id}/consume`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(input),
   });
   return parseResponse<OrderDto>(response);
 }
