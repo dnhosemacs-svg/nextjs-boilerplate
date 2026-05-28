@@ -4,7 +4,7 @@ import { InventoryModule } from "./inventory-module";
 import { InventoryPageHeader } from "./inventory-page-header";
 import { SearchBar } from "./search-bar";
 import { CategoryFilter } from "./category-filter";
-import { ProductList } from "./product-list";
+import { MaterialList } from "./material-list";
 import { MaterialForm } from "./material-form";
 
 export function ProductsView() {
@@ -24,7 +24,7 @@ export function ProductsView() {
           </div>
 
           <div className="inventory-warm-body">
-            <ProductList />
+            <MaterialList />
           </div>
         </section>
 
