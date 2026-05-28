@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import {
   Select,
   SelectContent,
@@ -17,11 +16,6 @@ export function CategoryFilter() {
   const categoryId = useUiStore((s) => s.productFilters.categoryId);
   const setProductFilters = useUiStore((s) => s.setProductFilters);
   const { data: categories = [], isLoading } = useCategoriesQuery();
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   return (
     <Select
@@ -31,7 +25,7 @@ export function CategoryFilter() {
           categoryId: value && value !== ALL ? value : undefined,
         })
       }
-      disabled={mounted && isLoading}
+      disabled={isLoading}
     >
       <SelectTrigger className="w-full min-w-[12rem]">
         <SelectValue placeholder="Todas las categorías" />

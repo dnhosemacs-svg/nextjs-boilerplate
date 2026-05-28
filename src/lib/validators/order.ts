@@ -90,7 +90,7 @@ export function parseOrderTransition(
   if (next === currentStatus) {
     return {
       success: false as const,
-      error: z.ZodError.create([
+      error: new z.ZodError([
         {
           code: "custom",
           message: "El pedido ya está en ese estado",
@@ -103,7 +103,7 @@ export function parseOrderTransition(
   if (!canTransitionOrder(currentStatus, next, role)) {
     return {
       success: false as const,
-      error: z.ZodError.create([
+      error: new z.ZodError([
         {
           code: "custom",
           message: "Transición no permitida para tu rol",

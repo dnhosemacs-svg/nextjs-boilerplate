@@ -9,8 +9,12 @@ import {
   validationErrorResponse,
 } from "@/lib/api-route-utils";
 import { db } from "@/lib/db";
-import { serializeProduct } from "@/lib/serializers/product";
-import { updateProductStockSchema } from "@/lib/validators/product";
+import { serializeMaterial } from "@/lib/serializers/material";
+import { z } from "zod";
+
+const updateMaterialStockSchema = z.object({
+  stock: z.coerce.number().min(0, "El stock no puede ser negativo").finite(),
+});
 
 export async function PATCH(request: Request, { params }: IdRouteContext) {
   const auth = await requireRole(UserRole.ADMIN, UserRole.WORKER);
@@ -20,7 +24,7 @@ export async function PATCH(request: Request, { params }: IdRouteContext) {
   const body = await parseJsonBody(request);
   if (!body.ok) return body.response;
 
-  const parsed = updateProductStockSchema.safeParse(body.data);
+  const parsed = updateMaterialStockSchema.safeParse(body.data);
   if (!parsed.success) {
     return validationErrorResponse(parsed.error);
   }
@@ -32,16 +36,16 @@ export async function PATCH(request: Request, { params }: IdRouteContext) {
     );
   }
 
-  const existing = await db.product.findUnique({ where: { id } });
+  const existing = await db.material.findUnique({ where: { id } });
   if (!existing) {
     return NextResponse.json({ error: "No encontrado" }, { status: 404 });
   }
 
-  const updated = await db.product.update({
+  const updated = await db.material.update({
     where: { id },
     data: { stock: parsed.data.stock },
     include: { category: true },
   });
 
-  return NextResponse.json(serializeProduct(updated), { status: 200 });
+  return NextResponse.json(serializeMaterial(updated), { status: 200 });
 }

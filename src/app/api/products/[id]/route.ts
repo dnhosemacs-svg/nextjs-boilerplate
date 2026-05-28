@@ -10,8 +10,8 @@ import {
 } from "@/lib/api-route-utils";
 import { db } from "@/lib/db";
 import { handlePrismaWriteError } from "@/lib/prisma-errors";
-import { serializeProduct } from "@/lib/serializers/product";
-import { updateProductSchema } from "@/lib/validators/product";
+import { serializeMaterial } from "@/lib/serializers/material";
+import { updateMaterialSchema } from "@/lib/validators/material";
 
 export async function PATCH(request: Request, { params }: IdRouteContext) {
   const auth = await requireRole(UserRole.ADMIN);
@@ -21,26 +21,38 @@ export async function PATCH(request: Request, { params }: IdRouteContext) {
   const body = await parseJsonBody(request);
   if (!body.ok) return body.response;
 
-  const parsed = updateProductSchema.safeParse(body.data);
+  const parsed = updateMaterialSchema.safeParse(body.data);
   if (!parsed.success) {
     return validationErrorResponse(parsed.error);
   }
 
-  const existing = await db.product.findUnique({ where: { id } });
+  const existing = await db.material.findUnique({ where: { id } });
   if (!existing) {
     return NextResponse.json({ error: "No encontrado" }, { status: 404 });
   }
 
+  const data = {
+    ...parsed.data,
+    sku:
+      parsed.data.sku === undefined
+        ? undefined
+        : (parsed.data.sku?.trim() || null),
+    location:
+      parsed.data.location === undefined
+        ? undefined
+        : (parsed.data.location?.trim() || null),
+  };
+
   try {
-    const updated = await db.product.update({
+    const updated = await db.material.update({
       where: { id },
-      data: parsed.data,
+      data,
       include: { category: true },
     });
-    return NextResponse.json(serializeProduct(updated), { status: 200 });
+    return NextResponse.json(serializeMaterial(updated), { status: 200 });
   } catch (error) {
     const prismaError = handlePrismaWriteError(error, {
-      unique: "Ya existe un producto con ese SKU",
+      unique: "Ya existe un material con ese SKU",
       foreignKey: "La categoría indicada no existe",
     });
     if (prismaError) return prismaError;
@@ -54,11 +66,11 @@ export async function DELETE(_request: Request, { params }: IdRouteContext) {
 
   const { id } = await resolveRouteParams(params);
 
-  const existing = await db.product.findUnique({ where: { id } });
+  const existing = await db.material.findUnique({ where: { id } });
   if (!existing) {
     return NextResponse.json({ error: "No encontrado" }, { status: 404 });
   }
 
-  const deleted = await db.product.delete({ where: { id } });
-  return NextResponse.json(serializeProduct(deleted), { status: 200 });
+  const deleted = await db.material.delete({ where: { id } });
+  return NextResponse.json(serializeMaterial(deleted), { status: 200 });
 }

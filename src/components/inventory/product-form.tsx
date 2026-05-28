@@ -75,10 +75,10 @@ export function ProductForm({ mode = "create", product, onDone }: ProductFormPro
   if (mode === "edit") {
     return <ProductFormEdit product={product} onDone={onDone} />;
   }
-  return <ProductFormCreate onDone={onDone} />;
+  return <ProductFormCreate />;
 }
 
-function ProductFormCreate({ onDone }: { onDone?: () => void }) {
+function ProductFormCreate() {
   const { data: categories = [] } = useCategoriesQuery();
   const createMutation = useCreateProductMutation();
   const fieldId = (name: string) => `product-${name}`;

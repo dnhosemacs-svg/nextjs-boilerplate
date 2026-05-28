@@ -104,7 +104,10 @@ export async function POST(request: Request, { params }: IdRouteContext) {
       type,
       quantity: parsed.data.quantity,
       reason: parsed.data.reason,
-      orderId: "orderId" in parsed.data ? parsed.data.orderId : undefined,
+      orderId:
+        "orderId" in parsed.data && typeof parsed.data.orderId === "string"
+          ? parsed.data.orderId
+          : undefined,
       userId: auth.session.user.id,
     });
     return NextResponse.json(result, { status: 201 });

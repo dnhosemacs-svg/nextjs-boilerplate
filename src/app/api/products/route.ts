@@ -3,30 +3,29 @@ import { NextResponse } from "next/server";
 import { Prisma } from "@/generated/prisma/client";
 import { requireRole } from "@/lib/api-auth";
 import { UserRole } from "@/types/user-role";
-import {
-  parseJsonBody,
-  validationErrorResponse,
-} from "@/lib/api-route-utils";
+import { parseJsonBody, validationErrorResponse } from "@/lib/api-route-utils";
 import { db } from "@/lib/db";
 import { handlePrismaWriteError } from "@/lib/prisma-errors";
-import { serializeProduct } from "@/lib/serializers/product";
+import { serializeMaterial } from "@/lib/serializers/material";
 import {
-  createProductSchema,
-  productListQuerySchema,
-  type ProductListQuery,
-} from "@/lib/validators/product";
+  createMaterialSchema,
+  materialListQuerySchema,
+  type MaterialListQuery,
+} from "@/lib/validators/material";
 
 function orderByFromQuery(
-  query: ProductListQuery,
-): Prisma.ProductOrderByWithRelationInput {
+  query: MaterialListQuery,
+): Prisma.MaterialOrderByWithRelationInput {
   const dir = query.sortOrder;
   switch (query.sortBy) {
     case "name":
       return { name: dir };
-    case "price":
-      return { price: dir };
+    case "unitCost":
+      return { unitCost: dir };
     case "stock":
       return { stock: dir };
+    case "minStock":
+      return { minStock: dir };
     case "createdAt":
       return { createdAt: dir };
     case "updatedAt":
@@ -48,31 +47,31 @@ export async function GET(request: Request) {
     sortOrder: url.searchParams.get("sortOrder") ?? undefined,
   };
 
-  const parsed = productListQuerySchema.safeParse(queryRaw);
+  const parsed = materialListQuerySchema.safeParse(queryRaw);
   if (!parsed.success) {
     return validationErrorResponse(parsed.error);
   }
 
   const query = parsed.data;
-
-  const where: Prisma.ProductWhereInput = {};
+  const where: Prisma.MaterialWhereInput = {};
   if (query.search) {
     where.OR = [
       { name: { contains: query.search, mode: "insensitive" } },
-      { description: { contains: query.search, mode: "insensitive" } },
+      { sku: { contains: query.search, mode: "insensitive" } },
+      { location: { contains: query.search, mode: "insensitive" } },
     ];
   }
   if (query.categoryId) {
     where.categoryId = query.categoryId;
   }
 
-  const products = await db.product.findMany({
+  const materials = await db.material.findMany({
     where,
     orderBy: orderByFromQuery(query),
     include: { category: true },
   });
 
-  return NextResponse.json(products.map(serializeProduct), { status: 200 });
+  return NextResponse.json(materials.map(serializeMaterial), { status: 200 });
 }
 
 export async function POST(request: Request) {
@@ -82,31 +81,32 @@ export async function POST(request: Request) {
   const body = await parseJsonBody(request);
   if (!body.ok) return body.response;
 
-  const parsed = createProductSchema.safeParse(body.data);
+  const parsed = createMaterialSchema.safeParse(body.data);
   if (!parsed.success) {
     return validationErrorResponse(parsed.error);
   }
 
-  const { name, description, sku, price, stock, categoryId } = parsed.data;
+  const { name, sku, unit, unitCost, minStock, location, categoryId } = parsed.data;
 
   try {
-    const created = await db.product.create({
+    const created = await db.material.create({
       data: {
         name,
-        description,
-        sku,
-        price,
-        stock,
+        sku: sku?.trim() || null,
+        unit,
+        unitCost,
+        minStock,
+        location: location?.trim() || null,
         categoryId,
       },
       include: { category: true },
     });
 
-    return NextResponse.json(serializeProduct(created), { status: 201 });
+    return NextResponse.json(serializeMaterial(created), { status: 201 });
   } catch (error) {
     const prismaError = handlePrismaWriteError(error, {
-      unique: "Ya existe un producto con ese SKU",
-      foreignKey: "La categoría indicada no existe",
+      unique: "Ya existe un material con ese SKU",
+      foreignKey: "La categoria indicada no existe",
     });
     if (prismaError) return prismaError;
     throw error;
