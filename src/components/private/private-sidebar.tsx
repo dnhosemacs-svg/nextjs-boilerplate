@@ -5,9 +5,9 @@ import { usePathname } from "next/navigation";
 
 import {
   ADMIN_NAV_ITEMS,
+  getOrderNavItems,
   INVENTORY_NAV_ITEMS,
   isActivePath,
-  ORDER_NAV_ITEMS,
   type NavItem,
 } from "@/lib/navigation";
 import { canAccessInventory, canManageUsers } from "@/lib/permissions";
@@ -58,6 +58,7 @@ export default function PrivateSidebar({
   const pathname = usePathname();
   const showInventory = canAccessInventory(role);
   const showAdmin = canManageUsers(role);
+  const orderNavItems = getOrderNavItems(role);
 
   return (
     <>
@@ -90,7 +91,7 @@ export default function PrivateSidebar({
 
         <nav aria-label="Pedidos" className="mt-6">
           <p className="eyebrow mb-2">Pedidos</p>
-          <NavLinkList items={[...ORDER_NAV_ITEMS]} pathname={pathname} onClose={onClose} />
+          <NavLinkList items={orderNavItems} pathname={pathname} onClose={onClose} />
         </nav>
 
         {showAdmin ? (
