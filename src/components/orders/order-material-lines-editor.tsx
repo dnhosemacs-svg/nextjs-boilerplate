@@ -2,11 +2,13 @@
 
 import { useMemo, useState } from "react";
 
+import { buildTemplateDraftLines } from "@/lib/bom-templates";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useMaterialsQuery } from "@/hooks/inventory/use-materials-query";
 import { useSetOrderMaterialLinesMutation } from "@/hooks/orders/use-order-mutations";
 import type { OrderDto } from "@/types/order";
+import type { FurnitureType } from "@/lib/validators/order";
 
 type OrderMaterialLinesEditorProps = {
   order: OrderDto;
@@ -89,6 +91,29 @@ export function OrderMaterialLinesEditor({ order }: OrderMaterialLinesEditorProp
     });
   }
 
+  function handleLoadTemplate() {
+    const templateLines = buildTemplateDraftLines({
+      furnitureType: order.furnitureType as FurnitureType,
+      params: (order.params as Record<string, unknown>) ?? {},
+      materials: materialOptions,
+    });
+
+    if (templateLines.length === 0) {
+      setFormError(
+        "No se pudo cargar plantilla. Verifica tipo de mueble, params y materiales base (M2, M, UD).",
+      );
+      return;
+    }
+
+    setFormError(null);
+    setLines(
+      templateLines.map((line) => ({
+        materialId: line.materialId,
+        plannedQty: String(line.plannedQty),
+      })),
+    );
+  }
+
   const mutationError = saveLinesMutation.error?.message ?? null;
   const isPending = saveLinesMutation.isPending;
 
@@ -148,6 +173,14 @@ export function OrderMaterialLinesEditor({ order }: OrderMaterialLinesEditorProp
       {mutationError ? <p className="text-xs text-destructive">{mutationError}</p> : null}
 
       <div className="flex flex-wrap gap-2">
+        <Button
+          type="button"
+          variant="outline"
+          onClick={handleLoadTemplate}
+          disabled={isPending || materialOptions.length === 0}
+        >
+          Cargar plantilla
+        </Button>
         <Button type="button" variant="outline" onClick={addLine} disabled={isPending}>
           Anadir linea
         </Button>

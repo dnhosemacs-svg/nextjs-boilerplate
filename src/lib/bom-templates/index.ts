@@ -1,4 +1,6 @@
 import type { FurnitureType } from "@/lib/validators/order";
+import type { Material } from "@/types/inventory";
+import type { UpsertOrderMaterialLinePayload } from "@/types/order";
 
 export const BOARD_WASTE_FACTOR = 0.1;
 
@@ -129,4 +131,48 @@ export const BOM_TEMPLATES: Record<FurnitureType, BomTemplateDefinition> = {
   ENCIMERA: { furnitureType: "ENCIMERA", compute: computeEncimera },
   ZAPATERO: { furnitureType: "ZAPATERO", compute: computeZapatero },
 };
+
+function round3(value: number): number {
+  return Math.round(value * 1000) / 1000;
+}
+
+function materialByUnit(materials: Material[], unit: Material["unit"]): Material | null {
+  const ordered = [...materials].sort((a, b) => a.name.localeCompare(b.name));
+  return ordered.find((material) => material.unit === unit) ?? null;
+}
+
+function toTemplateParams(params: Record<string, unknown>): BomTemplateParams {
+  return {
+    ancho: safeNumber(params.ancho),
+    alto: safeNumber(params.alto),
+    fondo: safeNumber(params.fondo),
+    puertas: safeNumber(params.puertas),
+    cajones: safeNumber(params.cajones),
+    baldas: safeNumber(params.baldas),
+  };
+}
+
+export function buildTemplateDraftLines(input: {
+  furnitureType: FurnitureType;
+  params: Record<string, unknown>;
+  materials: Material[];
+}): UpsertOrderMaterialLinePayload[] {
+  const template = BOM_TEMPLATES[input.furnitureType];
+  const amounts = template.compute(toTemplateParams(input.params));
+  const board = materialByUnit(input.materials, "M2");
+  const slat = materialByUnit(input.materials, "M");
+  const fittings = materialByUnit(input.materials, "UD");
+
+  const lines: UpsertOrderMaterialLinePayload[] = [];
+  if (board && amounts.tableroM2 > 0) {
+    lines.push({ materialId: board.id, plannedQty: round3(amounts.tableroM2) });
+  }
+  if (slat && amounts.listonM > 0) {
+    lines.push({ materialId: slat.id, plannedQty: round3(amounts.listonM) });
+  }
+  if (fittings && amounts.herrajesUd > 0) {
+    lines.push({ materialId: fittings.id, plannedQty: round3(amounts.herrajesUd) });
+  }
+  return lines;
+}
 
