@@ -5,7 +5,7 @@ export const ORDER_NAV_ITEMS = [
 ] as const;
 
 export const INVENTORY_NAV_ITEMS = [
-  { href: "/products", label: "Productos" },
+  { href: "/products", label: "Materiales" },
   { href: "/categories", label: "Categorías" },
 ] as const;
 
