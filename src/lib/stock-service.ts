@@ -91,7 +91,13 @@ export async function getMaterialStock(
 export async function recordMovement(input: RecordMovementInput) {
   const type = input.type;
 
-  if (type !== "IN" && type !== "OUT" && type !== "ADJUST") {
+  if (
+    type !== "IN" &&
+    type !== "OUT" &&
+    type !== "ADJUST" &&
+    type !== "RESERVE" &&
+    type !== "RELEASE"
+  ) {
     throw new StockServiceError("INVALID_MOVEMENT", "Tipo de movimiento no válido");
   }
 
@@ -147,6 +153,60 @@ export async function recordMovement(input: RecordMovementInput) {
       }
     }
 
+    if (type === "RESERVE") {
+      if (!quantity.greaterThan(0)) {
+        throw new StockServiceError(
+          "INVALID_MOVEMENT",
+          "La cantidad de reserva debe ser mayor que cero",
+        );
+      }
+      if (!input.orderId) {
+        throw new StockServiceError(
+          "INVALID_MOVEMENT",
+          "orderId es obligatorio para reservas",
+        );
+      }
+
+      const order = await tx.order.findUnique({
+        where: { id: input.orderId },
+        select: { id: true },
+      });
+      if (!order) {
+        throw new StockServiceError("ORDER_NOT_FOUND", "Pedido no encontrado");
+      }
+
+      const stockBeforeReserve = await computeMaterialStockDecimal(tx, input.materialId);
+      if (stockBeforeReserve.available.lessThan(quantity)) {
+        throw new StockServiceError(
+          "INSUFFICIENT_AVAILABLE",
+          "Stock disponible insuficiente para reservar",
+        );
+      }
+    }
+
+    if (type === "RELEASE") {
+      if (!quantity.greaterThan(0)) {
+        throw new StockServiceError(
+          "INVALID_MOVEMENT",
+          "La cantidad de liberación debe ser mayor que cero",
+        );
+      }
+      if (!input.orderId) {
+        throw new StockServiceError(
+          "INVALID_MOVEMENT",
+          "orderId es obligatorio para liberaciones",
+        );
+      }
+
+      const order = await tx.order.findUnique({
+        where: { id: input.orderId },
+        select: { id: true },
+      });
+      if (!order) {
+        throw new StockServiceError("ORDER_NOT_FOUND", "Pedido no encontrado");
+      }
+    }
+
     if (type === "ADJUST") {
       if (quantity.isZero()) {
         throw new StockServiceError(
@@ -182,7 +242,10 @@ export async function recordMovement(input: RecordMovementInput) {
         quantity: storedQuantity,
         reason: input.reason?.trim() || null,
         materialId: input.materialId,
-        orderId: type === "OUT" ? (input.orderId ?? null) : null,
+        orderId:
+          type === "OUT" || type === "RESERVE" || type === "RELEASE"
+            ? (input.orderId ?? null)
+            : null,
         userId: input.userId ?? null,
       },
     });

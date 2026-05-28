@@ -6,7 +6,7 @@ export type MaterialStockSnapshot = {
 
 export type RecordMovementInput = {
   materialId: string;
-  type: "IN" | "OUT" | "ADJUST";
+  type: "IN" | "OUT" | "ADJUST" | "RESERVE" | "RELEASE";
   quantity: number;
   reason?: string;
   orderId?: string;
