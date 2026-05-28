@@ -5,7 +5,7 @@ import { InventoryPageHeader } from "./inventory-page-header";
 import { SearchBar } from "./search-bar";
 import { CategoryFilter } from "./category-filter";
 import { ProductList } from "./product-list";
-import { ProductForm } from "./product-form";
+import { MaterialForm } from "./material-form";
 
 export function ProductsView() {
   return (
@@ -30,7 +30,7 @@ export function ProductsView() {
 
         <section className="inventory-products-form-panel">
           <h2 className="inventory-warm-subtitle">Nuevo material</h2>
-          <ProductForm />
+          <MaterialForm />
         </section>
       </div>
     </InventoryModule>
