@@ -1,6 +1,12 @@
 import { parseResponse } from "@/lib/http/parse-response";
 import type { OrderListQuery } from "@/lib/query-keys";
-import type { CreateOrderPayload, OrderDto, UpdateOrderPayload } from "@/types/order";
+import type {
+  CreateOrderPayload,
+  OrderDto,
+  SetOrderMaterialLinesPayload,
+  UpdateOrderPayload,
+} from "@/types/order";
+import type { OrderStatus } from "@/types/order-status";
 
 function ordersUrl(query?: OrderListQuery) {
   const params = new URLSearchParams();
@@ -44,6 +50,30 @@ export async function updateOrder(
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(input),
+  });
+  return parseResponse<OrderDto>(response);
+}
+
+export async function setOrderMaterialLines(
+  id: string,
+  input: SetOrderMaterialLinesPayload,
+): Promise<OrderDto> {
+  const response = await fetch(`/api/orders/${id}/materials`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(input),
+  });
+  return parseResponse<OrderDto>(response);
+}
+
+export async function transitionOrderStatus(
+  id: string,
+  status: OrderStatus,
+): Promise<OrderDto> {
+  const response = await fetch(`/api/orders/${id}/status`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ status }),
   });
   return parseResponse<OrderDto>(response);
 }
