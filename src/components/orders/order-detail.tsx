@@ -2,6 +2,7 @@
 
 import { OrderForm } from "@/components/orders/order-form";
 import { OrderMaterialLinesEditor } from "@/components/orders/order-material-lines-editor";
+import { OrderRealConsumptionEditor } from "@/components/orders/order-real-consumption-editor";
 import { OrderStatusActions } from "@/components/orders/order-status-actions";
 import { useOrderQuery } from "@/hooks/orders/use-order-query";
 
@@ -78,6 +79,9 @@ export function OrderDetail({ id, mode = "internal" }: OrderDetailProps) {
       <div className="space-y-4">
         <OrderForm mode="edit" order={order} />
         {isClientMode ? null : <OrderMaterialLinesEditor order={order} />}
+        {!isClientMode && order.status === "IN_PRODUCTION" ? (
+          <OrderRealConsumptionEditor order={order} />
+        ) : null}
         <OrderStatusActions order={order} />
 
         {!isClientMode && order.hasShortages ? (
