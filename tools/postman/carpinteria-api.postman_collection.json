@@ -583,6 +583,135 @@
       ]
     },
     {
+      "name": "07 — Materials & movements (2.4)",
+      "item": [
+        {
+          "name": "materials",
+          "item": [
+            {
+              "name": "200 — GET materials",
+              "request": {
+                "method": "GET",
+                "header": [{ "key": "Cookie", "value": "{{cookie}}" }],
+                "url": "{{baseUrl}}/api/materials"
+              },
+              "response": []
+            },
+            {
+              "name": "201 — POST material",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "if (pm.response.code === 201) {",
+                      "  const body = pm.response.json();",
+                      "  if (body && body.id) pm.collectionVariables.set('materialId', body.id);",
+                      "}"
+                    ],
+                    "type": "text/javascript"
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  { "key": "Cookie", "value": "{{cookie}}" },
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Material 2.4\",\n  \"sku\": \"MAT-24-{{$timestamp}}\",\n  \"unit\": \"UD\",\n  \"unitCost\": 3.5,\n  \"minStock\": 1,\n  \"location\": \"Estante A\",\n  \"categoryId\": \"{{categoryId}}\"\n}"
+                },
+                "url": "{{baseUrl}}/api/materials"
+              },
+              "response": []
+            },
+            {
+              "name": "200 — GET material by id",
+              "request": {
+                "method": "GET",
+                "header": [{ "key": "Cookie", "value": "{{cookie}}" }],
+                "url": "{{baseUrl}}/api/materials/{{materialId}}"
+              },
+              "response": []
+            },
+            {
+              "name": "200 — PATCH material",
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  { "key": "Cookie", "value": "{{cookie}}" },
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"location\": \"Estante B\"\n}"
+                },
+                "url": "{{baseUrl}}/api/materials/{{materialId}}"
+              },
+              "response": []
+            },
+            {
+              "name": "200 — DELETE material",
+              "request": {
+                "method": "DELETE",
+                "header": [{ "key": "Cookie", "value": "{{cookie}}" }],
+                "url": "{{baseUrl}}/api/materials/{{materialId}}"
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "movements (IN/ADJUST)",
+          "item": [
+            {
+              "name": "201 — POST movement IN (+5)",
+              "request": {
+                "method": "POST",
+                "header": [
+                  { "key": "Cookie", "value": "{{cookie}}" },
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"type\": \"IN\",\n  \"quantity\": 5\n}"
+                },
+                "url": "{{baseUrl}}/api/materials/{{materialId}}/movements"
+              },
+              "response": []
+            },
+            {
+              "name": "201 — POST movement ADJUST (+1)",
+              "request": {
+                "method": "POST",
+                "header": [
+                  { "key": "Cookie", "value": "{{cookie}}" },
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"type\": \"ADJUST\",\n  \"quantity\": 1,\n  \"reason\": \"Ajuste inventario\"\n}"
+                },
+                "url": "{{baseUrl}}/api/materials/{{materialId}}/movements"
+              },
+              "response": []
+            },
+            {
+              "name": "200 — GET movements by material",
+              "request": {
+                "method": "GET",
+                "header": [{ "key": "Cookie", "value": "{{cookie}}" }],
+                "url": "{{baseUrl}}/api/materials/{{materialId}}/movements"
+              },
+              "response": []
+            }
+          ]
+        }
+      ]
+    },
+    {
       "name": "05 — Tasks (muestra auth)",
       "item": [
         {
