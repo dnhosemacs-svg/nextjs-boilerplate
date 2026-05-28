@@ -12,7 +12,7 @@ export function CategoriesView() {
         <InventoryPageHeader
           variant="warm"
           title="Categorías"
-          description="Crear, editar y eliminar categorías del inventario."
+          description="Crear, editar y eliminar categorías de materiales."
         />
 
         <section className="surface-card inventory-warm-panel">

@@ -89,7 +89,7 @@ export function CategoryList() {
         open={!!toDelete}
         onOpenChange={(open) => !open && setToDelete(null)}
         title="Eliminar categoría"
-        description={`¿Seguro que quieres eliminar «${toDelete?.name}»? No debe tener productos asociados.`}
+        description={`¿Seguro que quieres eliminar «${toDelete?.name}»? No debe tener materiales asociados.`}
         loading={deleteMutation.isPending}
         onConfirm={() => {
           if (!toDelete) return;
