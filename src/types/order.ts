@@ -56,3 +56,10 @@ export type UpsertOrderMaterialLinePayload = {
 export type SetOrderMaterialLinesPayload = {
   lines: UpsertOrderMaterialLinePayload[];
 };
+
+export type ConfirmOrderActualConsumptionPayload = {
+  lines: {
+    materialId: string;
+    actualQty: number;
+  }[];
+};

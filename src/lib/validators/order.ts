@@ -87,6 +87,38 @@ export const setOrderMaterialLinesSchema = z.object({
 
 export type SetOrderMaterialLinesInput = z.infer<typeof setOrderMaterialLinesSchema>;
 
+/** Consumo real de materiales en producción */
+export const orderActualMaterialLineSchema = z.object({
+  materialId: z.string().trim().min(1),
+  actualQty: z.coerce
+    .number()
+    .positive("La cantidad real debe ser mayor que cero")
+    .finite(),
+});
+
+export const confirmOrderActualConsumptionSchema = z.object({
+  lines: z
+    .array(orderActualMaterialLineSchema)
+    .min(1, "Añade al menos una línea de consumo real")
+    .superRefine((lines, ctx) => {
+      const seen = new Set<string>();
+      for (const [index, line] of lines.entries()) {
+        if (seen.has(line.materialId)) {
+          ctx.addIssue({
+            code: "custom",
+            message: "No se permite repetir materiales en consumo real",
+            path: [index, "materialId"],
+          });
+        }
+        seen.add(line.materialId);
+      }
+    }),
+});
+
+export type ConfirmOrderActualConsumptionInput = z.infer<
+  typeof confirmOrderActualConsumptionSchema
+>;
+
 /** PATCH transición de estado */
 export const transitionOrderSchema = z.object({
   status: orderStatusSchema,
