@@ -1,3 +1,5 @@
+import { OrderForm } from "@/components/orders/order-form";
+
 export default function NewOrderPage() {
   return (
     <main className="page-shell max-w-4xl items-start">
@@ -8,10 +10,7 @@ export default function NewOrderPage() {
             Crea un pedido indicando tipo de mueble, parámetros, notas y cliente.
           </p>
         </header>
-
-        <p className="text-sm text-[var(--muted)]">
-          Pendiente: integrar formulario conectado a <code>POST /api/orders</code>.
-        </p>
+        <OrderForm mode="create" />
       </section>
     </main>
   );
