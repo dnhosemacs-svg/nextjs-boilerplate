@@ -12,12 +12,11 @@ import { recordMovement, StockServiceError } from "@/lib/stock-service";
 import {
   recordStockAdjustSchema,
   recordStockInSchema,
-  recordStockOutSchema,
 } from "@/lib/validators/stock-movement";
 import { UserRole } from "@/types/user-role";
 
 type MovementRequestBody = {
-  type?: "IN" | "OUT" | "ADJUST";
+  type?: "IN" | "ADJUST";
   quantity?: unknown;
   reason?: unknown;
   orderId?: unknown;
@@ -69,7 +68,7 @@ export async function POST(request: Request, { params }: IdRouteContext) {
   const payload = body.data as MovementRequestBody;
   const type = payload.type;
 
-  if (type !== "IN" && type !== "OUT" && type !== "ADJUST") {
+  if (type !== "IN" && type !== "ADJUST") {
     return NextResponse.json({ error: "Tipo de movimiento no válido" }, { status: 400 });
   }
 
@@ -90,9 +89,7 @@ export async function POST(request: Request, { params }: IdRouteContext) {
   const parsed =
     type === "IN"
       ? recordStockInSchema.safeParse(dataByType)
-      : type === "OUT"
-        ? recordStockOutSchema.safeParse(dataByType)
-        : recordStockAdjustSchema.safeParse(dataByType);
+      : recordStockAdjustSchema.safeParse(dataByType);
 
   if (!parsed.success) {
     return validationErrorResponse(parsed.error);
