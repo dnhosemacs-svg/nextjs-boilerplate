@@ -7,6 +7,7 @@ export const PROTECTED_API_PREFIXES = [
   "/api/products",
   "/api/categories",
   "/api/materials",
+  "/api/orders",
   "/api/users",
 ] as const;
 
