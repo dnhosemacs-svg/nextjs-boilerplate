@@ -4,13 +4,28 @@ import { OrderForm } from "@/components/orders/order-form";
 import { OrderMaterialLinesEditor } from "@/components/orders/order-material-lines-editor";
 import { OrderStatusActions } from "@/components/orders/order-status-actions";
 import { useOrderQuery } from "@/hooks/orders/use-order-query";
-import type { OrderShortageItemDto } from "@/types/order";
 
 type OrderDetailProps = {
   id: string;
+  mode?: "internal" | "client";
 };
 
-export function OrderDetail({ id }: OrderDetailProps) {
+function orderSummaryText(
+  furnitureType: string,
+  params: Record<string, unknown>,
+): string {
+  const width = params.ancho ?? params.width;
+  const height = params.alto ?? params.height;
+
+  if (width && height) {
+    return `${furnitureType} ${width}x${height} cm`;
+  }
+
+  return furnitureType;
+}
+
+export function OrderDetail({ id, mode = "internal" }: OrderDetailProps) {
+  const isClientMode = mode === "client";
   const query = useOrderQuery(id);
 
   if (query.isLoading) {
@@ -26,6 +41,10 @@ export function OrderDetail({ id }: OrderDetailProps) {
   }
 
   const order = query.data;
+  const orderParams = (order.params as Record<string, unknown>) ?? {};
+  const laborAmount = Number(order.laborAmount ?? "0");
+  const materialsSubtotal = Number(order.materialsSubtotal);
+  const orderTotal = (materialsSubtotal + laborAmount).toFixed(2);
   const shortages = order.shortages ?? [];
 
   return (
@@ -36,17 +55,32 @@ export function OrderDetail({ id }: OrderDetailProps) {
         <p className="max-w-2xl text-sm leading-relaxed text-[var(--muted)]">
           Estado actual: {order.status}
         </p>
+        {isClientMode ? (
+          <p className="max-w-2xl text-sm leading-relaxed text-[var(--muted)]">
+            Resumen: {orderSummaryText(order.furnitureType, orderParams)}
+          </p>
+        ) : null}
         <p className="max-w-2xl text-sm leading-relaxed text-[var(--muted)]">
           Subtotal materiales: {order.materialsSubtotal} EUR
         </p>
+        {isClientMode && order.laborAmount ? (
+          <p className="max-w-2xl text-sm leading-relaxed text-[var(--muted)]">
+            Mano de obra: {order.laborAmount} EUR
+          </p>
+        ) : null}
+        {isClientMode ? (
+          <p className="max-w-2xl text-sm leading-relaxed text-[var(--muted)]">
+            Total pedido: {orderTotal} EUR
+          </p>
+        ) : null}
       </header>
 
       <div className="space-y-4">
         <OrderForm mode="edit" order={order} />
-        <OrderMaterialLinesEditor order={order} />
+        {isClientMode ? null : <OrderMaterialLinesEditor order={order} />}
         <OrderStatusActions order={order} />
 
-        {order.hasShortages ? (
+        {!isClientMode && order.hasShortages ? (
           <section className="space-y-2 rounded-lg border border-destructive/40 bg-destructive/5 p-4">
             <h2 className="text-sm font-semibold text-destructive">Faltantes detectados</h2>
             {shortages.length === 0 ? (
@@ -56,11 +90,10 @@ export function OrderDetail({ id }: OrderDetailProps) {
             ) : (
               <ul className="space-y-1 text-xs text-destructive">
                 {shortages.map((item, index) => {
-                  const shortage = item as OrderShortageItemDto;
                   return (
-                    <li key={`${shortage.materialId}-${index}`}>
-                      Material {shortage.materialId}: falta {shortage.missingQty} (planificado{" "}
-                      {shortage.plannedQty}, disponible {shortage.availableAtApproval})
+                    <li key={`${item.materialId}-${index}`}>
+                      Material {item.materialId}: falta {item.missingQty} (planificado{" "}
+                      {item.plannedQty}, disponible {item.availableAtApproval})
                     </li>
                   );
                 })}

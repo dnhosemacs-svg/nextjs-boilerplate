@@ -11,7 +11,7 @@ export default async function MyOrderDetailPage({
 
   return (
     <main className="page-shell max-w-4xl items-start">
-      <OrderDetail id={id} />
+      <OrderDetail id={id} mode="client" />
     </main>
   );
 }
