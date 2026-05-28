@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -29,6 +29,11 @@ export function OrderRealConsumptionEditor({ order }: OrderRealConsumptionEditor
   const mutation = useConfirmOrderActualConsumptionMutation();
   const [lines, setLines] = useState<DraftActualLine[]>(buildDraftLines(order));
   const [formError, setFormError] = useState<string | null>(null);
+
+  useEffect(() => {
+    setLines(buildDraftLines(order));
+    setFormError(null);
+  }, [order]);
 
   const hasOverrun = useMemo(
     () => lines.some((line) => Number(line.actualQty) > Number(line.plannedQty)),
