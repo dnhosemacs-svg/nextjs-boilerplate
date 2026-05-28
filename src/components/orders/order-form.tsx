@@ -34,8 +34,9 @@ export function OrderForm({ mode, order }: OrderFormProps) {
       }
       setJsonError(null);
       return parsed as Record<string, unknown>;
-    } catch {
-      setJsonError("JSON de params no válido");
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "JSON de params no válido";
+      setJsonError(message);
       return null;
     }
   }
@@ -48,7 +49,7 @@ export function OrderForm({ mode, order }: OrderFormProps) {
     if (mode === "create") {
       createMutation.mutate(
         {
-          furnitureType,
+          furnitureType: furnitureType.trim().toUpperCase(),
           params,
           notes: notes.trim() || undefined,
           clientId: clientId.trim() || undefined,
@@ -68,7 +69,7 @@ export function OrderForm({ mode, order }: OrderFormProps) {
       {
         id: order.id,
         input: {
-          furnitureType,
+          furnitureType: furnitureType.trim().toUpperCase(),
           params,
           notes: notes.trim() || null,
         },
@@ -91,6 +92,9 @@ export function OrderForm({ mode, order }: OrderFormProps) {
         value={furnitureType}
         onChange={(e) => setFurnitureType(e.target.value)}
       />
+      <p className="-mt-2 text-xs text-[var(--muted)]">
+        Usa tipos válidos como MESA, ARMARIO, ESTANTERIA o CAJONERA.
+      </p>
       {mode === "create" ? (
         <Input
           placeholder="clientId (opcional para ADMIN/WORKER)"

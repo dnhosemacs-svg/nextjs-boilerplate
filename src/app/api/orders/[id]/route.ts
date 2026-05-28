@@ -53,6 +53,12 @@ export async function PATCH(request: Request, { params }: IdRouteContext) {
   if (isClient && order.clientId !== auth.session.user.id) {
     return NextResponse.json({ error: "No encontrado" }, { status: 404 });
   }
+  if (isClient && order.status !== "DRAFT") {
+    return NextResponse.json(
+      { error: "Solo puedes editar pedidos propios en borrador" },
+      { status: 403 },
+    );
+  }
 
   const updated = await db.order.update({
     where: { id },
