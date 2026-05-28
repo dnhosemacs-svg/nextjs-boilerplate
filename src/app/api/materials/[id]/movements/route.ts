@@ -7,6 +7,7 @@ import {
   resolveRouteParams,
   validationErrorResponse,
 } from "@/lib/api-route-utils";
+import { db } from "@/lib/db";
 import { recordMovement, StockServiceError } from "@/lib/stock-service";
 import {
   recordStockAdjustSchema,
@@ -21,6 +22,45 @@ type MovementRequestBody = {
   reason?: unknown;
   orderId?: unknown;
 };
+
+export async function GET(_request: Request, { params }: IdRouteContext) {
+  const auth = await requireRole(UserRole.ADMIN, UserRole.WORKER);
+  if (!auth.ok) return auth.response;
+
+  const { id } = await resolveRouteParams(params);
+
+  const material = await db.material.findUnique({
+    where: { id },
+    select: { id: true },
+  });
+  if (!material) {
+    return NextResponse.json({ error: "No encontrado" }, { status: 404 });
+  }
+
+  const movements = await db.stockMovement.findMany({
+    where: { materialId: id },
+    orderBy: { createdAt: "desc" },
+    select: {
+      id: true,
+      type: true,
+      quantity: true,
+      reason: true,
+      materialId: true,
+      orderId: true,
+      userId: true,
+      createdAt: true,
+    },
+    take: 100,
+  });
+
+  return NextResponse.json(
+    movements.map((movement) => ({
+      ...movement,
+      quantity: movement.quantity.toString(),
+    })),
+    { status: 200 },
+  );
+}
 
 export async function POST(request: Request, { params }: IdRouteContext) {
   const body = await parseJsonBody(request);
