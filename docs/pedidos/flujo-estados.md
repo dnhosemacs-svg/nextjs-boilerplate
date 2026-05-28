@@ -105,6 +105,27 @@ Al pasar a **`CANCELLED`**:
 
 ---
 
+## IN_PRODUCTION: consumo real (tarjeta 4.1)
+
+En estado **`IN_PRODUCTION`** se registra consumo real por línea (`actualQty`) desde
+`/api/orders/[id]/consume`.
+
+Al confirmar consumo real:
+
+1. Se actualiza `OrderMaterialLine.actualQty` por cada material planificado.
+2. Se crea movimiento `StockMovement` tipo `OUT` por la cantidad real consumida.
+3. Se crea movimiento `StockMovement` tipo `RELEASE` para liberar la reserva activa asociada.
+4. Se cierran reservas (`OrderReservation.active = false`).
+5. Se recalcula stock físico (`materials.stock`) y, por definición, el disponible (`physical - reserved`).
+
+Si `actualQty > plannedQty`, la operación se **permite** y se registra:
+
+- aviso funcional en respuesta (`warnings`),
+- log operacional explícito (`orders.consume-real.overrun`),
+- motivo en movimiento OUT (`Consumo real en producción (exceso sobre plan)`).
+
+---
+
 ## Campos editables por estado
 
 Referencia en `ORDER_EDITABLE_FIELDS_BY_STATUS` (`src/lib/validators/order.ts`):
@@ -124,6 +145,7 @@ Referencia en `ORDER_EDITABLE_FIELDS_BY_STATUS` (`src/lib/validators/order.ts`):
 
 ```ts
 import { approveOrder, cancelOrder } from "@/lib/order-workflow";
+import { consumeRealMaterialsInProduction } from "@/lib/order-reservations";
 
 if (body.status === "APPROVED") {
   await approveOrder(order.id, session.user.role, session.user.id);
@@ -132,4 +154,8 @@ if (body.status === "APPROVED") {
 if (body.status === "CANCELLED") {
   await cancelOrder(order.id, session.user.role, session.user.id);
 }
+
+await consumeRealMaterialsInProduction(order.id, [
+  { materialId: "mat-1", actualQty: 2.5 },
+]);
 ```
