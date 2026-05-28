@@ -1,0 +1,68 @@
+"use client";
+
+import { Button } from "@/components/ui/button";
+import { useTransitionOrderStatusMutation } from "@/hooks/orders/use-order-mutations";
+import type { OrderDto } from "@/types/order";
+import type { OrderStatus } from "@/types/order-status";
+
+type OrderStatusAction = {
+  label: string;
+  status: OrderStatus;
+  variant?: "default" | "destructive";
+};
+
+type OrderStatusActionsProps = {
+  order: OrderDto;
+};
+
+function availableActions(order: OrderDto): OrderStatusAction[] {
+  switch (order.status) {
+    case "DRAFT":
+      return [{ label: "Cancelar", status: "CANCELLED", variant: "destructive" }];
+    case "PENDING":
+      return [
+        { label: "Aprobar", status: "APPROVED" },
+        { label: "Cancelar", status: "CANCELLED", variant: "destructive" },
+      ];
+    default:
+      return [];
+  }
+}
+
+export function OrderStatusActions({ order }: OrderStatusActionsProps) {
+  const mutation = useTransitionOrderStatusMutation();
+  const actions = availableActions(order);
+
+  if (actions.length === 0) {
+    return (
+      <section className="rounded-lg border border-border p-4">
+        <h2 className="text-sm font-semibold">Acciones de estado</h2>
+        <p className="mt-2 text-xs text-[var(--muted)]">
+          No hay transiciones habilitadas en esta etapa para el estado actual.
+        </p>
+      </section>
+    );
+  }
+
+  return (
+    <section className="space-y-3 rounded-lg border border-border p-4">
+      <h2 className="text-sm font-semibold">Acciones de estado</h2>
+
+      <div className="flex flex-wrap gap-2">
+        {actions.map((action) => (
+          <Button
+            key={action.label}
+            type="button"
+            variant={action.variant ?? "default"}
+            disabled={mutation.isPending}
+            onClick={() => mutation.mutate({ id: order.id, status: action.status })}
+          >
+            {mutation.isPending ? "Aplicando..." : action.label}
+          </Button>
+        ))}
+      </div>
+
+      {mutation.error ? <p className="text-xs text-destructive">{mutation.error.message}</p> : null}
+    </section>
+  );
+}
