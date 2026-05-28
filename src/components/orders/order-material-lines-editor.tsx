@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -28,15 +28,21 @@ function buildDraftLines(order: OrderDto): DraftLine[] {
 export function OrderMaterialLinesEditor({ order }: OrderMaterialLinesEditorProps) {
   const materialsQuery = useMaterialsQuery({});
   const saveLinesMutation = useSetOrderMaterialLinesMutation();
-  const [lines, setLines] = useState<DraftLine[]>(() => buildDraftLines(order));
+  const [lines, setLines] = useState<DraftLine[]>(buildDraftLines(order));
   const [formError, setFormError] = useState<string | null>(null);
 
-  useEffect(() => {
-    setLines(buildDraftLines(order));
-    setFormError(null);
-  }, [order.id, order.materialLines]);
-
   const materialOptions = useMemo(() => materialsQuery.data ?? [], [materialsQuery.data]);
+  const hasPendingChanges = useMemo(() => {
+    const current = lines.map((line) => ({
+      materialId: line.materialId.trim(),
+      plannedQty: line.plannedQty.trim(),
+    }));
+    const initial = buildDraftLines(order).map((line) => ({
+      materialId: line.materialId.trim(),
+      plannedQty: line.plannedQty.trim(),
+    }));
+    return JSON.stringify(current) !== JSON.stringify(initial);
+  }, [lines, order]);
 
   function updateLine(index: number, patch: Partial<DraftLine>) {
     setLines((current) =>
@@ -144,6 +150,17 @@ export function OrderMaterialLinesEditor({ order }: OrderMaterialLinesEditorProp
       <div className="flex flex-wrap gap-2">
         <Button type="button" variant="outline" onClick={addLine} disabled={isPending}>
           Anadir linea
+        </Button>
+        <Button
+          type="button"
+          variant="outline"
+          onClick={() => {
+            setLines(buildDraftLines(order));
+            setFormError(null);
+          }}
+          disabled={isPending || !hasPendingChanges}
+        >
+          Revertir cambios
         </Button>
         <Button type="button" onClick={handleSave} disabled={isPending || materialOptions.length === 0}>
           {isPending ? "Guardando..." : "Guardar lineas"}
