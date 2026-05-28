@@ -12,6 +12,7 @@ Archivos para importar en **Postman** o **Thunder Client** (ambos admiten import
 Sigue el checklist paso a paso: [CHECKLIST.md](CHECKLIST.md) (21 requests; cubre **401**, felices, **400**, **404** y **409**).
 
 **Stock / libro mayor (tarjeta 2.1):** [CHECKLIST-STOCK.md](CHECKLIST-STOCK.md) — carpeta `06 — Materials stock (2.1)`. Necesitas `materialId` (Prisma Studio) y, para OUT con pedido real, `orderId`.
+**Materiales y movimientos (tarjeta 2.4):** [CHECKLIST-MATERIALS-MOVEMENTS.md](CHECKLIST-MATERIALS-MOVEMENTS.md) — carpeta `07 — Materials & movements (2.4)`.
 
 ## Sesión (obligatorio)
 
