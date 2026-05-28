@@ -18,7 +18,7 @@ import { parseOrderTransition, transitionOrderSchema } from "@/lib/validators/or
 import { UserRole } from "@/types/user-role";
 
 export async function PATCH(request: Request, { params }: IdRouteContext) {
-  const auth = await requireRole(UserRole.ADMIN, UserRole.WORKER);
+  const auth = await requireRole(UserRole.ADMIN, UserRole.WORKER, UserRole.CLIENT);
   if (!auth.ok) return auth.response;
 
   const body = await parseJsonBody(request);
@@ -36,6 +36,10 @@ export async function PATCH(request: Request, { params }: IdRouteContext) {
     select: { id: true, status: true, clientId: true },
   });
   if (!order) {
+    return NextResponse.json({ error: "No encontrado" }, { status: 404 });
+  }
+  const isClient = auth.session.user.role === UserRole.CLIENT;
+  if (isClient && order.clientId !== auth.session.user.id) {
     return NextResponse.json({ error: "No encontrado" }, { status: 404 });
   }
 
