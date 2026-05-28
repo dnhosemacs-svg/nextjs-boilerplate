@@ -66,7 +66,26 @@ export const orderMaterialLineSchema = z.object({
 
 export const orderMaterialLinesSchema = z
   .array(orderMaterialLineSchema)
-  .min(1, "Añade al menos una línea de material");
+  .min(1, "Añade al menos una línea de material")
+  .superRefine((lines, ctx) => {
+    const seen = new Set<string>();
+    for (const [index, line] of lines.entries()) {
+      if (seen.has(line.materialId)) {
+        ctx.addIssue({
+          code: "custom",
+          message: "No se permite repetir materiales en líneas planificadas",
+          path: [index, "materialId"],
+        });
+      }
+      seen.add(line.materialId);
+    }
+  });
+
+export const setOrderMaterialLinesSchema = z.object({
+  lines: orderMaterialLinesSchema,
+});
+
+export type SetOrderMaterialLinesInput = z.infer<typeof setOrderMaterialLinesSchema>;
 
 /** PATCH transición de estado */
 export const transitionOrderSchema = z.object({

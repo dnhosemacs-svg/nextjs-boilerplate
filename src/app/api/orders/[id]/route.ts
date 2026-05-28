@@ -18,7 +18,14 @@ export async function GET(_request: Request, { params }: IdRouteContext) {
 
   const { id } = await resolveRouteParams(params);
 
-  const order = await db.order.findUnique({ where: { id } });
+  const order = await db.order.findUnique({
+    where: { id },
+    include: {
+      materialLines: {
+        orderBy: { createdAt: "asc" },
+      },
+    },
+  });
   if (!order) {
     return NextResponse.json({ error: "No encontrado" }, { status: 404 });
   }
@@ -66,6 +73,11 @@ export async function PATCH(request: Request, { params }: IdRouteContext) {
       furnitureType: parsed.data.furnitureType,
       parameters: parsed.data.params,
       notes: parsed.data.notes,
+    },
+    include: {
+      materialLines: {
+        orderBy: { createdAt: "asc" },
+      },
     },
   });
 
