@@ -119,6 +119,8 @@ model Order {
   furnitureType String
   parameters    Json
   notes         String?
+  hasShortages  Boolean     @default(false)
+  shortages     Json?
   laborAmount   Decimal?    @db.Decimal(10, 2)
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @updatedAt
