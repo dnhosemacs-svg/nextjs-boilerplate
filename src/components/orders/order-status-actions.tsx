@@ -18,12 +18,27 @@ type OrderStatusActionsProps = {
 function availableActions(order: OrderDto): OrderStatusAction[] {
   switch (order.status) {
     case "DRAFT":
-      return [{ label: "Cancelar", status: "CANCELLED", variant: "destructive" }];
+      return [
+        { label: "Enviar", status: "PENDING" },
+        { label: "Cancelar", status: "CANCELLED", variant: "destructive" },
+      ];
     case "PENDING":
       return [
         { label: "Aprobar", status: "APPROVED" },
         { label: "Cancelar", status: "CANCELLED", variant: "destructive" },
       ];
+    case "APPROVED":
+      return [
+        { label: "En produccion", status: "IN_PRODUCTION" },
+        { label: "Cancelar", status: "CANCELLED", variant: "destructive" },
+      ];
+    case "IN_PRODUCTION":
+      return [
+        { label: "Marcar listo", status: "READY" },
+        { label: "Cancelar", status: "CANCELLED", variant: "destructive" },
+      ];
+    case "READY":
+      return [{ label: "Marcar entregado", status: "DELIVERED" }];
     default:
       return [];
   }
