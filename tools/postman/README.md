@@ -33,6 +33,7 @@ Sigue el checklist paso a paso: [CHECKLIST.md](CHECKLIST.md) (21 requests; cubre
 | `04 — Products (errores)` | **400** query/body; **404** PATCH |
 | `05 — Tasks (muestra auth)` | **200** con cookie; **401** sin cookie |
 | `06 — Materials stock (2.1)` | GET stock; POST IN/OUT/ADJUST; **400** / **404** / **409** |
+| `07 — Materials & movements (2.4)` | CRUD materiales; POST movements IN/ADJUST; GET movements; **400** / **401** / **403** / **404** |
 
 Las subcarpetas **409** deben ejecutarse **en orden** (1 → 2 → 3). Algunos requests guardan `categoryId` / `productId` en variables con scripts de test.
 
