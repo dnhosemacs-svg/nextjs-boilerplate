@@ -53,18 +53,18 @@ export async function DELETE(_request: Request, { params }: IdRouteContext) {
 
   const category = await db.category.findUnique({
     where: { id },
-    include: { _count: { select: { products: true } } },
+    include: { _count: { select: { materials: true } } },
   });
 
   if (!category) {
     return NextResponse.json({ error: "No encontrado" }, { status: 404 });
   }
 
-  if (category._count.products > 0) {
+  if (category._count.materials > 0) {
     return NextResponse.json(
       {
         error:
-          "No se puede eliminar la categoría porque tiene productos asociados",
+          "No se puede eliminar la categoría porque tiene materiales asociados",
       },
       { status: 409 },
     );
