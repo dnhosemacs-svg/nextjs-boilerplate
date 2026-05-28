@@ -14,6 +14,10 @@ type ReserveOnApprovalResult = {
   reservedCount: number;
 };
 
+type ReleaseOnCancelResult = {
+  releasedCount: number;
+};
+
 function decimalOrZero(value: Prisma.Decimal | null | undefined): Prisma.Decimal {
   return value ?? new Prisma.Decimal(0);
 }
@@ -123,12 +127,44 @@ export async function reservePlannedMaterialsOnApproval(
 }
 
 /**
- * Al cancelar un pedido: desactiva reservas activas (preparación para liberar stock).
- * Tarjeta 2.2: añadir movimientos StockMovement RELEASE y recalcular disponible.
+ * Al cancelar un pedido: crea movimientos RELEASE y desactiva reservas activas.
+ */
+export async function releaseReservationsOnCancel(
+  orderId: string,
+  userId?: string,
+): Promise<ReleaseOnCancelResult> {
+  return db.$transaction(async (tx) => {
+    const activeReservations = await tx.orderReservation.findMany({
+      where: { orderId, active: true },
+      select: { materialId: true, quantity: true },
+    });
+
+    for (const reservation of activeReservations) {
+      await tx.stockMovement.create({
+        data: {
+          type: "RELEASE",
+          quantity: reservation.quantity,
+          reason: "Liberación al cancelar pedido",
+          materialId: reservation.materialId,
+          orderId,
+          userId: userId ?? null,
+        },
+      });
+    }
+
+    await tx.orderReservation.updateMany({
+      where: { orderId, active: true },
+      data: { active: false },
+    });
+
+    return { releasedCount: activeReservations.length };
+  });
+}
+
+/**
+ * Compatibilidad con código existente.
+ * Delega en la implementación completa de liberación al cancelar.
  */
 export async function markReservationsForRelease(orderId: string) {
-  return db.orderReservation.updateMany({
-    where: { orderId, active: true },
-    data: { active: false },
-  });
+  return releaseReservationsOnCancel(orderId);
 }
