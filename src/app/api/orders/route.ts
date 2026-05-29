@@ -46,11 +46,19 @@ export async function GET(request: Request) {
   const status = url.searchParams.get("status");
   const furnitureType = url.searchParams.get("furnitureType");
   const clientIdQuery = url.searchParams.get("clientId");
+  const hasShortagesParam = url.searchParams.get("hasShortages");
 
   const where: Prisma.OrderWhereInput = {};
 
   if (status) where.status = status as Prisma.EnumOrderStatusFilter["equals"];
   if (furnitureType) where.furnitureType = furnitureType;
+
+  if (hasShortagesParam === "true") {
+    if (auth.session.user.role === UserRole.CLIENT) {
+      return NextResponse.json({ error: "No autorizado" }, { status: 403 });
+    }
+    where.hasShortages = true;
+  }
 
   if (auth.session.user.role === UserRole.CLIENT) {
     where.clientId = auth.session.user.id;
