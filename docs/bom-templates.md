@@ -102,3 +102,10 @@ Implementado en `src/lib/bom-templates/index.ts`.
 5. Guardar lineas.
 6. El worker revisa antes de aprobar el pedido.
 
+---
+
+## Roadmap IA (fase 2)
+
+En v1 las cantidades salen de reglas fijas en código. La **fase 2** prevé sugerir el BOM desde el histórico de pedidos entregados (`DELIVERED`), no sustituir la revisión humana.
+
+Ver: [Fase 2 — IA: BOM desde histórico](pedidos/fase-2-ia.md).

@@ -191,3 +191,11 @@ Tras el flujo feliz (§3) o cualquier secuencia de `PATCH .../status`:
 - [ ] Evento inicial `DRAFT` al `POST /api/orders`
 - [ ] Un evento por cada transición (`PENDING`, `APPROVED`, `IN_PRODUCTION`, `READY`, `DELIVERED`, etc.)
 - [ ] Tabla `order_material_lines` con `plannedQty` y `actualQty` en pedido entregado
+
+---
+
+## 5. Nota Fase 2 IA (documentación)
+
+- [ ] Existe [docs/pedidos/fase-2-ia.md](../../docs/pedidos/fase-2-ia.md) con la frase: sugerir BOM desde histórico de `DELIVERED`
+- [ ] [docs/bom-templates.md](../../docs/bom-templates.md) enlaza al roadmap IA
+- [ ] [docs/pedidos/datos-ml.md](../../docs/pedidos/datos-ml.md) enlaza a fase-2-ia

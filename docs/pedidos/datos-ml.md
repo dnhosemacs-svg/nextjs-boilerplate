@@ -2,7 +2,7 @@
 
 Tarjeta **4.4**: qué se persiste hoy en PostgreSQL para entrenar o analizar pedidos cerrados en una **fase 2** (sugerencia de BOM desde histórico).
 
-Roadmap IA (documento del paso 5): `docs/pedidos/fase-2-ia.md`.
+Roadmap IA: [fase-2-ia.md](fase-2-ia.md) — *Fase 2 IA = sugerir BOM desde histórico de pedidos `DELIVERED` cerrados.*
 
 ---
 
