@@ -47,6 +47,7 @@ export type UpdateOrderPayload = Partial<{
   furnitureType: string;
   params: OrderParams;
   notes: string | null;
+  laborAmount: number;
 }>;
 
 export type UpsertOrderMaterialLinePayload = {
