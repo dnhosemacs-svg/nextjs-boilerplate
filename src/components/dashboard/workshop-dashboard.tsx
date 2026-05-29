@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { useMemo } from "react";
-import { LowStockWidget } from "@/components/dashboard/low-stock-widget";
 import { ShortagesWidget } from "@/components/dashboard/shortages-widget";
 import { OrderWorkerAssignment } from "@/components/orders/order-worker-assignment";
 import { QueryErrorState } from "@/components/inventory/query-error-state";
@@ -91,7 +90,6 @@ export function WorkshopDashboard({ role }: WorkshopDashboardProps) {
       {showOps ? (
         <div className="dashboard-widgets-grid mb-8 space-y-6">
           <ShortagesWidget />
-          <LowStockWidget />
         </div>
       ) : null}
 

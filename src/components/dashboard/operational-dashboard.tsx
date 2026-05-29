@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { ClientDashboard } from "@/components/dashboard/client-dashboard";
-import { LowStockWidget } from "@/components/dashboard/low-stock-widget";
 import { ShortagesWidget } from "@/components/dashboard/shortages-widget";
 import { canManageUsers, canViewOperationalWidgets } from "@/lib/permissions";
 import type { UserRole } from "@/types/user-role";
@@ -25,7 +24,7 @@ export function OperationalDashboard({ role }: OperationalDashboardProps) {
           <p className="content-description">
             {role === R.CLIENT
               ? "Estado de tus pedidos y accesos rápidos."
-              : "Prioriza faltantes, stock bajo y seguimiento operativo."}
+              : "Prioriza faltantes y seguimiento operativo."}
           </p>
           {canManageUsers(role) ? (
             <Link href="/admin/users" className="ui-link-underline text-sm w-fit">
@@ -38,7 +37,6 @@ export function OperationalDashboard({ role }: OperationalDashboardProps) {
       {showOps ? (
         <div className="dashboard-widgets-grid space-y-6">
           <ShortagesWidget />
-          <LowStockWidget />
         </div>
       ) : (
         <ClientDashboard />

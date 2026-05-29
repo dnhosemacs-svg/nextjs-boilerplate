@@ -11,7 +11,6 @@ import {
   type NavItem,
 } from "@/lib/navigation";
 import { canAccessInventory, canManageUsers } from "@/lib/permissions";
-import { roleLabel } from "@/lib/role-labels";
 import type { UserRole } from "@/types/user-role";
 
 type PrivateSidebarProps = {
@@ -75,7 +74,6 @@ export default function PrivateSidebar({
         <div className="private-sidebar-top">
           <p className="eyebrow">Panel interno</p>
           <h2 className="section-heading text-3xl">Taller</h2>
-          <p className="text-sm text-[var(--muted)]">{roleLabel(role)}</p>
         </div>
 
         {showInventory ? (

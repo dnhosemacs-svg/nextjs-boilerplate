@@ -4,9 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { sessionUserLabel } from "@/lib/session-user-label";
-import { roleLabel } from "@/lib/role-labels";
 import { signOut, useSession } from "next-auth/react";
-import { Badge } from "@/components/ui/badge";
 
 type PrivateHeaderProps = {
   onOpenSidebar: () => void;
@@ -56,12 +54,6 @@ export default function PrivateHeader({ onOpenSidebar }: PrivateHeaderProps) {
           </>
         ) : (
           <>
-            {isAuthenticated && session?.user?.role ? (
-              <Badge variant="secondary" className="hidden sm:inline-flex">
-                {roleLabel(session.user.role)}
-              </Badge>
-            ) : null}
-
             {userLabel ? (
               <span
                 className="hidden max-w-[14rem] shrink-0 truncate text-sm font-medium text-[var(--foreground)] sm:inline"

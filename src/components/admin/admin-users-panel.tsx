@@ -2,7 +2,6 @@
 
 import { AdminUserCreateForm } from "./admin-user-create-form";
 import { AdminUserList } from "./admin-user-list";
-import { AdminUserSync } from "./admin-user-sync";
 
 export function AdminUsersPanel() {
   return (
@@ -16,13 +15,6 @@ export function AdminUsersPanel() {
           </p>
         </div>
         <AdminUserCreateForm />
-      </section>
-
-      <section className="surface-card flex flex-col gap-4 p-6">
-        <div>
-          <h2 className="section-heading text-2xl">Sincronizar Firebase</h2>
-        </div>
-        <AdminUserSync />
       </section>
 
       <section className="surface-card flex flex-col gap-4 p-6">
