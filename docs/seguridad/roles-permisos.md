@@ -8,38 +8,53 @@ Leyenda: **C** crear · **R** leer · **U** actualizar · **D** eliminar · **�
 | Materiales  | CRUD  | R, U stock    | — (sin UI almacén)  |
 | Movimientos | CRUD  | C (ajuste)    | —                   |
 | Pedidos     | CRUD  | CRUD          | CRUD (propios*)     |
-| Reservas    | CRUD  | R             | CRUD (propias*)     |
+| Reservas    | CRUD  | R             | — (vía flujo taller)|
 
-\* **Propios** = cuando el modelo tenga `ownerId` (fase posterior). Hasta entonces, pedidos/reservas comparten el acceso definido en código.
+\* **Propios** = `Order.clientId === session.user.id`. Si un CLIENT accede a un pedido ajeno, la API responde **403** (`src/lib/order-access.ts`).
 
 ## Mapeo al código actual
 
-| Dominio (futuro) | Rutas / API en el boilerplate |
-|------------------|-------------------------------|
-| Materiales       | `/products`, `/categories`, `/api/products`, `/api/categories` |
-| Movimientos      | `PATCH /api/products/:id/stock` |
-| Pedidos          | `/tasks/*`, `/api/tasks` |
-| Usuarios         | Pendiente: `/admin/*` |
-| Reservas         | Pendiente |
+| Dominio   | Rutas / API |
+|-----------|-------------|
+| Materiales | `/products`, `/categories`, `/api/materials`, `/api/categories` |
+| Movimientos | `PATCH /api/materials/:id/stock`, `/api/materials/:id/movements` |
+| Pedidos   | `/orders`, `/my-orders`, `/orders/new`, `/api/orders`, `/api/orders/:id`, `/api/orders/:id/status`, `/api/orders/:id/materials`, `/api/orders/:id/consume` |
+| Usuarios  | `/admin/users`, `/api/users` (ADMIN) |
+| Reservas  | Automáticas al `APPROVED` / liberación al `CANCELLED` (`src/lib/order-reservations.ts`) |
 
 ## Permisos en UI (páginas)
 
 | Ruta           | ADMIN | WORKER | CLIENT |
 |----------------|-------|--------|--------|
 | `/dashboard`   | ✓     | ✓      | ✓      |
-| `/tasks/*`     | ✓     | ✓      | ✓      |
+| `/orders`, `/orders/new`, `/orders/[id]` | ✓ | ✓ | — |
+| `/my-orders`   | —     | —      | ✓      |
 | `/stats`       | ✓     | ✓      | ✓      |
 | `/products`    | ✓     | ✓      | ✗      |
 | `/categories`  | ✓     | ✓      | ✗      |
 | `/admin/*`     | ✓     | ✗      | ✗      |
+| `/tasks/*`     | ✓     | ✓      | ✓      | *(legacy demo)* |
 
 ## Roles
 
 Definidos en `src/types/user-role.ts`:
 
-- **ADMIN** — gestión completa y futura administración de usuarios.
-- **WORKER** — operativa de taller: inventario y stock, sin panel admin.
-- **CLIENT** — pedidos y reservas propias; sin acceso al almacén (UI ni APIs de inventario).
+- **ADMIN** — gestión completa, usuarios y operativa de taller.
+- **WORKER** — inventario, stock y ciclo de vida de pedidos (sin panel admin).
+- **CLIENT** — pedidos propios; sin acceso al almacén (UI ni APIs de materiales).
+
+## Transiciones de pedido (resumen)
+
+| Acción | CLIENT (propio) | WORKER / ADMIN |
+|--------|-----------------|----------------|
+| DRAFT → PENDING | ✓ | ✓ |
+| PENDING → APPROVED | — | ✓ (reserva materiales) |
+| APPROVED → IN_PRODUCTION → READY → DELIVERED | — | ✓ |
+| Cancelar (estados permitidos) | ✓* | ✓ |
+
+\* CLIENT solo en estados `DRAFT` / `PENDING` del pedido propio.
+
+Detalle: [flujo-estados](../pedidos/flujo-estados.md).
 
 ## Implementación
 
@@ -47,8 +62,9 @@ Definidos en `src/types/user-role.ts`:
 |-------------|-----------------|
 | Prisma      | Campo `role` en modelo `User` |
 | NextAuth    | Rol en JWT y `session.user.role` |
-| APIs        | `requireRole(...)` junto a `requireApiSession()` |
+| APIs        | `requireRole(...)` en handlers |
+| Pedidos     | `denyIfClientNotOrderOwner` en rutas por id |
 | Middleware  | Bloqueo de `/products`, `/categories`, `/admin/*` según rol |
-| UI          | Ocultar navegación de inventario a `CLIENT` |
+| UI          | `getOrderNavItems` en `src/lib/navigation.ts` |
 
-Ver también: [middleware](middleware.md), [API](../api.md).
+Ver también: [middleware](middleware.md), [API inventario](../api.md), [README pedidos y roles](../../README.md#pedidos-y-roles).

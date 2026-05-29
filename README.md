@@ -14,10 +14,11 @@ Aplicación web de gestión para el taller de carpintería construida con Next.j
 
 ## Características
 
-- CRUD completo de pedidos (`/api/tasks` y `/api/tasks/:id`).
+- Pedidos en PostgreSQL con flujo de estados, reservas de stock y roles (`/api/orders`, `/orders`, `/my-orders`).
+- Inventario de materiales y categorías (`/api/materials`, `/products`, `/categories`).
 - Inicio de sesión con correo electrónico/contraseña (Firebase REST en servidor) y GitHub OAuth si está configurado.
 - Registro de cuentas en `/register` (Firebase Auth en el navegador).
-- Rutas protegidas para trabajo interno (`/dashboard`, `/tasks/*`, `/stats`).
+- Rutas protegidas por rol (`CLIENT`, `WORKER`, `ADMIN`) con middleware y `requireRole` en API.
 - Redirección post-login segura con `next` y `callbackUrl`.
 - UI con Server Components + Client Components donde hay estado.
 
@@ -36,6 +37,37 @@ Documentación técnica:
 
 - [Arquitectura](docs/arquitectura.md)
 - [API REST inventario](docs/api.md)
+
+---
+
+## Pedidos y roles
+
+Pedidos persistidos en PostgreSQL (`Order` en `prisma/schema.prisma`). Tres roles en `users.role` (NextAuth → `session.user.role`):
+
+| Rol | UI principal | Pedidos |
+| --- | ------------ | ------- |
+| **CLIENT** | `/my-orders`, `/orders/new` | Crear y editar **propios** en `DRAFT`; enviar a `PENDING`; cancelar borrador/enviado. No ve pedidos ajenos (**403** en API). |
+| **WORKER** | `/orders`, `/dashboard`, materiales | Flujo de taller: líneas, aprobar (reserva stock), producción, consumo real, entrega. |
+| **ADMIN** | Igual que worker + `/admin/users` | Gestión de usuarios y mismo acceso operativo a pedidos. |
+
+**Flujo de estados:**
+
+```text
+DRAFT → PENDING → APPROVED → IN_PRODUCTION → READY → DELIVERED
+         (cancelar desde varios estados → CANCELLED, libera reservas)
+```
+
+Documentación:
+
+- [Flujo de estados y transiciones](docs/pedidos/flujo-estados.md)
+- [Matriz de permisos](docs/seguridad/roles-permisos.md)
+- [Datos para ML / preparación IA](docs/pedidos/datos-ml.md)
+- [Fase 2 IA — BOM desde histórico](docs/pedidos/fase-2-ia.md)
+- [QA manual pedidos (tarjeta 4.4)](tools/postman/CHECKLIST-ORDERS-QA-4.4.md)
+
+**API principal:** `GET/POST /api/orders`, `GET/PATCH /api/orders/:id`, `PATCH /api/orders/:id/status`, `PUT /api/orders/:id/materials`, `POST /api/orders/:id/consume`, `GET /api/orders/:id/movements` (taller).
+
+> **Legacy:** `/tasks/*` y `/api/tasks` siguen en el repo como demo en cookie; usar **pedidos** (`/orders`) para el taller.
 
 ---
 
@@ -108,6 +140,9 @@ Documentación:
 - [OAuth 2.0 / GitHub](docs/seguridad/oauth.md)
 - [Middleware y protección de rutas](docs/seguridad/middleware.md)
 - [Credenciales y contraseñas](docs/seguridad/credenciales.md)
+- [Flujo de pedidos](docs/pedidos/flujo-estados.md)
+- [Plantillas BOM manuales](docs/bom-templates.md)
+- [QA pedidos 4.4](tools/postman/CHECKLIST-ORDERS-QA-4.4.md)
 
 ---
 
@@ -206,11 +241,13 @@ npx prisma db seed   # opcional: datos de demo
 - `/login`: inicio de sesión (correo/contraseña y GitHub si está configurado).
 - `/register`: crear cuenta con Firebase.
 - `/dashboard`: panel privado principal (protegida).
-- `/tasks/new`: crear pedido (protegida).
-- `/tasks/[id]`: ver/editar/eliminar pedido (protegida).
+- `/orders`, `/orders/new`, `/orders/[id]`: pedidos del taller (WORKER / ADMIN).
+- `/my-orders`: pedidos del cliente (CLIENT).
 - `/stats`: resumen operativo (protegida).
-- `/products`: inventario de productos (protegida).
-- `/categories`: gestión de categorías (protegida).
+- `/products`: materiales / inventario (WORKER / ADMIN).
+- `/categories`: categorías de materiales (WORKER / ADMIN).
+- `/admin/users`: gestión de usuarios (ADMIN).
+- `/tasks/new`, `/tasks/[id]`: demo legacy en cookie (sustituido por `/orders`).
 
 Rutas auxiliares:
 
@@ -221,7 +258,22 @@ Rutas auxiliares:
 
 ## API
 
-### Tasks
+### Pedidos (`/api/orders`)
+
+Requieren sesión. Resumen; detalle en [flujo-estados](docs/pedidos/flujo-estados.md).
+
+| Método | Ruta | Quién (orientativo) |
+| ------ | ---- | ------------------- |
+| `GET` / `POST` | `/api/orders` | Todos los roles; CLIENT solo ve/crea propios |
+| `GET` / `PATCH` | `/api/orders/:id` | CLIENT solo propio (**403** si ajeno); taller todos |
+| `PATCH` | `/api/orders/:id/status` | Transiciones según rol (aprobar/cancelar → reservas) |
+| `PUT` | `/api/orders/:id/materials` | WORKER / ADMIN |
+| `POST` | `/api/orders/:id/consume` | WORKER / ADMIN (`IN_PRODUCTION`) |
+| `GET` | `/api/orders/:id/movements` | WORKER / ADMIN |
+
+Códigos habituales: **401** sin cookie, **403** sin permiso o pedido ajeno (CLIENT), **404** id inexistente, **400** transición o validación inválida.
+
+### Tasks (legacy)
 
 - `GET /api/tasks`
   - **200**: devuelve `Task[]`.
@@ -258,7 +310,7 @@ El login desde la UI usa `signIn()` del cliente (`redirect: false` para credenti
 1. Arranca `npm run dev` e inicia sesión en `/login` con un usuario válido (Firebase + credenciales del proyecto).
 2. En el navegador, DevTools → **Cookies** de `http://localhost:3000` y copia el valor de la cookie de sesión de NextAuth. En local suele llamarse **`next-auth.session-token`** (en HTTPS/producción el nombre puede incluir prefijos `__Secure-` / `__Host-`).
 3. En **Thunder Client** o **Postman**, define `baseUrl` como `http://localhost:3000` y en cada petición protegida envía el header **`Cookie`** con ese par nombre/valor, por ejemplo: `next-auth.session-token=<valor copiado>`. También puedes guardar la cadena completa en una variable del entorno/colección.
-4. Comprueba que sin cookie (o con sesión caducada) las APIs sensibles responden **401** JSON (`{"error":"No autenticado"}`). Rutas relevantes: `src/app/api/tasks/*`, `src/app/api/products/*`, `src/app/api/categories/*`.
+4. Comprueba que sin cookie (o con sesión caducada) las APIs sensibles responden **401** JSON (`{"error":"No autenticado"}`). Rutas relevantes: `/api/orders/*`, `/api/materials/*`, `/api/categories/*`, `/api/tasks/*` (legacy).
 
 **Verificación rápida de códigos** (con sesión válida salvo donde se indica):
 
@@ -272,7 +324,7 @@ El login desde la UI usa `signIn()` del cliente (`redirect: false` para credenti
 
 > **Nota:** No versiones en git valores reales de cookies ni entornos exportados con secretos; usa variables locales o placeholders en colecciones compartidas.
 
-**Colección lista para importar:** [tools/postman/](tools/postman/) — `carpinteria-api.postman_collection.json` y `carpinteria-api.postman_environment.json` (Postman o Thunder Client). Tras importar, rellena la variable `cookie` del entorno y sigue [tools/postman/README.md](tools/postman/README.md). Checklist de verificación manual: [tools/postman/CHECKLIST.md](tools/postman/CHECKLIST.md).
+**Colección lista para importar:** [tools/postman/](tools/postman/) — `carpinteria-api.postman_collection.json` y `carpinteria-api.postman_environment.json` (Postman o Thunder Client). Tras importar, rellena la variable `cookie` del entorno y sigue [tools/postman/README.md](tools/postman/README.md). Checklists: [inventario](tools/postman/CHECKLIST.md), [pedidos QA 4.4](tools/postman/CHECKLIST-ORDERS-QA-4.4.md).
 
 ---
 
@@ -282,16 +334,17 @@ El login desde la UI usa `signIn()` del cliente (`redirect: false` para credenti
 
 `Category` y `Product` en `prisma/schema.prisma`. Relación uno-a-muchos; `price` como `Decimal(10, 2)`. Detalle: [docs/arquitectura.md](docs/arquitectura.md).
 
-### Pedidos (legacy)
+### Pedidos (PostgreSQL)
 
-`Task` (`src/types/task.ts`):
+`Order`, `OrderMaterialLine`, `OrderReservation`, `OrderStatusEvent` en `prisma/schema.prisma`.
 
-- `id: string`
-- `title: string`
-- `description?: string`
-- `status: "pending" | "in_progress" | "done"`
-- `createdAt: string` (ISO)
-- `updatedAt: string` (ISO)
+- Estados: `DRAFT`, `PENDING`, `APPROVED`, `IN_PRODUCTION`, `READY`, `DELIVERED`, `CANCELLED`
+- Campos clave: `furnitureType`, `parameters` (JSON), `clientId`, líneas con `plannedQty` / `actualQty`
+- Historial de estados en `order_status_events` (ML / trazabilidad)
+
+### Tasks (legacy, cookie)
+
+`Task` en `src/types/task.ts` — demo antigua; no usar para el taller.
 
 ---
 
@@ -347,6 +400,7 @@ Después: `npm run lint` y `npm run build`.
 
 ## Limitaciones conocidas
 
-- **Inventario:** persistido en PostgreSQL (Neon); requiere `DATABASE_URL` y `DIRECT_URL` configuradas.
-- **Pedidos (`Task`):** siguen en cookie por sesión (legacy del boilerplate).
-- Usuarios gestionados en Firebase; no hay panel de administración de usuarios en la app.
+- **Inventario y pedidos:** PostgreSQL (Neon); requiere `DATABASE_URL` y `DIRECT_URL`.
+- **Tasks legacy:** `/api/tasks` en cookie; la operativa del taller usa `/api/orders`.
+- **IA / BOM automático:** no desplegado (v1 = plantillas manuales; roadmap en [fase-2-ia](docs/pedidos/fase-2-ia.md)).
+- Panel de usuarios en `/admin/users` requiere Firebase Admin configurado en servidor.

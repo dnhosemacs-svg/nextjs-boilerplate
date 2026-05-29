@@ -199,3 +199,12 @@ Tras el flujo feliz (§3) o cualquier secuencia de `PATCH .../status`:
 - [ ] Existe [docs/pedidos/fase-2-ia.md](../../docs/pedidos/fase-2-ia.md) con la frase: sugerir BOM desde histórico de `DELIVERED`
 - [ ] [docs/bom-templates.md](../../docs/bom-templates.md) enlaza al roadmap IA
 - [ ] [docs/pedidos/datos-ml.md](../../docs/pedidos/datos-ml.md) enlaza a fase-2-ia
+
+---
+
+## 6. README — roles y pedidos
+
+- [ ] [README.md](../../README.md) tiene sección **Pedidos y roles** con tabla CLIENT / WORKER / ADMIN
+- [ ] README describe flujo `DRAFT` → `DELIVERED` y enlaces a docs de pedidos
+- [ ] Rutas `/orders`, `/my-orders` documentadas; `/tasks` marcado como legacy
+- [ ] [docs/seguridad/roles-permisos.md](../../docs/seguridad/roles-permisos.md) alineado con `/api/orders` y pedidos propios (**403**)
