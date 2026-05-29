@@ -2,11 +2,13 @@ import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import { getToken } from "next-auth/jwt";
 import { isProtectedApiPath } from "@/lib/protected-api-routes";
+import { isWorkshopStaff } from "@/lib/permissions";
 import {
   canAccessAdminPage,
   canAccessWarehousePage,
   getTokenRole,
   isAdminPage,
+  isPublicMarketingPage,
   isWarehousePage,
 } from "@/lib/route-access";
 import { getPostLoginDestination } from "@/lib/safe-redirect";
@@ -98,6 +100,28 @@ async function handleProtectedPage(request: NextRequest) {
 }
 
 /**
+ * Páginas públicas de marketing: admin/operario con sesión → panel.
+ */
+async function handleWorkshopPublicPages(request: NextRequest) {
+  const { pathname } = request.nextUrl;
+  if (!isPublicMarketingPage(pathname)) {
+    return null;
+  }
+
+  const token = await getToken({ req: request, secret: authSecret });
+  if (!hasValidToken(token)) {
+    return NextResponse.next();
+  }
+
+  const role = getTokenRole(token);
+  if (role && isWorkshopStaff(role)) {
+    return NextResponse.redirect(new URL("/dashboard", request.url));
+  }
+
+  return NextResponse.next();
+}
+
+/**
  * /register desactivado por env → login.
  */
 function handleRegisterDisabled(request: NextRequest) {
@@ -130,6 +154,9 @@ export async function middleware(request: NextRequest) {
   const registerDisabled = handleRegisterDisabled(request);
   if (registerDisabled) return registerDisabled;
 
+  const workshopPublic = await handleWorkshopPublicPages(request);
+  if (workshopPublic) return workshopPublic;
+
   const apiResult = await handleProtectedApi(request);
   if (apiResult) return apiResult;
 
@@ -144,6 +171,9 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
+    "/",
+    "/about",
+    "/info",
     "/dashboard",
     "/dashboard/:path*",
     "/orders",

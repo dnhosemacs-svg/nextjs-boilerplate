@@ -13,6 +13,11 @@ export function canManageUsers(role: UserRole): boolean {
   return role === R.ADMIN;
 }
 
+/** Equipo del taller (admin u operario): panel operativo, no landing pública. */
+export function isWorkshopStaff(role: UserRole): boolean {
+  return role === R.ADMIN || role === R.WORKER;
+}
+
 /** Ajustes de stock (movimientos de inventario). */
 export function canWriteStock(role: UserRole): boolean {
   return role === R.ADMIN || role === R.WORKER;

@@ -44,6 +44,14 @@ assert(
   "middleware.ts: debe definir handleProtectedPage para páginas privadas",
 );
 assert(
+  middleware.includes("handleWorkshopPublicPages"),
+  "middleware.ts: debe definir handleWorkshopPublicPages para marketing público",
+);
+assert(
+  middleware.includes("isPublicMarketingPage"),
+  "middleware.ts: debe usar isPublicMarketingPage (route-access.ts)",
+);
+assert(
   middleware.includes("isProtectedApiPath"),
   "middleware.ts: debe usar isProtectedApiPath (lista en protected-api-routes.ts)",
 );
@@ -61,6 +69,9 @@ assert(
 );
 
 const matcherRoutes = [
+  '"/"',
+  '"/about"',
+  '"/info"',
   '"/dashboard/:path*"',
   '"/stats"',
   '"/products"',

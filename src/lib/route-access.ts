@@ -5,6 +5,13 @@ import { canAccessInventory, canManageUsers } from "@/lib/permissions";
 export const ADMIN_PAGE_PREFIXES = ["/admin"] as const;
 export const WAREHOUSE_PAGE_PREFIXES = ["/products", "/categories"] as const;
 
+/** Landing y páginas informativas del sitio público (grupo `(public)`). */
+export const PUBLIC_MARKETING_PAGE_PATHS = ["/", "/about", "/info"] as const;
+
+export function isPublicMarketingPage(pathname: string): boolean {
+  return (PUBLIC_MARKETING_PAGE_PATHS as readonly string[]).includes(pathname);
+}
+
 export function pathnameStartsWith(pathname: string, prefix: string) {
   return pathname === prefix || pathname.startsWith(`${prefix}/`);
 }
