@@ -12,3 +12,15 @@ export type RecordMovementInput = {
   orderId?: string;
   userId?: string;
 };
+
+export type OrderStockMovementDto = {
+  id: string;
+  type: "IN" | "OUT" | "ADJUST" | "RESERVE" | "RELEASE";
+  quantity: string;
+  reason: string | null;
+  materialId: string;
+  materialName: string;
+  orderId: string | null;
+  userId: string | null;
+  createdAt: string;
+};
