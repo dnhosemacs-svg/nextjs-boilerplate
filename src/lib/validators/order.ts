@@ -188,6 +188,6 @@ export const ORDER_EDITABLE_FIELDS_BY_STATUS: Record<
   APPROVED: ["lines"],
   IN_PRODUCTION: ["lines"],
   READY: ["laborAmount"],
-  DELIVERED: [],
+  DELIVERED: ["laborAmount"],
   CANCELLED: [],
 };

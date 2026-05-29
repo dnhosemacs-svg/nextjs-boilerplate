@@ -83,7 +83,7 @@ export function OrderDetail({ id, mode = "internal" }: OrderDetailProps) {
           <OrderRealConsumptionEditor order={order} />
         ) : null}
         {!isClientMode ? <OrderLaborAmountEditor order={order} /> : null}
-        <OrderStatusActions order={order} />
+        {!isClientMode ? <OrderStatusActions order={order} /> : null}
 
         {!isClientMode && order.hasShortages ? (
           <section className="space-y-2 rounded-lg border border-destructive/40 bg-destructive/5 p-4">
