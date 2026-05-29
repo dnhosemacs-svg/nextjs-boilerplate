@@ -8,6 +8,7 @@ import {
   validationErrorResponse,
 } from "@/lib/api-route-utils";
 import { db } from "@/lib/db";
+import { denyIfClientNotOrderOwner } from "@/lib/order-access";
 import {
   approveOrder,
   cancelOrder,
@@ -38,10 +39,12 @@ export async function PATCH(request: Request, { params }: IdRouteContext) {
   if (!order) {
     return NextResponse.json({ error: "No encontrado" }, { status: 404 });
   }
-  const isClient = auth.session.user.role === UserRole.CLIENT;
-  if (isClient && order.clientId !== auth.session.user.id) {
-    return NextResponse.json({ error: "No encontrado" }, { status: 404 });
-  }
+  const denied = denyIfClientNotOrderOwner(
+    auth.session.user.role,
+    order.clientId,
+    auth.session.user.id,
+  );
+  if (denied) return denied;
 
   const transition = parseOrderTransition(
     order.status,

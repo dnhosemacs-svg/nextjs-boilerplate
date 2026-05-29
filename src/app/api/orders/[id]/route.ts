@@ -8,6 +8,7 @@ import {
   validationErrorResponse,
 } from "@/lib/api-route-utils";
 import { db } from "@/lib/db";
+import { denyIfClientNotOrderOwner } from "@/lib/order-access";
 import { serializeOrder } from "@/lib/serializers/order";
 import { setLaborAmountSchema, updateOrderDraftSchema } from "@/lib/validators/order";
 import { UserRole } from "@/types/user-role";
@@ -31,10 +32,12 @@ export async function GET(_request: Request, { params }: IdRouteContext) {
     return NextResponse.json({ error: "No encontrado" }, { status: 404 });
   }
 
-  const isClient = auth.session.user.role === UserRole.CLIENT;
-  if (isClient && order.clientId !== auth.session.user.id) {
-    return NextResponse.json({ error: "No encontrado" }, { status: 404 });
-  }
+  const denied = denyIfClientNotOrderOwner(
+    auth.session.user.role,
+    order.clientId,
+    auth.session.user.id,
+  );
+  if (denied) return denied;
 
   return NextResponse.json(serializeOrder(order, { audience }), { status: 200 });
 }
@@ -103,10 +106,14 @@ export async function PATCH(request: Request, { params }: IdRouteContext) {
     return NextResponse.json({ error: "No encontrado" }, { status: 404 });
   }
 
+  const denied = denyIfClientNotOrderOwner(
+    auth.session.user.role,
+    order.clientId,
+    auth.session.user.id,
+  );
+  if (denied) return denied;
+
   const isClient = auth.session.user.role === UserRole.CLIENT;
-  if (isClient && order.clientId !== auth.session.user.id) {
-    return NextResponse.json({ error: "No encontrado" }, { status: 404 });
-  }
   if (isClient && order.status !== "DRAFT") {
     return NextResponse.json(
       { error: "Solo puedes editar pedidos propios en borrador" },
