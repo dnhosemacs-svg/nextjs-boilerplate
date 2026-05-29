@@ -24,7 +24,7 @@ export async function listLowStockMaterials(): Promise<LowStockMaterialDto[]> {
 
     if (available < min) {
       result.push({
-        material: serializeMaterial(material),
+        material: serializeMaterial(material) as unknown as Material,
         available: stock.available,
         minStock: material.minStock.toString(),
       });

@@ -28,7 +28,12 @@ function buildDraftLines(order: OrderDto): DraftLine[] {
 }
 
 export function OrderMaterialLinesEditor({ order }: OrderMaterialLinesEditorProps) {
-  const materialsQuery = useMaterialsQuery({});
+  const materialsQuery = useMaterialsQuery({
+    search: undefined,
+    categoryId: undefined,
+    sortBy: "name",
+    sortOrder: "asc",
+  });
   const saveLinesMutation = useSetOrderMaterialLinesMutation();
   const [lines, setLines] = useState<DraftLine[]>(buildDraftLines(order));
   const [formError, setFormError] = useState<string | null>(null);
