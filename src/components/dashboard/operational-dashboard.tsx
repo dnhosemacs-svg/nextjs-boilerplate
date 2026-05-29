@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { ClientDashboard } from "@/components/dashboard/client-dashboard";
 import { LowStockWidget } from "@/components/dashboard/low-stock-widget";
 import { ShortagesWidget } from "@/components/dashboard/shortages-widget";
 import { canManageUsers, canViewOperationalWidgets } from "@/lib/permissions";
@@ -40,19 +41,7 @@ export function OperationalDashboard({ role }: OperationalDashboardProps) {
           <LowStockWidget />
         </div>
       ) : (
-        <section className="surface-card p-6">
-          <p className="text-sm text-[var(--muted)]">
-            Consulta el estado de tus pedidos en{" "}
-            <Link href="/my-orders" className="ui-link-underline">
-              Mis pedidos
-            </Link>{" "}
-            o crea uno nuevo desde{" "}
-            <Link href="/orders/new" className="ui-link-underline">
-              Nuevo pedido
-            </Link>
-            .
-          </p>
-        </section>
+        <ClientDashboard />
       )}
     </>
   );
