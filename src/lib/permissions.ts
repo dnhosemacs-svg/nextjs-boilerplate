@@ -41,3 +41,13 @@ export function canChangeOrderStatus(
 ): boolean {
   return canTransitionOrder(from, to, role);
 }
+
+/** Widgets del panel operativo (faltantes, stock bajo). */
+export function canViewOperationalWidgets(role: UserRole): boolean {
+  return role === R.ADMIN || role === R.WORKER;
+}
+
+/** Historial de movimientos de stock en detalle de pedido. */
+export function canViewOrderMovements(role: UserRole): boolean {
+  return role === R.ADMIN || role === R.WORKER;
+}
