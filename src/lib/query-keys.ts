@@ -6,6 +6,7 @@ export type OrderListQuery = Partial<{
   status: OrderStatus;
   furnitureType: string;
   clientId: string;
+  hasShortages: boolean;
 }>;
 
 export const queryKeys = {
@@ -34,5 +35,12 @@ export const queryKeys = {
     lists: () => [...queryKeys.orders.all, "list"] as const,
     list: (filters: OrderListQuery) => [...queryKeys.orders.lists(), filters] as const,
     detail: (id: string) => [...queryKeys.orders.all, "detail", id] as const,
+  },
+  dashboard: {
+    all: ["dashboard"] as const,
+    shortages: () => [...queryKeys.dashboard.all, "shortages"] as const,
+    lowStock: () => [...queryKeys.dashboard.all, "low-stock"] as const,
+    orderMovements: (orderId: string) =>
+      [...queryKeys.dashboard.all, "order-movements", orderId] as const,
   },
 };
