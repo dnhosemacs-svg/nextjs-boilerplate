@@ -47,3 +47,18 @@ export function isFirebaseEmailAlreadyExists(error: unknown): boolean {
     (error as { code?: string }).code === "auth/email-already-exists"
   );
 }
+
+/** Lista todas las cuentas de Firebase Auth (paginado). */
+export async function listAllFirebaseUsers(): Promise<UserRecord[]> {
+  const auth = getAuth(getAdminApp());
+  const users: UserRecord[] = [];
+  let pageToken: string | undefined;
+
+  do {
+    const page = await auth.listUsers(1000, pageToken);
+    users.push(...page.users);
+    pageToken = page.pageToken;
+  } while (pageToken);
+
+  return users;
+}

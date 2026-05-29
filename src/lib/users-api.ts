@@ -1,4 +1,5 @@
 import { parseResponse } from "@/lib/http/parse-response";
+import type { SyncFirebaseUsersResult } from "@/lib/sync-firebase-users";
 import type { AdminUser } from "@/types/admin-user";
 import type {
   CreateUserByAdminInput,
@@ -34,4 +35,9 @@ export async function updateUserRoleApi(
     body: JSON.stringify(input),
   });
   return parseResponse<AdminUser>(response);
+}
+
+export async function syncFirebaseUsers(): Promise<SyncFirebaseUsersResult> {
+  const response = await fetch("/api/users/sync", { method: "POST" });
+  return parseResponse<SyncFirebaseUsersResult>(response);
 }

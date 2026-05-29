@@ -1,7 +1,11 @@
 "use client";
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { createUser, updateUserRoleApi } from "@/lib/users-api";
+import {
+  createUser,
+  syncFirebaseUsers,
+  updateUserRoleApi,
+} from "@/lib/users-api";
 import { queryKeys } from "@/lib/query-keys";
 import type {
   CreateUserByAdminInput,
@@ -25,6 +29,17 @@ export function useUpdateUserRoleMutation() {
   return useMutation({
     mutationFn: ({ id, input }: { id: string; input: UpdateUserRoleInput }) =>
       updateUserRoleApi(id, input),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.users.all });
+    },
+  });
+}
+
+export function useSyncFirebaseUsersMutation() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: () => syncFirebaseUsers(),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.users.all });
     },
