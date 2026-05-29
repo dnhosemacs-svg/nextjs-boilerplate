@@ -14,6 +14,7 @@ function ordersUrl(query?: OrderListQuery) {
   if (query?.status) params.set("status", query.status);
   if (query?.furnitureType) params.set("furnitureType", query.furnitureType);
   if (query?.clientId) params.set("clientId", query.clientId);
+  if (query?.hasShortages) params.set("hasShortages", "true");
   const qs = params.toString();
   return qs ? `/api/orders?${qs}` : "/api/orders";
 }
