@@ -44,9 +44,6 @@ export function OrderDetail({ id, mode = "internal" }: OrderDetailProps) {
 
   const order = query.data;
   const orderParams = (order.params as Record<string, unknown>) ?? {};
-  const laborAmount = Number(order.laborAmount ?? "0");
-  const materialsSubtotal = Number(order.materialsSubtotal);
-  const orderTotal = (materialsSubtotal + laborAmount).toFixed(2);
   const shortages = order.shortages ?? [];
 
   return (
@@ -62,17 +59,19 @@ export function OrderDetail({ id, mode = "internal" }: OrderDetailProps) {
             Resumen: {orderSummaryText(order.furnitureType, orderParams)}
           </p>
         ) : null}
-        <p className="max-w-2xl text-sm leading-relaxed text-[var(--muted)]">
-          Subtotal materiales: {order.materialsSubtotal} EUR
-        </p>
-        {isClientMode && order.laborAmount ? (
+        {!isClientMode ? (
+          <p className="max-w-2xl text-sm leading-relaxed text-[var(--muted)]">
+            Subtotal materiales: {order.materialsSubtotal} EUR
+          </p>
+        ) : null}
+        {isClientMode && order.laborAmount !== null ? (
           <p className="max-w-2xl text-sm leading-relaxed text-[var(--muted)]">
             Mano de obra: {order.laborAmount} EUR
           </p>
         ) : null}
         {isClientMode ? (
           <p className="max-w-2xl text-sm leading-relaxed text-[var(--muted)]">
-            Total pedido: {orderTotal} EUR
+            Total pedido: {order.totalAmount} EUR
           </p>
         ) : null}
       </header>

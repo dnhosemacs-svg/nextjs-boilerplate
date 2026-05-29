@@ -28,12 +28,6 @@ function clientSummary(order: OrderDto): string {
   return order.furnitureType;
 }
 
-function orderTotal(order: OrderDto): string {
-  const materialTotal = Number(order.materialsSubtotal);
-  const laborTotal = Number(order.laborAmount ?? "0");
-  return (materialTotal + laborTotal).toFixed(2);
-}
-
 export function OrderList({ orders, mode = "internal" }: OrderListProps) {
   const isClientMode = mode === "client";
 
@@ -59,7 +53,7 @@ export function OrderList({ orders, mode = "internal" }: OrderListProps) {
             <TableCell>{order.id.slice(0, 10)}...</TableCell>
             <TableCell>{order.status}</TableCell>
             <TableCell>{isClientMode ? clientSummary(order) : order.furnitureType}</TableCell>
-            <TableCell>{isClientMode ? `${orderTotal(order)} EUR` : order.clientId}</TableCell>
+            <TableCell>{isClientMode ? `${order.totalAmount} EUR` : order.clientId}</TableCell>
             <TableCell>{new Date(order.createdAt).toLocaleString()}</TableCell>
             <TableCell>
               <Link
