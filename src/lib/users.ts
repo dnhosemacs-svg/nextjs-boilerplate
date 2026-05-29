@@ -88,10 +88,17 @@ export async function createAppUser(input: {
   });
 }
 
-export async function updateUserRole(id: string, role: UserRole) {
+export async function updateUserByAdmin(
+  id: string,
+  input: { role?: UserRole; name?: string | null },
+) {
+  const data: { role?: UserRole; name?: string | null } = {};
+  if (input.role !== undefined) data.role = input.role;
+  if (input.name !== undefined) data.name = input.name;
+
   return db.user.update({
     where: { id },
-    data: { role },
+    data,
     select: adminUserListSelect,
   });
 }

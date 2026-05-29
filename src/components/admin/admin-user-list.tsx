@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { QueryErrorState } from "@/components/inventory/query-error-state";
 import { Badge } from "@/components/ui/badge";
@@ -11,10 +12,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  useUpdateUserRoleMutation,
-  useUsersQuery,
-} from "@/hooks/users";
+import { useUpdateUserMutation, useUsersQuery } from "@/hooks/users";
 import { roleLabel } from "@/lib/role-labels";
 import { ADMIN_CREATABLE_ROLES } from "@/lib/validators/user";
 import type { AdminUser } from "@/types/admin-user";
@@ -26,9 +24,44 @@ function formatDate(value: string) {
   return date.toLocaleDateString("es-ES");
 }
 
+function UserNameCell({ user }: { user: AdminUser }) {
+  const updateMutation = useUpdateUserMutation();
+  const [value, setValue] = useState(user.name ?? "");
+
+  useEffect(() => {
+    setValue(user.name ?? "");
+  }, [user.name]);
+
+  function save() {
+    const trimmed = value.trim();
+    const next = trimmed === "" ? null : trimmed;
+    const current = user.name?.trim() || null;
+    if (next === current) return;
+    updateMutation.mutate({ id: user.id, input: { name: trimmed } });
+  }
+
+  return (
+    <input
+      type="text"
+      value={value}
+      disabled={updateMutation.isPending}
+      onChange={(event) => setValue(event.target.value)}
+      onBlur={save}
+      onKeyDown={(event) => {
+        if (event.key === "Enter") {
+          event.currentTarget.blur();
+        }
+      }}
+      placeholder="Sin nombre"
+      className="h-8 w-full min-w-[8rem] max-w-[14rem] rounded-lg border border-input bg-transparent px-2 text-sm outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 dark:bg-input/30"
+      aria-label={`Nombre de ${user.email}`}
+    />
+  );
+}
+
 function UserRoleCell({ user }: { user: AdminUser }) {
   const { data: session } = useSession();
-  const updateMutation = useUpdateUserRoleMutation();
+  const updateMutation = useUpdateUserMutation();
   const isSelf = session?.user?.id === user.id;
   const isAdminUser = user.role === UserRole.ADMIN;
 
@@ -62,7 +95,7 @@ function UserRoleCell({ user }: { user: AdminUser }) {
 
 export function AdminUserList() {
   const { data = [], isLoading, isError, error, refetch } = useUsersQuery();
-  const updateMutation = useUpdateUserRoleMutation();
+  const updateMutation = useUpdateUserMutation();
 
   if (isLoading) {
     return <p className="text-sm text-muted-foreground">Cargando usuarios…</p>;
@@ -101,7 +134,9 @@ export function AdminUserList() {
           {data.map((user) => (
             <TableRow key={user.id}>
               <TableCell>{user.email}</TableCell>
-              <TableCell>{user.name ?? "—"}</TableCell>
+              <TableCell>
+                <UserNameCell user={user} />
+              </TableCell>
               <TableCell>
                 <UserRoleCell user={user} />
               </TableCell>

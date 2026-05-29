@@ -4,12 +4,12 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   createUser,
   syncFirebaseUsers,
-  updateUserRoleApi,
+  updateUserByAdminApi,
 } from "@/lib/users-api";
 import { queryKeys } from "@/lib/query-keys";
 import type {
   CreateUserByAdminInput,
-  UpdateUserRoleInput,
+  UpdateUserByAdminInput,
 } from "@/lib/validators/user";
 
 export function useCreateUserMutation() {
@@ -23,17 +23,20 @@ export function useCreateUserMutation() {
   });
 }
 
-export function useUpdateUserRoleMutation() {
+export function useUpdateUserMutation() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, input }: { id: string; input: UpdateUserRoleInput }) =>
-      updateUserRoleApi(id, input),
+    mutationFn: ({ id, input }: { id: string; input: UpdateUserByAdminInput }) =>
+      updateUserByAdminApi(id, input),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.users.all });
     },
   });
 }
+
+/** @deprecated Usa useUpdateUserMutation */
+export const useUpdateUserRoleMutation = useUpdateUserMutation;
 
 export function useSyncFirebaseUsersMutation() {
   const queryClient = useQueryClient();

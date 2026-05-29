@@ -28,8 +28,13 @@ export const createUserByAdminSchema = z.object({
 
 export type CreateUserByAdminInput = z.infer<typeof createUserByAdminSchema>;
 
-export const updateUserRoleSchema = z.object({
-  role: adminCreatableRoleSchema,
-});
+export const updateUserByAdminSchema = z
+  .object({
+    role: adminCreatableRoleSchema.optional(),
+    name: z.string().trim().max(120, "El nombre es demasiado largo").optional(),
+  })
+  .refine((data) => data.role !== undefined || data.name !== undefined, {
+    message: "Indica al menos un campo para actualizar",
+  });
 
-export type UpdateUserRoleInput = z.infer<typeof updateUserRoleSchema>;
+export type UpdateUserByAdminInput = z.infer<typeof updateUserByAdminSchema>;

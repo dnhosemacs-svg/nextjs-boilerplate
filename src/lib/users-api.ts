@@ -3,7 +3,7 @@ import type { SyncFirebaseUsersResult } from "@/lib/sync-firebase-users";
 import type { AdminUser } from "@/types/admin-user";
 import type {
   CreateUserByAdminInput,
-  UpdateUserRoleInput,
+  UpdateUserByAdminInput,
 } from "@/lib/validators/user";
 
 export async function getUsers(): Promise<AdminUser[]> {
@@ -25,9 +25,9 @@ export async function createUser(
   return parseResponse<AdminUser>(response);
 }
 
-export async function updateUserRoleApi(
+export async function updateUserByAdminApi(
   id: string,
-  input: UpdateUserRoleInput,
+  input: UpdateUserByAdminInput,
 ): Promise<AdminUser> {
   const response = await fetch(`/api/users/${id}`, {
     method: "PATCH",
