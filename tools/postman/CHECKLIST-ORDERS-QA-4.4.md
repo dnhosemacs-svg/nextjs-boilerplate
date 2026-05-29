@@ -7,7 +7,9 @@ Verificación manual de seguridad, flujo y preparación IA.
 - [ ] `npm run dev` en marcha (`http://localhost:3000`)
 - [ ] Dos usuarios **CLIENT** distintos (A y B) con sesión en Firebase + fila en `users`
 - [ ] Usuario **WORKER** o **ADMIN** para pasos de taller (pasos 2–3)
+- [ ] `npx prisma db seed` (o materiales con stock) y un `materialId` copiado para líneas
 - [ ] Variable `cookie` = `next-auth.session-token=<valor del navegador>`
+- [ ] Variables Postman: `orderId`, `materialId` (opcional)
 - [ ] Entorno Postman importado desde `tools/postman/`
 
 ---
@@ -104,4 +106,74 @@ Variante opcional: repetir el flujo hasta `IN_PRODUCTION` y cancelar desde ahí 
 
 ## 3. Flujo feliz (aprobar → reservar → producir → entregar)
 
-*(Pendiente — paso 3 del plan)*
+Recorrido completo sin cancelar:
+
+`DRAFT` → `PENDING` → `APPROVED` (reserva) → `IN_PRODUCTION` (consumo real) → `READY` → `DELIVERED`
+
+Código: transiciones en `src/lib/order-transitions.ts`; aprobar en `approveOrder`; consumo en `POST /api/orders/:id/consume`. Detalle del consume: [CHECKLIST-ORDERS-CONSUMO-REAL.md](CHECKLIST-ORDERS-CONSUMO-REAL.md).
+
+### Secuencia API
+
+| # | Rol | Método | Ruta | Body | Esperado |
+| - | --- | ------ | ---- | ---- | -------- |
+| 1 | CLIENT | POST | `/api/orders` | Ver JSON “Crear pedido” | **201**, `status`: `DRAFT` |
+| 2 | WORKER | PUT | `/api/orders/{{orderId}}/materials` | Ver JSON “Líneas” | **200**, líneas en respuesta |
+| 3 | CLIENT | PATCH | `/api/orders/{{orderId}}/status` | `{ "status": "PENDING" }` | **200** |
+| 4 | WORKER | PATCH | `/api/orders/{{orderId}}/status` | `{ "status": "APPROVED" }` | **200** → reservas + `RESERVE` |
+| 5 | WORKER | PATCH | `/api/orders/{{orderId}}/status` | `{ "status": "IN_PRODUCTION" }` | **200** |
+| 6 | WORKER | POST | `/api/orders/{{orderId}}/consume` | Ver JSON “Consumo real” | **200**, `consumption` en body |
+| 7 | WORKER | PATCH | `/api/orders/{{orderId}}/status` | `{ "status": "READY" }` | **200** |
+| 8 | WORKER | PATCH | `/api/orders/{{orderId}}` | `{ "laborAmount": 150 }` *(opcional)* | **200** |
+| 9 | WORKER | PATCH | `/api/orders/{{orderId}}/status` | `{ "status": "DELIVERED" }` | **200** |
+
+**Crear pedido (paso 1):**
+
+```json
+{
+  "furnitureType": "ARMARIO",
+  "params": { "anchoCm": 120, "altoCm": 220, "profundidadCm": 60 },
+  "notes": "QA 4.4 — flujo feliz"
+}
+```
+
+**Líneas (paso 2)** — usa el mismo `materialId` en consume:
+
+```json
+{
+  "lines": [
+    { "materialId": "{{materialId}}", "plannedQty": 3 }
+  ]
+}
+```
+
+**Consumo real (paso 6)** — mismas cantidades que plan (ajusta si cambiaste `plannedQty`):
+
+```json
+{
+  "lines": [
+    { "materialId": "{{materialId}}", "actualQty": 3 }
+  ]
+}
+```
+
+### Hitos en base de datos (Prisma Studio)
+
+| Tras paso | Comprobar |
+| --------- | --------- |
+| 4 — APPROVED | `order_reservations` con `active = true`; `stock_movements` tipo `RESERVE` |
+| 6 — consume | `order_material_lines.actualQty` relleno; movimientos `OUT` + `RELEASE`; reservas `active = false` |
+| 9 — DELIVERED | `orders.status` = `DELIVERED`; sin reservas activas para ese `orderId` |
+
+### Comprobación extra (opcional)
+
+| # | Request | Esperado |
+| - | ------- | -------- |
+| 10 | `GET /api/orders/{{orderId}}/movements` (WORKER) | **200**, lista con `RESERVE`, `OUT`, `RELEASE` del pedido |
+| 11 | `GET /api/orders/{{orderId}}` (CLIENT dueño) | **200**, `status`: `DELIVERED` (vista cliente sin líneas de material) |
+
+### Cierre sección 3
+
+- [ ] Todos los `PATCH .../status` del flujo responden **200**
+- [ ] Tras aprobar hay reservas activas; tras consumo en producción quedan inactivas
+- [ ] Pedido termina en **DELIVERED**
+- [ ] No hubo que cancelar ni saltar estados

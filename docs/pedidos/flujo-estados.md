@@ -77,6 +77,8 @@ flowchart LR
 
 No hay transiciones desde `READY`, `DELIVERED` ni `CANCELLED`.
 
+**Flujo feliz de punta a punta (tarjeta 4.4):** [CHECKLIST-ORDERS-QA-4.4.md](../../tools/postman/CHECKLIST-ORDERS-QA-4.4.md) — sección 3 (`DRAFT` → `DELIVERED`, incluye consumo real en `IN_PRODUCTION`).
+
 ---
 
 ## Aprobación: reservas y faltantes
