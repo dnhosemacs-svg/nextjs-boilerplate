@@ -150,7 +150,7 @@ async function handleAuthPages(request: NextRequest) {
   return NextResponse.redirect(new URL(destination, request.url));
 }
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const registerDisabled = handleRegisterDisabled(request);
   if (registerDisabled) return registerDisabled;
 

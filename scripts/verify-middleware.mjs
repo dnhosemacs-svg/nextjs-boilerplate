@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * Paso 4: proxy (páginas + APIs 401) alineado con protected-api-routes y safe-redirect.
- * Comprobaciones estáticas en middleware.ts y, si el servidor responde, pruebas HTTP.
+ * Comprobaciones estáticas en proxy.ts y, si el servidor responde, pruebas HTTP.
  *
  * Uso:
  *   npm run verify:middleware
@@ -23,49 +23,49 @@ function read(relPath) {
   return readFileSync(join(ROOT, relPath), "utf8");
 }
 
-// —— Estáticas: middleware + catálogo de APIs ——
-const middleware = read("middleware.ts");
+// —— Estáticas: proxy + catálogo de APIs ——
+const proxy = read("src/proxy.ts");
 const protectedRoutes = read("src/lib/protected-api-routes.ts");
 
 assert(
-  /export\s+async\s+function\s+middleware/.test(middleware),
-  "middleware.ts: debe exportar async function middleware",
+  /export\s+async\s+function\s+proxy/.test(proxy),
+  "src/proxy.ts: debe exportar async function proxy",
 );
 assert(
-  middleware.includes("getAuthSecret"),
-  "middleware.ts: debe usar getAuthSecret() (mismo secreto que auth.ts)",
+  proxy.includes("getAuthSecret"),
+  "src/proxy.ts: debe usar getAuthSecret() (mismo secreto que auth.ts)",
 );
 assert(
-  middleware.includes("handleProtectedApi"),
-  "middleware.ts: debe definir handleProtectedApi para APIs",
+  proxy.includes("handleProtectedApi"),
+  "src/proxy.ts: debe definir handleProtectedApi para APIs",
 );
 assert(
-  middleware.includes("handleProtectedPage"),
-  "middleware.ts: debe definir handleProtectedPage para páginas privadas",
+  proxy.includes("handleProtectedPage"),
+  "src/proxy.ts: debe definir handleProtectedPage para páginas privadas",
 );
 assert(
-  middleware.includes("handleWorkshopPublicPages"),
-  "middleware.ts: debe definir handleWorkshopPublicPages para marketing público",
+  proxy.includes("handleWorkshopPublicPages"),
+  "src/proxy.ts: debe definir handleWorkshopPublicPages para marketing público",
 );
 assert(
-  middleware.includes("isPublicMarketingPage"),
-  "middleware.ts: debe usar isPublicMarketingPage (route-access.ts)",
+  proxy.includes("isPublicMarketingPage"),
+  "src/proxy.ts: debe usar isPublicMarketingPage (route-access.ts)",
 );
 assert(
-  middleware.includes("isProtectedApiPath"),
-  "middleware.ts: debe usar isProtectedApiPath (lista en protected-api-routes.ts)",
+  proxy.includes("isProtectedApiPath"),
+  "src/proxy.ts: debe usar isProtectedApiPath (lista en protected-api-routes.ts)",
 );
 assert(
   protectedRoutes.includes('"/api/orders"'),
   "protected-api-routes.ts: debe listar /api/orders",
 );
 assert(
-  middleware.includes("getPostLoginDestination"),
-  "middleware.ts: redirect con sesión en /login|/register debe usar getPostLoginDestination",
+  proxy.includes("getPostLoginDestination"),
+  "src/proxy.ts: redirect con sesión en /login|/register debe usar getPostLoginDestination",
 );
 assert(
-  /NextResponse\.json\([\s\S]*401/.test(middleware),
-  "middleware.ts: APIs sin sesión deben devolver 401 JSON",
+  /NextResponse\.json\([\s\S]*401/.test(proxy),
+  "src/proxy.ts: APIs sin sesión deben devolver 401 JSON",
 );
 
 const matcherRoutes = [
@@ -85,15 +85,15 @@ const matcherRoutes = [
   '"/register"',
 ];
 for (const route of matcherRoutes) {
-  assert(middleware.includes(route), `middleware.ts: matcher debe incluir ${route}`);
+  assert(proxy.includes(route), `proxy.ts: matcher debe incluir ${route}`);
 }
 
 // Cada prefijo protegido de API debe tener cobertura en el matcher
 const apiPrefixes = [...protectedRoutes.matchAll(/"(\/api\/[^"]+)"/g)].map((m) => m[1]);
 for (const prefix of apiPrefixes) {
   assert(
-    middleware.includes(`"${prefix}`) || middleware.includes(`${prefix}/:path*`),
-    `middleware.ts: matcher debe cubrir API protegida ${prefix}`,
+    proxy.includes(`"${prefix}`) || proxy.includes(`${prefix}/:path*`),
+    `proxy.ts: matcher debe cubrir API protegida ${prefix}`,
   );
 }
 
@@ -243,7 +243,7 @@ if (failures.length > 0) {
   for (const msg of failures) console.error(`  • ${msg}`);
   if (looksLikeStaleDev) {
     console.error(
-      "\n  Sugerencia: reinicia `npm run dev` tras cambiar middleware.ts,",
+      "\n  Sugerencia: reinicia `npm run dev` tras cambiar proxy.ts,",
     );
     console.error(
       "  o prueba contra build de producción: npm run build && npm run start",
