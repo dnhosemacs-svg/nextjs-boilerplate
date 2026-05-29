@@ -125,6 +125,20 @@ export async function getMaterialStock(id: string): Promise<StockSnapshot> {
   return parseResponse<StockSnapshot>(response);
 }
 
+export type LowStockMaterialItem = {
+  material: Material;
+  available: string;
+  minStock: string;
+};
+
+export async function getLowStockMaterials(): Promise<LowStockMaterialItem[]> {
+  const response = await fetch("/api/materials/low-stock", {
+    method: "GET",
+    cache: "no-store",
+  });
+  return parseResponse<LowStockMaterialItem[]>(response);
+}
+
 export type StockMovementItem = {
   id: string;
   type: "IN" | "OUT" | "ADJUST" | "RESERVE" | "RELEASE";
