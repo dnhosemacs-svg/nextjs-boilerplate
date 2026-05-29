@@ -1,6 +1,7 @@
 "use client";
 
 import { OrderForm } from "@/components/orders/order-form";
+import { OrderLaborAmountEditor } from "@/components/orders/order-labor-amount-editor";
 import { OrderMaterialLinesEditor } from "@/components/orders/order-material-lines-editor";
 import { OrderRealConsumptionEditor } from "@/components/orders/order-real-consumption-editor";
 import { OrderStatusActions } from "@/components/orders/order-status-actions";
@@ -82,6 +83,7 @@ export function OrderDetail({ id, mode = "internal" }: OrderDetailProps) {
         {!isClientMode && order.status === "IN_PRODUCTION" ? (
           <OrderRealConsumptionEditor order={order} />
         ) : null}
+        {!isClientMode ? <OrderLaborAmountEditor order={order} /> : null}
         <OrderStatusActions order={order} />
 
         {!isClientMode && order.hasShortages ? (
