@@ -3,7 +3,6 @@
  * Al añadir una ruta nueva sensible, inclúyela aquí y en el matcher de middleware.ts.
  */
 export const PROTECTED_API_PREFIXES = [
-  "/api/tasks",
   "/api/products",
   "/api/categories",
   "/api/materials",

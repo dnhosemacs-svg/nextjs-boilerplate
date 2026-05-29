@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { requireRole } from "@/lib/api-auth";
 import { type IdRouteContext, resolveRouteParams } from "@/lib/api-route-utils";
 import { db } from "@/lib/db";
+import { denyIfWorkerNotAssigned } from "@/lib/order-access";
 import { UserRole } from "@/types/user-role";
 
 export async function GET(_request: Request, { params }: IdRouteContext) {
@@ -18,6 +19,13 @@ export async function GET(_request: Request, { params }: IdRouteContext) {
   if (!order) {
     return NextResponse.json({ error: "No encontrado" }, { status: 404 });
   }
+
+  const denied = await denyIfWorkerNotAssigned(
+    auth.session.user.role,
+    order.id,
+    auth.session.user.id,
+  );
+  if (denied) return denied;
 
   const movements = await db.stockMovement.findMany({
     where: { orderId: id },

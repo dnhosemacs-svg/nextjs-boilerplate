@@ -1,10 +1,12 @@
 "use client";
 
+import { useSession } from "next-auth/react";
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { OrderList } from "@/components/orders/order-list";
 import { useOrdersQuery } from "@/hooks/orders/use-orders-query";
 import type { OrderStatus } from "@/types/order-status";
+import { UserRole } from "@/types/user-role";
 
 const ORDER_STATUS_OPTIONS: Array<{ value: "" | OrderStatus; label: string }> = [
   { value: "", label: "Todos los estados" },
@@ -23,14 +25,18 @@ type OrdersViewProps = {
 
 export function OrdersView({ mode = "internal" }: OrdersViewProps) {
   const isClientMode = mode === "client";
+  const { data: session } = useSession();
+  const isAdmin = session?.user?.role === UserRole.ADMIN;
   const [status, setStatus] = useState<"" | OrderStatus>("");
   const [furnitureType, setFurnitureType] = useState("");
   const [clientId, setClientId] = useState("");
+  const [unassignedOnly, setUnassignedOnly] = useState(false);
 
   const query = useOrdersQuery({
     status: status || undefined,
     furnitureType: furnitureType.trim() || undefined,
     clientId: isClientMode ? undefined : (clientId.trim() || undefined),
+    unassigned: isAdmin && unassignedOnly ? true : undefined,
   });
 
   return (
@@ -69,6 +75,17 @@ export function OrdersView({ mode = "internal" }: OrdersViewProps) {
           />
         )}
       </div>
+
+      {isAdmin ? (
+        <label className="mb-5 flex items-center gap-2 text-sm">
+          <input
+            type="checkbox"
+            checked={unassignedOnly}
+            onChange={(e) => setUnassignedOnly(e.target.checked)}
+          />
+          Solo pedidos sin operario asignado
+        </label>
+      ) : null}
 
       {query.isLoading ? <p className="text-sm text-[var(--muted)]">Cargando pedidos...</p> : null}
       {query.error ? <p className="text-sm text-destructive">{query.error.message}</p> : null}

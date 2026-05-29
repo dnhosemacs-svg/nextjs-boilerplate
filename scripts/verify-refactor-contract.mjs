@@ -39,7 +39,7 @@ async function request(path, init = {}) {
 async function main() {
   // Sin sesión el middleware responde 401 antes de parsear el body (defensa en profundidad).
   for (const [label, path] of [
-    ["POST /api/tasks", "/api/tasks"],
+    ["POST /api/orders", "/api/orders"],
     ["POST /api/products", "/api/products"],
     ["POST /api/categories", "/api/categories"],
   ]) {
@@ -53,13 +53,13 @@ async function main() {
   }
 
   // Validación Zod sin sesión: middleware 401 antes del handler
-  const { res: taskRes, json: taskJson } = await request("/api/tasks", {
+  const { res: taskRes, json: taskJson } = await request("/api/orders", {
     method: "POST",
     headers: { "content-type": "application/json" },
     body: JSON.stringify({ title: "" }),
   });
-  assert(taskRes.status === 401, "POST /api/tasks validación: 401 sin sesión (middleware)");
-  assert(taskJson?.error === "No autenticado", "POST /api/tasks: cuerpo 401 unificado");
+  assert(taskRes.status === 401, "POST /api/orders validación: 401 sin sesión (middleware)");
+  assert(taskJson?.error === "No autenticado", "POST /api/orders: cuerpo 401 unificado");
 
   // Páginas inventario protegidas
   for (const path of ["/products", "/categories"]) {

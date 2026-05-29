@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import type { Prisma } from "@/generated/prisma/client";
 
 import { requireRole } from "@/lib/api-auth";
 import {
@@ -8,8 +9,9 @@ import {
   validationErrorResponse,
 } from "@/lib/api-route-utils";
 import { db } from "@/lib/db";
-import { denyIfClientNotOrderOwner } from "@/lib/order-access";
-import { serializeOrder } from "@/lib/serializers/order";
+import { denyIfOrderAccessDenied } from "@/lib/order-access";
+import { orderDetailInclude } from "@/lib/order-queries";
+import { serializeOrderFromDetail } from "@/lib/serializers/order";
 import { setLaborAmountSchema, updateOrderDraftSchema } from "@/lib/validators/order";
 import { UserRole } from "@/types/user-role";
 
@@ -22,24 +24,20 @@ export async function GET(_request: Request, { params }: IdRouteContext) {
 
   const order = await db.order.findUnique({
     where: { id },
-    include: {
-      materialLines: {
-        orderBy: { createdAt: "asc" },
-      },
-    },
+    include: orderDetailInclude,
   });
   if (!order) {
     return NextResponse.json({ error: "No encontrado" }, { status: 404 });
   }
 
-  const denied = denyIfClientNotOrderOwner(
+  const denied = await denyIfOrderAccessDenied(
     auth.session.user.role,
-    order.clientId,
+    order,
     auth.session.user.id,
   );
   if (denied) return denied;
 
-  return NextResponse.json(serializeOrder(order, { audience }), { status: 200 });
+  return NextResponse.json(serializeOrderFromDetail(order, { audience }), { status: 200 });
 }
 
 export async function PATCH(request: Request, { params }: IdRouteContext) {
@@ -54,16 +52,27 @@ export async function PATCH(request: Request, { params }: IdRouteContext) {
     typeof body.data === "object" &&
     "laborAmount" in (body.data as Record<string, unknown>);
 
+  const { id } = await resolveRouteParams(params);
+
+  const order = await db.order.findUnique({
+    where: { id },
+    select: { id: true, status: true, clientId: true },
+  });
+  if (!order) {
+    return NextResponse.json({ error: "No encontrado" }, { status: 404 });
+  }
+
+  const denied = await denyIfOrderAccessDenied(
+    auth.session.user.role,
+    order,
+    auth.session.user.id,
+  );
+  if (denied) return denied;
+
   if (hasLaborAmount) {
     const parsedLabor = setLaborAmountSchema.safeParse(body.data);
     if (!parsedLabor.success) {
       return validationErrorResponse(parsedLabor.error);
-    }
-
-    const { id } = await resolveRouteParams(params);
-    const order = await db.order.findUnique({ where: { id } });
-    if (!order) {
-      return NextResponse.json({ error: "No encontrado" }, { status: 404 });
     }
 
     const role = auth.session.user.role;
@@ -85,33 +94,16 @@ export async function PATCH(request: Request, { params }: IdRouteContext) {
     const updated = await db.order.update({
       where: { id },
       data: { laborAmount: parsedLabor.data.laborAmount },
-      include: {
-        materialLines: {
-          orderBy: { createdAt: "asc" },
-        },
-      },
+      include: orderDetailInclude,
     });
 
-    return NextResponse.json(serializeOrder(updated), { status: 200 });
+    return NextResponse.json(serializeOrderFromDetail(updated), { status: 200 });
   }
 
   const parsed = updateOrderDraftSchema.safeParse(body.data);
   if (!parsed.success) {
     return validationErrorResponse(parsed.error);
   }
-
-  const { id } = await resolveRouteParams(params);
-  const order = await db.order.findUnique({ where: { id } });
-  if (!order) {
-    return NextResponse.json({ error: "No encontrado" }, { status: 404 });
-  }
-
-  const denied = denyIfClientNotOrderOwner(
-    auth.session.user.role,
-    order.clientId,
-    auth.session.user.id,
-  );
-  if (denied) return denied;
 
   const isClient = auth.session.user.role === UserRole.CLIENT;
   if (isClient && order.status !== "DRAFT") {
@@ -121,19 +113,22 @@ export async function PATCH(request: Request, { params }: IdRouteContext) {
     );
   }
 
+  const updateData: Prisma.OrderUpdateInput = {};
+  if (parsed.data.furnitureType !== undefined) {
+    updateData.furnitureType = parsed.data.furnitureType;
+  }
+  if (parsed.data.params !== undefined) {
+    updateData.parameters = parsed.data.params as Prisma.InputJsonValue;
+  }
+  if (parsed.data.notes !== undefined) {
+    updateData.notes = parsed.data.notes;
+  }
+
   const updated = await db.order.update({
     where: { id },
-    data: {
-      furnitureType: parsed.data.furnitureType,
-      parameters: parsed.data.params,
-      notes: parsed.data.notes,
-    },
-    include: {
-      materialLines: {
-        orderBy: { createdAt: "asc" },
-      },
-    },
+    data: updateData,
+    include: orderDetailInclude,
   });
 
-  return NextResponse.json(serializeOrder(updated), { status: 200 });
+  return NextResponse.json(serializeOrderFromDetail(updated), { status: 200 });
 }

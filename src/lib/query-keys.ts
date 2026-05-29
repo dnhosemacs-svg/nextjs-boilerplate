@@ -7,6 +7,7 @@ export type OrderListQuery = Partial<{
   furnitureType: string;
   clientId: string;
   hasShortages: boolean;
+  unassigned: boolean;
 }>;
 
 export const queryKeys = {

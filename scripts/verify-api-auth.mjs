@@ -31,8 +31,8 @@ function collectApiRoutes(dir, acc = []) {
 /** Rutas API que exigen middleware + requireApiSession (deben figurar en protected-api-routes). */
 function isCatalogProtectedApiRoute(rel) {
   return (
-    rel.includes("/api/tasks/") ||
-    rel.endsWith("api/tasks/route.ts") ||
+    rel.includes("/api/orders/") ||
+    rel.endsWith("api/orders/route.ts") ||
     rel.includes("/api/categories/") ||
     rel.endsWith("api/categories/route.ts") ||
     rel.includes("/api/products/") ||
@@ -47,8 +47,8 @@ const middleware = read("middleware.ts");
 const apiAuth = read("src/lib/api-auth.ts");
 
 assert(
-  protectedRoutes.includes('"/api/tasks"'),
-  "protected-api-routes.ts: debe listar /api/tasks",
+  protectedRoutes.includes('"/api/orders"'),
+  "protected-api-routes.ts: debe listar /api/orders",
 );
 assert(
   protectedRoutes.includes('"/api/categories"'),
@@ -149,18 +149,18 @@ async function probe(path, { method = "GET", expectStatus, bodyIncludes, notRedi
 
 const httpCases = [
   {
-    name: "GET /api/tasks sin sesión → 401 JSON",
+    name: "GET /api/orders sin sesión → 401 JSON",
     run: () =>
-      probe("/api/tasks", {
+      probe("/api/orders", {
         expectStatus: 401,
         bodyIncludes: "No autenticado",
         notRedirect: true,
       }),
   },
   {
-    name: "POST /api/tasks sin sesión → 401 JSON",
+    name: "POST /api/orders sin sesión → 401 JSON",
     run: () =>
-      probe("/api/tasks", {
+      probe("/api/orders", {
         method: "POST",
         expectStatus: 401,
         bodyIncludes: "No autenticado",
@@ -168,9 +168,9 @@ const httpCases = [
       }),
   },
   {
-    name: "GET /api/tasks/fake-id sin sesión → 401 JSON",
+    name: "GET /api/orders/fake-id sin sesión → 401 JSON",
     run: () =>
-      probe("/api/tasks/test-id", {
+      probe("/api/orders/test-id", {
         expectStatus: 401,
         bodyIncludes: "No autenticado",
         notRedirect: true,

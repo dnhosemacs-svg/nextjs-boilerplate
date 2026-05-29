@@ -8,7 +8,9 @@ import {
   validationErrorResponse,
 } from "@/lib/api-route-utils";
 import { db } from "@/lib/db";
-import { serializeOrder } from "@/lib/serializers/order";
+import { denyIfWorkerNotAssigned } from "@/lib/order-access";
+import { orderDetailInclude } from "@/lib/order-queries";
+import { serializeOrderFromDetail } from "@/lib/serializers/order";
 import {
   ORDER_EDITABLE_FIELDS_BY_STATUS,
   setOrderMaterialLinesSchema,
@@ -31,11 +33,18 @@ export async function PUT(request: Request, { params }: IdRouteContext) {
 
   const order = await db.order.findUnique({
     where: { id },
-    select: { id: true, status: true },
+    select: { id: true, status: true, clientId: true },
   });
   if (!order) {
     return NextResponse.json({ error: "No encontrado" }, { status: 404 });
   }
+
+  const denied = await denyIfWorkerNotAssigned(
+    auth.session.user.role,
+    order.id,
+    auth.session.user.id,
+  );
+  if (denied) return denied;
 
   if (!ORDER_EDITABLE_FIELDS_BY_STATUS[order.status].includes("lines")) {
     return NextResponse.json(
@@ -75,11 +84,7 @@ export async function PUT(request: Request, { params }: IdRouteContext) {
 
     return tx.order.findUnique({
       where: { id },
-      include: {
-        materialLines: {
-          orderBy: { createdAt: "asc" },
-        },
-      },
+      include: orderDetailInclude,
     });
   });
 
@@ -87,5 +92,5 @@ export async function PUT(request: Request, { params }: IdRouteContext) {
     return NextResponse.json({ error: "No encontrado" }, { status: 404 });
   }
 
-  return NextResponse.json(serializeOrder(updatedOrder), { status: 200 });
+  return NextResponse.json(serializeOrderFromDetail(updatedOrder), { status: 200 });
 }

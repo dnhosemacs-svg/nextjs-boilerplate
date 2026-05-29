@@ -8,14 +8,15 @@ import {
   validationErrorResponse,
 } from "@/lib/api-route-utils";
 import { db } from "@/lib/db";
-import { denyIfClientNotOrderOwner } from "@/lib/order-access";
+import { denyIfOrderAccessDenied } from "@/lib/order-access";
+import { orderDetailInclude } from "@/lib/order-queries";
+import { serializeOrderFromDetail } from "@/lib/serializers/order";
 import { recordOrderStatusEvent } from "@/lib/order-status-events";
 import {
   approveOrder,
   cancelOrder,
   OrderWorkflowError,
 } from "@/lib/order-workflow";
-import { serializeOrder } from "@/lib/serializers/order";
 import { parseOrderTransition, transitionOrderSchema } from "@/lib/validators/order";
 import { UserRole } from "@/types/user-role";
 
@@ -40,9 +41,9 @@ export async function PATCH(request: Request, { params }: IdRouteContext) {
   if (!order) {
     return NextResponse.json({ error: "No encontrado" }, { status: 404 });
   }
-  const denied = denyIfClientNotOrderOwner(
+  const denied = await denyIfOrderAccessDenied(
     auth.session.user.role,
-    order.clientId,
+    order,
     auth.session.user.id,
   );
   if (denied) return denied;
@@ -72,17 +73,13 @@ export async function PATCH(request: Request, { params }: IdRouteContext) {
 
     const updatedOrder = await db.order.findUnique({
       where: { id },
-      include: {
-        materialLines: {
-          orderBy: { createdAt: "asc" },
-        },
-      },
+      include: orderDetailInclude,
     });
     if (!updatedOrder) {
       return NextResponse.json({ error: "No encontrado" }, { status: 404 });
     }
 
-    return NextResponse.json(serializeOrder(updatedOrder), { status: 200 });
+    return NextResponse.json(serializeOrderFromDetail(updatedOrder), { status: 200 });
   } catch (error) {
     if (!(error instanceof OrderWorkflowError)) throw error;
 

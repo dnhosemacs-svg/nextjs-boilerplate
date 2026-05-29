@@ -72,7 +72,6 @@ const middleware = read("middleware.ts");
 for (const route of [
   "/dashboard",
   "/stats",
-  "/tasks",
   "/products",
   "/categories",
   "/login",

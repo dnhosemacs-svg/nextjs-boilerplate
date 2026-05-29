@@ -1,59 +1,15 @@
-import Link from "next/link";
-import { getTaskStats } from "@/lib/task-stats";
-import { listTasksFromCookieStore } from "@/lib/tasks-cookie-store";
+import { getServerSession } from "next-auth";
+import { OrderStatsView } from "@/components/dashboard/order-stats-view";
+import { authOptions } from "@/lib/auth";
+import { UserRole } from "@/types/user-role";
 
 export default async function StatsPage() {
-  const tasks = await listTasksFromCookieStore();
-  const { total, pending, inProgress, done, completionRate } = getTaskStats(tasks);
-  const statCards = [
-    { label: "Total pedidos", value: total },
-    { label: "Pendientes", value: pending },
-    { label: "En proceso", value: inProgress },
-    { label: "Terminados", value: done },
-  ];
+  const session = await getServerSession(authOptions);
+  const role = session?.user?.role ?? UserRole.CLIENT;
 
   return (
     <main className="page-shell max-w-4xl items-start">
-      <section className="surface-card stats-layout">
-        <header className="stats-block flex flex-col gap-3">
-          <p className="eyebrow">Resumen operativo</p>
-          <h1 className="section-heading">Estadísticas del taller</h1>
-          <p className="stats-description">
-            Estado actual de los pedidos para planificar carga de trabajo y prioridades del equipo.
-          </p>
-        </header>
-
-        <div className="stats-grid stats-block">
-          {statCards.map((card) => (
-            <article
-              key={card.label}
-              className="stats-card"
-            >
-              <p className="eyebrow">{card.label}</p>
-              <p className="stats-value">
-                {card.value}
-              </p>
-            </article>
-          ))}
-        </div>
-
-        <article className="stats-highlight stats-block">
-          <p className="eyebrow">Rendimiento</p>
-          <p className="stats-highlight-label">
-            Tasa de finalización actual:
-          </p>
-          <p className="stats-highlight-value">{completionRate}%</p>
-        </article>
-
-        <div>
-          <Link
-            href="/"
-            className="ui-pill ui-pill-secondary"
-          >
-            Volver al inicio
-          </Link>
-        </div>
-      </section>
+      <OrderStatsView role={role} />
     </main>
   );
 }

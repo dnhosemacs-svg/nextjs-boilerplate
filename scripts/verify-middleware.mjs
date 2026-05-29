@@ -48,8 +48,8 @@ assert(
   "middleware.ts: debe usar isProtectedApiPath (lista en protected-api-routes.ts)",
 );
 assert(
-  protectedRoutes.includes('"/api/tasks"'),
-  "protected-api-routes.ts: debe listar /api/tasks",
+  protectedRoutes.includes('"/api/orders"'),
+  "protected-api-routes.ts: debe listar /api/orders",
 );
 assert(
   middleware.includes("getPostLoginDestination"),
@@ -62,7 +62,6 @@ assert(
 
 const matcherRoutes = [
   '"/dashboard/:path*"',
-  '"/tasks/:path*"',
   '"/stats"',
   '"/products"',
   '"/products/:path*"',
@@ -70,7 +69,7 @@ const matcherRoutes = [
   '"/categories/:path*"',
   '"/admin"',
   '"/admin/:path*"',
-  '"/api/tasks/:path*"',
+  '"/api/orders/:path*"',
   '"/login"',
   '"/register"',
 ];
@@ -181,17 +180,17 @@ const httpCases = [
       }),
   },
   {
-    name: "sin sesión /tasks/new → redirect login",
+    name: "sin sesión /orders/new → redirect login",
     run: () =>
-      probe("/tasks/new", {
+      probe("/orders/new", {
         expectRedirect: true,
         locationIncludes: "/login",
       }),
   },
   {
-    name: "sin sesión GET /api/tasks → 401 JSON",
+    name: "sin sesión GET /api/orders → 401 JSON",
     run: () =>
-      probe("/api/tasks", {
+      probe("/api/orders", {
         expectStatus: 401,
         bodyIncludes: "No autenticado",
       }),

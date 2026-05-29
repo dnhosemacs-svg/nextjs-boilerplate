@@ -5,7 +5,6 @@ export const ORDER_NAV_ITEMS = [
   { href: "/dashboard", label: "Panel" },
   { href: "/orders", label: "Pedidos" },
   { href: "/orders/new", label: "Nuevo pedido" },
-  { href: "/tasks/new", label: "Nuevo pedido (legacy)" },
   { href: "/stats", label: "Estadísticas" },
 ] as const;
 

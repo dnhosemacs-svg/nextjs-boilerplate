@@ -19,6 +19,12 @@ export type OrderShortageItemDto = {
   missingQty: string;
 };
 
+export type OrderAssignedWorkerDto = {
+  id: string;
+  email: string;
+  name: string | null;
+};
+
 export type OrderDto = {
   id: string;
   clientId: string;
@@ -30,10 +36,15 @@ export type OrderDto = {
   shortages: OrderShortageItemDto[] | null;
   laborAmount: string | null;
   materialLines: OrderMaterialLineDto[];
+  assignedWorkers: OrderAssignedWorkerDto[];
   materialsSubtotal: string;
   totalAmount: string;
   createdAt: string;
   updatedAt: string;
+};
+
+export type AssignOrderWorkersPayload = {
+  workerIds: string[];
 };
 
 export type CreateOrderPayload = {

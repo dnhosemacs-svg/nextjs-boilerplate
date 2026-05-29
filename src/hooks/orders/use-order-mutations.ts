@@ -2,6 +2,7 @@
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
+  assignOrderWorkers,
   confirmOrderActualConsumption,
   createOrder,
   setOrderMaterialLines,
@@ -10,6 +11,7 @@ import {
 } from "@/lib/orders-api";
 import { queryKeys } from "@/lib/query-keys";
 import type {
+  AssignOrderWorkersPayload,
   ConfirmOrderActualConsumptionPayload,
   CreateOrderPayload,
   SetOrderMaterialLinesPayload,
@@ -83,6 +85,19 @@ export function useConfirmOrderActualConsumptionMutation() {
       id: string;
       input: ConfirmOrderActualConsumptionPayload;
     }) => confirmOrderActualConsumption(id, input),
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.orders.all });
+      queryClient.invalidateQueries({ queryKey: queryKeys.orders.detail(variables.id) });
+    },
+  });
+}
+
+export function useAssignOrderWorkersMutation() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ id, input }: { id: string; input: AssignOrderWorkersPayload }) =>
+      assignOrderWorkers(id, input),
     onSuccess: (_data, variables) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.orders.all });
       queryClient.invalidateQueries({ queryKey: queryKeys.orders.detail(variables.id) });

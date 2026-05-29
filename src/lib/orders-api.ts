@@ -1,6 +1,7 @@
 import { parseResponse } from "@/lib/http/parse-response";
 import type { OrderListQuery } from "@/lib/query-keys";
 import type {
+  AssignOrderWorkersPayload,
   ConfirmOrderActualConsumptionPayload,
   CreateOrderPayload,
   OrderDto,
@@ -16,6 +17,7 @@ function ordersUrl(query?: OrderListQuery) {
   if (query?.furnitureType) params.set("furnitureType", query.furnitureType);
   if (query?.clientId) params.set("clientId", query.clientId);
   if (query?.hasShortages) params.set("hasShortages", "true");
+  if (query?.unassigned) params.set("unassigned", "true");
   const qs = params.toString();
   return qs ? `/api/orders?${qs}` : "/api/orders";
 }
@@ -97,6 +99,18 @@ export async function confirmOrderActualConsumption(
 ): Promise<OrderDto> {
   const response = await fetch(`/api/orders/${id}/consume`, {
     method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(input),
+  });
+  return parseResponse<OrderDto>(response);
+}
+
+export async function assignOrderWorkers(
+  id: string,
+  input: AssignOrderWorkersPayload,
+): Promise<OrderDto> {
+  const response = await fetch(`/api/orders/${id}/assign`, {
+    method: "PUT",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(input),
   });

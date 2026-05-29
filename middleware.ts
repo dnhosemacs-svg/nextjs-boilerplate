@@ -28,7 +28,6 @@ function hasValidToken(
 function isProtectedPage(pathname: string): boolean {
   if (pathname === "/stats") return true;
   if (pathname === "/dashboard" || pathname.startsWith("/dashboard/")) return true;
-  if (pathname === "/tasks" || pathname.startsWith("/tasks/")) return true;
   if (pathname === "/orders" || pathname.startsWith("/orders/")) return true;
   if (pathname === "/products" || pathname.startsWith("/products/")) return true;
   if (pathname === "/categories" || pathname.startsWith("/categories/")) return true;
@@ -147,7 +146,6 @@ export const config = {
   matcher: [
     "/dashboard",
     "/dashboard/:path*",
-    "/tasks/:path*",
     "/orders",
     "/orders/:path*",
     "/stats",
@@ -157,7 +155,6 @@ export const config = {
     "/categories/:path*",
     "/admin",
     "/admin/:path*",
-    "/api/tasks/:path*",
     "/api/products/:path*",
     "/api/categories/:path*",
     "/api/materials/:path*",

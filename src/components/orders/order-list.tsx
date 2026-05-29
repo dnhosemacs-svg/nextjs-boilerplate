@@ -43,6 +43,7 @@ export function OrderList({ orders, mode = "internal" }: OrderListProps) {
           <TableHead>Estado</TableHead>
           <TableHead>{isClientMode ? "Resumen" : "Tipo mueble"}</TableHead>
           <TableHead>{isClientMode ? "Total" : "Cliente"}</TableHead>
+          {isClientMode ? null : <TableHead>Operarios</TableHead>}
           <TableHead>Creado</TableHead>
           <TableHead>Acciones</TableHead>
         </TableRow>
@@ -54,6 +55,15 @@ export function OrderList({ orders, mode = "internal" }: OrderListProps) {
             <TableCell>{order.status}</TableCell>
             <TableCell>{isClientMode ? clientSummary(order) : order.furnitureType}</TableCell>
             <TableCell>{isClientMode ? `${order.totalAmount} EUR` : order.clientId}</TableCell>
+            {isClientMode ? null : (
+              <TableCell className="max-w-[200px] text-xs">
+                {order.assignedWorkers.length === 0
+                  ? "Sin asignar"
+                  : order.assignedWorkers
+                      .map((worker) => worker.name ?? worker.email)
+                      .join(", ")}
+              </TableCell>
+            )}
             <TableCell>{new Date(order.createdAt).toLocaleString()}</TableCell>
             <TableCell>
               <Link

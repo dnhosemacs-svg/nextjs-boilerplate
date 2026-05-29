@@ -133,8 +133,8 @@ assert(
 for (const rel of [
   "src/app/(app)/dashboard/page.tsx",
   "src/app/(app)/stats/page.tsx",
-  "src/app/(app)/tasks/new/page.tsx",
-  "src/app/(app)/tasks/[id]/page.tsx",
+  "src/app/(app)/orders/new/page.tsx",
+  "src/app/(app)/orders/[id]/page.tsx",
 ]) {
   const content = read(rel);
   assert(

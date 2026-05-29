@@ -8,11 +8,13 @@ import {
   validationErrorResponse,
 } from "@/lib/api-route-utils";
 import { db } from "@/lib/db";
+import { denyIfWorkerNotAssigned } from "@/lib/order-access";
 import {
   consumeRealMaterialsInProduction,
   OrderConsumptionError,
 } from "@/lib/order-reservations";
-import { serializeOrder } from "@/lib/serializers/order";
+import { orderDetailInclude } from "@/lib/order-queries";
+import { serializeOrderFromDetail } from "@/lib/serializers/order";
 import { confirmOrderActualConsumptionSchema } from "@/lib/validators/order";
 import { UserRole } from "@/types/user-role";
 
@@ -30,6 +32,21 @@ export async function POST(request: Request, { params }: IdRouteContext) {
 
   const { id } = await resolveRouteParams(params);
 
+  const order = await db.order.findUnique({
+    where: { id },
+    select: { id: true },
+  });
+  if (!order) {
+    return NextResponse.json({ error: "No encontrado" }, { status: 404 });
+  }
+
+  const denied = await denyIfWorkerNotAssigned(
+    auth.session.user.role,
+    order.id,
+    auth.session.user.id,
+  );
+  if (denied) return denied;
+
   try {
     const consumption = await consumeRealMaterialsInProduction(
       id,
@@ -39,11 +56,7 @@ export async function POST(request: Request, { params }: IdRouteContext) {
 
     const updatedOrder = await db.order.findUnique({
       where: { id },
-      include: {
-        materialLines: {
-          orderBy: { createdAt: "asc" },
-        },
-      },
+      include: orderDetailInclude,
     });
     if (!updatedOrder) {
       return NextResponse.json({ error: "No encontrado" }, { status: 404 });
@@ -51,7 +64,7 @@ export async function POST(request: Request, { params }: IdRouteContext) {
 
     return NextResponse.json(
       {
-        ...serializeOrder(updatedOrder),
+        ...serializeOrderFromDetail(updatedOrder),
         consumption,
       },
       { status: 200 },

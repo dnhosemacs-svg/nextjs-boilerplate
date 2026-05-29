@@ -1,11 +1,14 @@
 "use client";
 
+import { useSession } from "next-auth/react";
 import { OrderForm } from "@/components/orders/order-form";
+import { OrderWorkerAssignment } from "@/components/orders/order-worker-assignment";
 import { OrderLaborAmountEditor } from "@/components/orders/order-labor-amount-editor";
 import { OrderMaterialLinesEditor } from "@/components/orders/order-material-lines-editor";
 import { OrderRealConsumptionEditor } from "@/components/orders/order-real-consumption-editor";
 import { OrderStatusActions } from "@/components/orders/order-status-actions";
 import { useOrderQuery } from "@/hooks/orders/use-order-query";
+import { UserRole } from "@/types/user-role";
 
 type OrderDetailProps = {
   id: string;
@@ -28,6 +31,8 @@ function orderSummaryText(
 
 export function OrderDetail({ id, mode = "internal" }: OrderDetailProps) {
   const isClientMode = mode === "client";
+  const { data: session } = useSession();
+  const isAdmin = session?.user?.role === UserRole.ADMIN;
   const query = useOrderQuery(id);
 
   if (query.isLoading) {
@@ -77,6 +82,7 @@ export function OrderDetail({ id, mode = "internal" }: OrderDetailProps) {
       </header>
 
       <div className="space-y-4">
+        {!isClientMode && isAdmin ? <OrderWorkerAssignment order={order} /> : null}
         <OrderForm mode="edit" order={order} />
         {isClientMode ? null : <OrderMaterialLinesEditor order={order} />}
         {!isClientMode && order.status === "IN_PRODUCTION" ? (

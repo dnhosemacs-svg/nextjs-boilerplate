@@ -50,8 +50,10 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  stockMovements StockMovement[]
-  clientOrders   Order[]         @relation("OrderClient")
+  stockMovements      StockMovement[]
+  clientOrders        Order[]                   @relation("OrderClient")
+  workerAssignments   OrderWorkerAssignment[]   @relation("OrderWorkerAssignments")
+  assignmentsCreated  OrderWorkerAssignment[]   @relation("OrderAssignmentsAssignedBy")
 
   @@map("users")
 }
@@ -125,14 +127,31 @@ model Order {
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @updatedAt
 
-  materialLines   OrderMaterialLine[]
-  reservations    OrderReservation[]
-  stockMovements  StockMovement[]
-  statusEvents    OrderStatusEvent[]
+  materialLines       OrderMaterialLine[]
+  reservations        OrderReservation[]
+  stockMovements      StockMovement[]
+  statusEvents        OrderStatusEvent[]
+  workerAssignments   OrderWorkerAssignment[]
 
   @@index([clientId])
   @@index([status])
   @@map("orders")
+}
+
+model OrderWorkerAssignment {
+  id           String   @id @default(cuid())
+  orderId      String
+  order        Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  workerId     String
+  worker       User     @relation("OrderWorkerAssignments", fields: [workerId], references: [id], onDelete: Cascade)
+  assignedAt   DateTime @default(now())
+  assignedById String?
+  assignedBy   User?    @relation("OrderAssignmentsAssignedBy", fields: [assignedById], references: [id], onDelete: SetNull)
+
+  @@unique([orderId, workerId])
+  @@index([orderId])
+  @@index([workerId])
+  @@map("order_worker_assignments")
 }
 
 model OrderStatusEvent {

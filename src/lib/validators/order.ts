@@ -178,6 +178,15 @@ export const setLaborAmountSchema = z.object({
 
 export type SetLaborAmountInput = z.infer<typeof setLaborAmountSchema>;
 
+/** PUT /api/orders/:id/assign — solo ADMIN */
+export const assignOrderWorkersSchema = z.object({
+  workerIds: z
+    .array(z.string().trim().min(1, "Id de operario no válido"))
+    .max(20, "Demasiados operarios asignados"),
+});
+
+export type AssignOrderWorkersInput = z.infer<typeof assignOrderWorkersSchema>;
+
 /** Campos editables por estado (referencia para handlers) */
 export const ORDER_EDITABLE_FIELDS_BY_STATUS: Record<
   OrderStatus,

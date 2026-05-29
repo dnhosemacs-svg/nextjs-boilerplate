@@ -142,8 +142,8 @@ async function runAnonymousTests() {
   const protectedPages = [
     { path: "/dashboard", expectCallback: "/dashboard" },
     { path: "/stats", expectCallback: "/stats" },
-    { path: "/tasks/new", expectCallback: "/tasks/new" },
-    { path: "/tasks/demo-001", expectCallback: "/tasks/demo-001" },
+    { path: "/orders/new", expectCallback: "/orders/new" },
+    { path: "/orders", expectCallback: "/orders" },
   ];
 
   for (const { path, expectCallback } of protectedPages) {
@@ -175,9 +175,9 @@ async function runAnonymousTests() {
   }
 
   const apiCases = [
-    { path: "/api/tasks", method: "GET" },
-    { path: "/api/tasks", method: "POST", body: "{}" },
-    { path: "/api/tasks/fake-id", method: "GET" },
+    { path: "/api/orders", method: "GET" },
+    { path: "/api/orders", method: "POST", body: "{}" },
+    { path: "/api/orders/fake-id", method: "GET" },
   ];
 
   for (const { path, method, body } of apiCases) {
@@ -235,10 +235,10 @@ async function runAuthenticatedTests(cookie) {
     "con sesión /dashboard: 200 (sin redirect a login)",
   );
 
-  const tasks = await fetchManual(`${BASE_URL}/api/tasks`, { headers });
+  const tasks = await fetchManual(`${BASE_URL}/api/orders`, { headers });
   assert(
     tasks.status === 200,
-    "con sesión GET /api/tasks: 200",
+    "con sesión GET /api/orders: 200",
   );
 }
 
