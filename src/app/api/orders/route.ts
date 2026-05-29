@@ -61,6 +61,11 @@ export async function GET(request: Request) {
   const orders = await db.order.findMany({
     where,
     orderBy: { createdAt: "desc" },
+    include: {
+      materialLines: {
+        orderBy: { createdAt: "asc" },
+      },
+    },
   });
 
   return NextResponse.json(
