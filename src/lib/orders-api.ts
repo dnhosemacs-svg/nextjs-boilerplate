@@ -8,6 +8,7 @@ import type {
   UpdateOrderPayload,
 } from "@/types/order";
 import type { OrderStatus } from "@/types/order-status";
+import type { OrderStockMovementDto } from "@/types/stock";
 
 function ordersUrl(query?: OrderListQuery) {
   const params = new URLSearchParams();
@@ -33,6 +34,16 @@ export async function getOrderById(id: string): Promise<OrderDto> {
     cache: "no-store",
   });
   return parseResponse<OrderDto>(response);
+}
+
+export async function getOrderMovements(
+  orderId: string,
+): Promise<OrderStockMovementDto[]> {
+  const response = await fetch(`/api/orders/${orderId}/movements`, {
+    method: "GET",
+    cache: "no-store",
+  });
+  return parseResponse<OrderStockMovementDto[]>(response);
 }
 
 export async function createOrder(input: CreateOrderPayload): Promise<OrderDto> {
