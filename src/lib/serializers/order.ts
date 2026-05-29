@@ -47,9 +47,13 @@ export function serializeOrder(
     updatedAt: line.updatedAt.toISOString(),
   }));
 
-  const materialsSubtotal = (order.materialLines ?? [])
-    .reduce((acc, line) => acc + toNumber(line.plannedQty) * toNumber(line.unitCostSnapshot), 0)
-    .toFixed(2);
+  const materialsSubtotalNumber = (order.materialLines ?? []).reduce(
+    (acc, line) => acc + toNumber(line.plannedQty) * toNumber(line.unitCostSnapshot),
+    0,
+  );
+  const laborAmountNumber = order.laborAmount ? toNumber(order.laborAmount) : 0;
+  const materialsSubtotal = materialsSubtotalNumber.toFixed(2);
+  const totalAmount = (materialsSubtotalNumber + laborAmountNumber).toFixed(2);
 
   return {
     id: order.id,
@@ -66,6 +70,7 @@ export function serializeOrder(
     laborAmount: order.laborAmount?.toString() ?? null,
     materialLines: isClientAudience ? [] : materialLines,
     materialsSubtotal,
+    totalAmount,
     createdAt: order.createdAt.toISOString(),
     updatedAt: order.updatedAt.toISOString(),
   };

@@ -31,6 +31,7 @@ export type OrderDto = {
   laborAmount: string | null;
   materialLines: OrderMaterialLineDto[];
   materialsSubtotal: string;
+  totalAmount: string;
   createdAt: string;
   updatedAt: string;
 };
