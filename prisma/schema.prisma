@@ -128,10 +128,23 @@ model Order {
   materialLines   OrderMaterialLine[]
   reservations    OrderReservation[]
   stockMovements  StockMovement[]
+  statusEvents    OrderStatusEvent[]
 
   @@index([clientId])
   @@index([status])
   @@map("orders")
+}
+
+model OrderStatusEvent {
+  id        String      @id @default(cuid())
+  orderId   String
+  order     Order       @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  status    OrderStatus
+  changedAt DateTime    @default(now())
+  userId    String?
+
+  @@index([orderId])
+  @@map("order_status_events")
 }
 
 model OrderMaterialLine {

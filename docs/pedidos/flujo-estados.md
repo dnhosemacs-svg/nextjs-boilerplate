@@ -13,8 +13,9 @@ Tarjeta **1.3**: máquina de estados, roles y validadores. Implementación en c�
 | Aprobar / cancelar | `src/lib/order-workflow.ts` |
 | Reservas de pedido | `src/lib/order-reservations.ts` |
 | API estado pedido | `src/app/api/orders/[id]/status/route.ts` |
+| Historial estados (ML) | `src/lib/order-status-events.ts` → `order_status_events` |
 
-Ver también: [Matriz de permisos](../seguridad/roles-permisos.md).
+Ver también: [Matriz de permisos](../seguridad/roles-permisos.md), [Datos para ML](datos-ml.md).
 
 ---
 

@@ -177,3 +177,17 @@ Código: transiciones en `src/lib/order-transitions.ts`; aprobar en `approveOrde
 - [ ] Tras aprobar hay reservas activas; tras consumo en producción quedan inactivas
 - [ ] Pedido termina en **DELIVERED**
 - [ ] No hubo que cancelar ni saltar estados
+
+---
+
+## 4. Campos ML y timestamps por estado
+
+Documentación: [docs/pedidos/datos-ml.md](../../docs/pedidos/datos-ml.md).
+
+Tras el flujo feliz (§3) o cualquier secuencia de `PATCH .../status`:
+
+- [ ] Ejecutaste migración: `npx prisma migrate deploy` (o `migrate dev` en local)
+- [ ] En Prisma Studio → `order_status_events`: filas ordenadas por `changedAt` para tu `orderId`
+- [ ] Evento inicial `DRAFT` al `POST /api/orders`
+- [ ] Un evento por cada transición (`PENDING`, `APPROVED`, `IN_PRODUCTION`, `READY`, `DELIVERED`, etc.)
+- [ ] Tabla `order_material_lines` con `plannedQty` y `actualQty` en pedido entregado

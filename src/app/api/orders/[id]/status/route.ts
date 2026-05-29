@@ -9,6 +9,7 @@ import {
 } from "@/lib/api-route-utils";
 import { db } from "@/lib/db";
 import { denyIfClientNotOrderOwner } from "@/lib/order-access";
+import { recordOrderStatusEvent } from "@/lib/order-status-events";
 import {
   approveOrder,
   cancelOrder,
@@ -66,6 +67,8 @@ export async function PATCH(request: Request, { params }: IdRouteContext) {
         data: { status },
       });
     }
+
+    await recordOrderStatusEvent(id, status, auth.session.user.id);
 
     const updatedOrder = await db.order.findUnique({
       where: { id },

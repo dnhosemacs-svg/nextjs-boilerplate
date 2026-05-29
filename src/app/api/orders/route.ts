@@ -3,6 +3,7 @@ import { Prisma } from "@/generated/prisma/client";
 import { requireRole } from "@/lib/api-auth";
 import { parseJsonBody, validationErrorResponse } from "@/lib/api-route-utils";
 import { db } from "@/lib/db";
+import { recordOrderStatusEvent } from "@/lib/order-status-events";
 import { serializeOrder } from "@/lib/serializers/order";
 import { createOrderSchema } from "@/lib/validators/order";
 import { UserRole } from "@/types/user-role";
@@ -33,6 +34,8 @@ export async function POST(request: Request) {
       status: "DRAFT",
     },
   });
+
+  await recordOrderStatusEvent(created.id, "DRAFT", auth.session.user.id);
 
   return NextResponse.json(serializeOrder(created), { status: 201 });
 }
