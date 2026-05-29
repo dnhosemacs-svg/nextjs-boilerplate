@@ -21,6 +21,12 @@ export const ORDER_TRANSITIONS: OrderTransition[] = [
   { from: S.PENDING, to: S.CANCELLED, roles: [R.CLIENT, R.WORKER, R.ADMIN] },
   { from: S.APPROVED, to: S.CANCELLED, roles: [R.WORKER, R.ADMIN] },
   { from: S.IN_PRODUCTION, to: S.CANCELLED, roles: [R.WORKER, R.ADMIN] },
+  /** Reactivación tras cancelación errónea (solo ADMIN). */
+  { from: S.CANCELLED, to: S.PENDING, roles: [R.ADMIN] },
+  { from: S.CANCELLED, to: S.APPROVED, roles: [R.ADMIN] },
+  { from: S.CANCELLED, to: S.IN_PRODUCTION, roles: [R.ADMIN] },
+  { from: S.CANCELLED, to: S.READY, roles: [R.ADMIN] },
+  { from: S.CANCELLED, to: S.DRAFT, roles: [R.ADMIN] },
 ];
 
 const transitionKey = (from: OrderStatus, to: OrderStatus) => `${from}->${to}`;
@@ -43,6 +49,16 @@ export function canTransitionOrder(
 ): boolean {
   const rule = findOrderTransition(from, to);
   return rule?.roles.includes(role) ?? false;
+}
+
+/** Destinos permitidos desde un estado para un rol concreto. */
+export function getOrderTransitionTargets(
+  from: OrderStatus,
+  role: UserRole,
+): OrderStatus[] {
+  return ORDER_TRANSITIONS.filter(
+    (transition) => transition.from === from && transition.roles.includes(role),
+  ).map((transition) => transition.to);
 }
 
 /** Estados desde los que se puede cancelar */
