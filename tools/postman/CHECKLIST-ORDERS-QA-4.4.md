@@ -39,7 +39,66 @@ Verificación manual de seguridad, flujo y preparación IA.
 
 ## 2. Cancelar pedido libera reservas
 
-*(Pendiente — paso 2 del plan)*
+La lógica está en `cancelOrder` → `releaseReservationsOnCancel` (`src/lib/order-workflow.ts`, `src/lib/order-reservations.ts`). Este bloque comprueba que al cancelar desde **`APPROVED`** o **`IN_PRODUCTION`** el stock reservado vuelve a estar disponible.
+
+### Preparar pedido con reservas activas
+
+Cookie de **WORKER** o **ADMIN** salvo donde se indique.
+
+| # | Request | Body / notas | Esperado |
+| - | ------- | ------------ | -------- |
+| 1 | Login **CLIENT** (o WORKER con `clientId` en POST) | — | Cookie cliente/taller |
+| 2 | `POST /api/orders` | Ver JSON abajo | **201** → `orderId` |
+| 3 | `PUT /api/orders/{{orderId}}/materials` | `lines` con `materialId` + `plannedQty` | **200** |
+| 4 | `PATCH /api/orders/{{orderId}}/status` | `{ "status": "PENDING" }` | **200** |
+| 5 | Cookie **WORKER** | — | — |
+| 6 | `PATCH /api/orders/{{orderId}}/status` | `{ "status": "APPROVED" }` | **200** (crea `RESERVE` + reservas activas) |
+
+**POST pedido (paso 2):**
+
+```json
+{
+  "furnitureType": "ESTANTERIA",
+  "params": { "anchoCm": 100, "altoCm": 200, "profundidadCm": 30 },
+  "notes": "QA 4.4 — cancelar reservas"
+}
+```
+
+**PUT materiales (paso 3)** — sustituye `materialId` por un id real (Prisma Studio o `GET` materiales vía taller):
+
+```json
+{
+  "lines": [
+    { "materialId": "{{materialId}}", "plannedQty": 2 }
+  ]
+}
+```
+
+### Comprobar estado “antes de cancelar” (Prisma Studio)
+
+- [ ] `orders.status` = `APPROVED`
+- [ ] `order_reservations`: al menos una fila con `orderId` y `active = true`
+- [ ] `stock_movements`: movimientos `RESERVE` para ese `orderId`
+
+### Cancelar
+
+| # | Request | Esperado |
+| - | ------- | -------- |
+| 7 | `PATCH /api/orders/{{orderId}}/status` con `{ "status": "CANCELLED" }` (WORKER) | **200**, `status`: `CANCELLED` |
+
+Variante opcional: repetir el flujo hasta `IN_PRODUCTION` y cancelar desde ahí (misma liberación).
+
+### Comprobar estado “después de cancelar” (Prisma Studio)
+
+- [ ] `orders.status` = `CANCELLED`
+- [ ] `order_reservations` del pedido: todas con `active = false`
+- [ ] `stock_movements`: nuevos movimientos `RELEASE` con `reason` “Liberación al cancelar pedido” (o similar) y mismo `orderId`
+
+### Cierre sección 2
+
+- [ ] Tras **APPROVED** había reservas activas
+- [ ] Tras **CANCELLED** no queda ninguna reserva `active = true` para ese pedido
+- [ ] Existen movimientos **RELEASE** asociados al cancelar
 
 ---
 

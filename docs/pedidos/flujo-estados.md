@@ -73,7 +73,7 @@ flowchart LR
 | APPROVED → CANCELLED | — | ✓ | ✓ | Crea `RELEASE` y desactiva reservas activas |
 | IN_PRODUCTION → CANCELLED | — | ✓ | ✓ | Crea `RELEASE` y desactiva reservas activas |
 
-\* **CLIENT** solo en pedidos propios (`clientId === session.user.id`); se validará en la API (tarjeta 3.1).
+\* **CLIENT** solo en pedidos propios (`clientId === session.user.id`); si no, la API responde **403** (`src/lib/order-access.ts`).
 
 No hay transiciones desde `READY`, `DELIVERED` ni `CANCELLED`.
 
@@ -97,11 +97,13 @@ Al pasar a **`APPROVED`**:
 
 ## Cancelación y reservas
 
-Al pasar a **`CANCELLED`**:
+Al pasar a **`CANCELLED`** (vía `PATCH /api/orders/:id/status` → `cancelOrder`):
 
 1. Se crean movimientos `StockMovement` tipo `RELEASE` para cada reserva activa del pedido.
 2. Se desactivan reservas (`OrderReservation.active = false`).
-3. `markReservationsForRelease(orderId)` se mantiene por compatibilidad y delega en la liberación completa.
+3. `markReservationsForRelease(orderId)` se mantiene por compatibilidad y delega en `releaseReservationsOnCancel`.
+
+**Verificación manual (tarjeta 4.4):** [CHECKLIST-ORDERS-QA-4.4.md](../../tools/postman/CHECKLIST-ORDERS-QA-4.4.md) — sección 2.
 
 ---
 
