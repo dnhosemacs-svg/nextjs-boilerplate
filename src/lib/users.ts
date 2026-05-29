@@ -37,6 +37,19 @@ export async function getUserRoleById(id: string): Promise<UserRole | null> {
   return user.role as UserRole;
 }
 
+export async function getUserProfileById(id: string) {
+  const user = await db.user.findUnique({
+    where: { id },
+    select: { email: true, name: true, role: true },
+  });
+  if (!user) return null;
+  return {
+    email: user.email,
+    name: user.name,
+    role: user.role as UserRole,
+  };
+}
+
 const adminUserListSelect = {
   id: true,
   email: true,

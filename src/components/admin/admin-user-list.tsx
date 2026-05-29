@@ -25,6 +25,7 @@ function formatDate(value: string) {
 }
 
 function UserNameCell({ user }: { user: AdminUser }) {
+  const { data: session, update: updateSession } = useSession();
   const updateMutation = useUpdateUserMutation();
   const [value, setValue] = useState(user.name ?? "");
 
@@ -37,7 +38,16 @@ function UserNameCell({ user }: { user: AdminUser }) {
     const next = trimmed === "" ? null : trimmed;
     const current = user.name?.trim() || null;
     if (next === current) return;
-    updateMutation.mutate({ id: user.id, input: { name: trimmed } });
+    updateMutation.mutate(
+      { id: user.id, input: { name: trimmed } },
+      {
+        onSuccess: () => {
+          if (session?.user?.id === user.id) {
+            void updateSession();
+          }
+        },
+      },
+    );
   }
 
   return (

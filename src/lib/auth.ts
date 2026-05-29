@@ -3,7 +3,7 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import GitHubProvider from "next-auth/providers/github";
 import { CREDENTIALS_SIGN_IN_ERROR_CODES } from "@/lib/credentials-sign-in-errors";
 import { signInWithPassword } from "@/lib/firebase-auth-rest";
-import { getUserRoleById, upsertUserFromAuth } from "@/lib/users";
+import { getUserProfileById, getUserRoleById, upsertUserFromAuth } from "@/lib/users";
 import { getAuthSecret } from "@/lib/server-env";
 import { UserRole } from "@/types/user-role";
 
@@ -38,15 +38,15 @@ export const authOptions = {
           const role = await getUserRoleById(user.id);
           token.role = role ?? UserRole.CLIENT;
         }
-      } else if (trigger === "update" && token.sub) {
-        const role = await getUserRoleById(token.sub);
-        if (role) {
-          token.role = role;
-        }
-      } else if (token.sub && !token.role) {
-        const role = await getUserRoleById(token.sub);
-        if (role) {
-          token.role = role;
+      } else if (token.sub) {
+        const profile = await getUserProfileById(token.sub);
+        if (profile) {
+          token.email = profile.email;
+          token.name = profile.name;
+          token.role = profile.role;
+        } else if (!token.role) {
+          const role = await getUserRoleById(token.sub);
+          if (role) token.role = role;
         }
       }
       return token;

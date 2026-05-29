@@ -64,8 +64,12 @@ export default function PrivateHeader({ onOpenSidebar }: PrivateHeaderProps) {
 
             {userLabel ? (
               <span
-                className="hidden max-w-[11rem] shrink-0 truncate text-sm text-[var(--muted)] sm:inline"
-                title={session?.user?.email ?? undefined}
+                className="hidden max-w-[14rem] shrink-0 truncate text-sm font-medium text-[var(--foreground)] sm:inline"
+                title={
+                  session?.user?.name?.trim()
+                    ? (session?.user?.email ?? undefined)
+                    : undefined
+                }
               >
                 {userLabel}
               </span>

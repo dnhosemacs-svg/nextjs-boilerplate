@@ -41,8 +41,8 @@ function SiteHeaderAuth({
     <div className="site-header-actions" aria-busy={status === "loading"}>
       {userLabel ? (
         <span
-          className="hidden max-w-[11rem] shrink-0 truncate text-sm text-[var(--muted)] sm:inline"
-          title={sessionEmail ?? undefined}
+          className="hidden max-w-[14rem] shrink-0 truncate text-sm font-medium sm:inline"
+          title={sessionEmail && userLabel !== sessionEmail ? sessionEmail : undefined}
         >
           {userLabel}
         </span>
