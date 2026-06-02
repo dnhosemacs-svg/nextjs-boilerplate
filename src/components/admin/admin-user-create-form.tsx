@@ -96,7 +96,7 @@ export function AdminUserCreateForm() {
         control={form.control}
         render={({ field, fieldState }) => (
           <Field data-invalid={!!fieldState.error}>
-            <FieldLabel>Nombre (opcional)</FieldLabel>
+            <FieldLabel>Nombre</FieldLabel>
             <FieldContent>
               <Input {...field} />
               <FieldError errors={[fieldState.error]} />
