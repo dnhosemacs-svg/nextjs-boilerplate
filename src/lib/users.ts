@@ -13,17 +13,28 @@ type UpsertUserInput = {
  * El id debe ser el Firebase localId (mismo que session.user.id).
  */
 export async function upsertUserFromAuth(input: UpsertUserInput) {
-  return db.user.upsert({
+  const existing = await db.user.findUnique({
     where: { id: input.id },
-    create: {
-      id: input.id,
+    select: { id: true, name: true },
+  });
+
+  if (!existing) {
+    return db.user.create({
+      data: {
+        id: input.id,
+        email: input.email,
+        name: input.name ?? null,
+        role: input.role ?? UserRoleConst.CLIENT,
+      },
+    });
+  }
+
+  return db.user.update({
+    where: { id: input.id },
+    data: {
       email: input.email,
-      name: input.name ?? null,
-      role: input.role ?? UserRoleConst.CLIENT,
-    },
-    update: {
-      email: input.email,
-      ...(input.name !== undefined ? { name: input.name } : {}),
+      // No pisar nombres editados por admin/usuario en cada login.
+      ...(existing.name == null && input.name !== undefined ? { name: input.name } : {}),
     },
   });
 }
