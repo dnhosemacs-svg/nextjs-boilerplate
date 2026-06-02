@@ -70,7 +70,7 @@ function AdminStatusEditor({ order }: { order: OrderDto }) {
           value={selected}
           disabled={mutation.isPending}
           onChange={(event) => setSelected(event.target.value as OrderStatus | "")}
-          className="h-9 rounded-lg border border-input bg-transparent px-2 text-sm text-[var(--foreground)] outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 dark:bg-input/30"
+          className="warm-native-select h-9 rounded-lg border border-input px-2 text-sm text-[var(--foreground)] outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 dark:bg-input/30"
         >
           <option value="">Seleccionar…</option>
           {targets.map((status) => (

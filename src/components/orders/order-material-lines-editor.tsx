@@ -137,7 +137,7 @@ export function OrderMaterialLinesEditor({ order }: OrderMaterialLinesEditorProp
         {lines.map((line, index) => (
           <div key={`${index}-${line.materialId}`} className="grid grid-cols-1 gap-2 md:grid-cols-12">
             <select
-              className="h-8 rounded-lg border border-input bg-transparent px-2.5 text-sm md:col-span-7"
+              className="warm-native-select h-8 rounded-lg border border-input px-2.5 text-sm md:col-span-7"
               value={line.materialId}
               onChange={(e) => updateLine(index, { materialId: e.target.value })}
               disabled={isPending}

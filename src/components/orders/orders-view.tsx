@@ -3,6 +3,13 @@
 import { useSession } from "next-auth/react";
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { OrderList } from "@/components/orders/order-list";
 import { useOrdersQuery } from "@/hooks/orders/use-orders-query";
 import type { OrderStatus } from "@/types/order-status";
@@ -18,6 +25,7 @@ const ORDER_STATUS_OPTIONS: Array<{ value: "" | OrderStatus; label: string }> = 
   { value: "DELIVERED", label: "DELIVERED" },
   { value: "CANCELLED", label: "CANCELLED" },
 ];
+const ALL_STATUSES = "__all__";
 
 type OrdersViewProps = {
   mode?: "internal" | "client";
@@ -51,17 +59,26 @@ export function OrdersView({ mode = "internal" }: OrdersViewProps) {
       </header>
 
       <div className={`mb-5 grid grid-cols-1 gap-3 ${isClientMode ? "md:grid-cols-2" : "md:grid-cols-3"}`}>
-        <select
-          className="h-8 rounded-lg border border-input bg-transparent px-2.5 text-sm"
-          value={status}
-          onChange={(e) => setStatus(e.target.value as "" | OrderStatus)}
+        <Select
+          value={status || ALL_STATUSES}
+          onValueChange={(value) =>
+            setStatus(value === ALL_STATUSES ? "" : (value as OrderStatus))
+          }
         >
-          {ORDER_STATUS_OPTIONS.map((option) => (
-            <option key={option.label} value={option.value}>
-              {option.label}
-            </option>
-          ))}
-        </select>
+          <SelectTrigger className="w-full">
+            <SelectValue placeholder="Todos los estados" />
+          </SelectTrigger>
+          <SelectContent>
+            {ORDER_STATUS_OPTIONS.map((option) => (
+              <SelectItem
+                key={option.label}
+                value={option.value === "" ? ALL_STATUSES : option.value}
+              >
+                {option.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
         <Input
           placeholder="Filtrar por tipo de mueble"
           value={furnitureType}

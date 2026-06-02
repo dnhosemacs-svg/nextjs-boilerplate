@@ -5,6 +5,13 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
   Field,
   FieldContent,
   FieldError,
@@ -105,16 +112,18 @@ export function AdminUserCreateForm() {
           <Field data-invalid={!!fieldState.error}>
             <FieldLabel>Rol</FieldLabel>
             <FieldContent>
-              <select
-                {...field}
-                className="h-8 w-full rounded-lg border border-input bg-transparent px-2.5 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 dark:bg-input/30"
-              >
-                {ADMIN_CREATABLE_ROLES.map((role) => (
-                  <option key={role} value={role}>
-                    {roleLabel(role)}
-                  </option>
-                ))}
-              </select>
+              <Select value={field.value} onValueChange={field.onChange}>
+                <SelectTrigger className="w-full">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {ADMIN_CREATABLE_ROLES.map((role) => (
+                    <SelectItem key={role} value={role}>
+                      {roleLabel(role)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
               <FieldError errors={[fieldState.error]} />
             </FieldContent>
           </Field>

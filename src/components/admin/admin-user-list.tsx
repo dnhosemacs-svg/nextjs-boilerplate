@@ -5,6 +5,13 @@ import { useSession } from "next-auth/react";
 import { QueryErrorState } from "@/components/inventory/query-error-state";
 import { Badge } from "@/components/ui/badge";
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
   Table,
   TableBody,
   TableCell,
@@ -84,22 +91,25 @@ function UserRoleCell({ user }: { user: AdminUser }) {
   }
 
   return (
-    <select
+    <Select
       value={user.role}
       disabled={updateMutation.isPending}
-      onChange={(event) => {
-        const role = event.target.value as (typeof ADMIN_CREATABLE_ROLES)[number];
+      onValueChange={(value) => {
+        const role = value as (typeof ADMIN_CREATABLE_ROLES)[number];
         updateMutation.mutate({ id: user.id, input: { role } });
       }}
-      className="h-8 min-w-[8rem] rounded-lg border border-input bg-transparent px-2 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 dark:bg-input/30"
-      aria-label={`Rol de ${user.email}`}
     >
-      {ADMIN_CREATABLE_ROLES.map((role) => (
-        <option key={role} value={role}>
-          {roleLabel(role)}
-        </option>
-      ))}
-    </select>
+      <SelectTrigger className="h-8 min-w-[8rem]" aria-label={`Rol de ${user.email}`}>
+        <SelectValue />
+      </SelectTrigger>
+      <SelectContent>
+        {ADMIN_CREATABLE_ROLES.map((role) => (
+          <SelectItem key={role} value={role}>
+            {roleLabel(role)}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
   );
 }
 
