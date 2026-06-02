@@ -667,6 +667,8 @@ a {
 .warm-native-select {
   color: var(--foreground);
   background-color: var(--surface);
+  padding-inline: 0.75rem;
+  line-height: 1.25;
 }
 
 .warm-native-select option {
