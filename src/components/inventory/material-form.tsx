@@ -206,7 +206,7 @@ function MaterialFormFields({
   onSubmit,
 }: MaterialFormFieldsProps) {
   return (
-    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+    <form onSubmit={form.handleSubmit(onSubmit)} className="inventory-form">
       <FieldGroup>
         <Controller
           name="name"

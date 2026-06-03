@@ -36,22 +36,25 @@ export function OrderList({ orders, mode = "internal" }: OrderListProps) {
   }
 
   return (
-    <Table>
-      <TableHeader>
-        <TableRow>
-          <TableHead>ID</TableHead>
-          <TableHead>Estado</TableHead>
-          <TableHead>{isClientMode ? "Resumen" : "Tipo mueble"}</TableHead>
-          <TableHead>{isClientMode ? "Total" : "Cliente"}</TableHead>
-          {isClientMode ? null : <TableHead>Operarios</TableHead>}
-          <TableHead>Creado</TableHead>
-          <TableHead>Acciones</TableHead>
-        </TableRow>
-      </TableHeader>
+    <div className="workshop-table-wrap">
+      <Table className="workshop-table">
+        <TableHeader>
+          <TableRow>
+            <TableHead className="workshop-table-head-edge">ID</TableHead>
+            <TableHead>Estado</TableHead>
+            <TableHead>{isClientMode ? "Resumen" : "Tipo mueble"}</TableHead>
+            <TableHead>{isClientMode ? "Total" : "Cliente"}</TableHead>
+            {isClientMode ? null : <TableHead>Operarios</TableHead>}
+            <TableHead>Creado</TableHead>
+            <TableHead className="workshop-table-head-edge">Acciones</TableHead>
+          </TableRow>
+        </TableHeader>
       <TableBody>
         {orders.map((order) => (
           <TableRow key={order.id}>
-            <TableCell>{order.id.slice(0, 10)}...</TableCell>
+            <TableCell className="workshop-table-cell-edge font-medium">
+              {order.id.slice(0, 10)}...
+            </TableCell>
             <TableCell>{order.status}</TableCell>
             <TableCell>{isClientMode ? clientSummary(order) : order.furnitureType}</TableCell>
             <TableCell>{isClientMode ? `${order.totalAmount} EUR` : order.clientId}</TableCell>
@@ -65,7 +68,7 @@ export function OrderList({ orders, mode = "internal" }: OrderListProps) {
               </TableCell>
             )}
             <TableCell>{new Date(order.createdAt).toLocaleString()}</TableCell>
-            <TableCell>
+            <TableCell className="workshop-table-cell-edge">
               <Link
                 href={isClientMode ? `/my-orders/${order.id}` : `/orders/${order.id}`}
                 className="ui-pill ui-pill-secondary"
@@ -76,6 +79,7 @@ export function OrderList({ orders, mode = "internal" }: OrderListProps) {
           </TableRow>
         ))}
       </TableBody>
-    </Table>
+      </Table>
+    </div>
   );
 }

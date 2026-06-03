@@ -141,15 +141,16 @@ export function AdminUserList() {
 
   return (
     <>
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Correo</TableHead>
-            <TableHead>Nombre</TableHead>
-            <TableHead>Rol</TableHead>
-            <TableHead>Alta</TableHead>
-          </TableRow>
-        </TableHeader>
+      <div className="workshop-table-wrap">
+        <Table className="workshop-table">
+          <TableHeader>
+            <TableRow>
+              <TableHead>Correo</TableHead>
+              <TableHead>Nombre</TableHead>
+              <TableHead>Rol</TableHead>
+              <TableHead className="workshop-table-head-edge">Alta</TableHead>
+            </TableRow>
+          </TableHeader>
         <TableBody>
           {data.map((user) => (
             <TableRow key={user.id}>
@@ -160,11 +161,14 @@ export function AdminUserList() {
               <TableCell>
                 <UserRoleCell user={user} />
               </TableCell>
-              <TableCell>{formatDate(user.createdAt)}</TableCell>
+              <TableCell className="workshop-table-cell-edge">
+                {formatDate(user.createdAt)}
+              </TableCell>
             </TableRow>
           ))}
         </TableBody>
-      </Table>
+        </Table>
+      </div>
 
       {updateMutation.isError ? (
         <p className="mt-2 text-sm text-destructive">

@@ -1068,6 +1068,76 @@ button:focus-visible,
   border-bottom: 0;
 }
 
+/* Tablas del panel (pedidos, usuarios, etc.) — cabecera legible sobre fondo cálido */
+.workshop-list-section {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.workshop-table-wrap {
+  overflow-x: auto;
+  margin-top: 0.25rem;
+  border: 1px solid var(--line);
+  border-radius: 0.75rem;
+  background: var(--surface);
+  box-shadow: 0 10px 22px -22px rgb(45 34 25 / 0.45);
+}
+
+.workshop-table-wrap [data-slot="table"] {
+  min-width: 680px;
+}
+
+.workshop-table-wrap [data-slot="table-header"] [data-slot="table-row"] {
+  border-bottom: 1px solid color-mix(in srgb, var(--line) 90%, transparent);
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--surface-strong) 88%, var(--surface)) 0%,
+    var(--surface-strong) 100%
+  );
+}
+
+.workshop-table-wrap [data-slot="table-head"] {
+  height: auto;
+  padding: 1.15rem 1rem 0.9rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--foreground);
+  white-space: nowrap;
+}
+
+.workshop-table-wrap .workshop-table-head-edge {
+  padding-inline: 1.15rem;
+  background: color-mix(in srgb, var(--brand) 8%, var(--surface-strong));
+}
+
+.workshop-table-wrap [data-slot="table-cell"] {
+  padding: 0.9rem 1rem;
+  color: var(--foreground);
+  border-bottom: 1px solid color-mix(in srgb, var(--line) 55%, transparent);
+}
+
+.workshop-table-wrap .workshop-table-cell-edge {
+  padding-inline: 1.15rem;
+}
+
+.workshop-table-wrap [data-slot="table-body"] [data-slot="table-row"]:last-child [data-slot="table-cell"] {
+  border-bottom: 0;
+}
+
+.workshop-table-wrap [data-slot="table-body"] [data-slot="table-row"]:hover {
+  background: color-mix(in srgb, var(--brand) 5%, var(--surface));
+}
+
+.workshop-filters-bar {
+  padding: 1rem 1.1rem;
+  border: 1px solid var(--line);
+  border-radius: 0.75rem;
+  background: color-mix(in srgb, var(--surface-strong) 55%, var(--surface));
+}
+
 .private-shell {
   min-height: 100vh;
   display: flex;
@@ -1576,6 +1646,15 @@ button:focus-visible,
   width: 100%;
   padding-top: 1.1rem;
   border-top: 1px solid var(--line);
+}
+
+/* Formularios de inventario: mismo aire entre campos y botón de envío (gap-5) */
+.inventory-form {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1.25rem;
+  width: 100%;
 }
 
 .inventory-module.dark {

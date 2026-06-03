@@ -58,7 +58,10 @@ export function OrdersView({ mode = "internal" }: OrdersViewProps) {
         </p>
       </header>
 
-      <div className={`mb-5 grid grid-cols-1 gap-3 ${isClientMode ? "md:grid-cols-2" : "md:grid-cols-3"}`}>
+      <div className="workshop-list-section">
+      <div
+        className={`workshop-filters-bar grid grid-cols-1 gap-3 ${isClientMode ? "md:grid-cols-2" : "md:grid-cols-3"}`}
+      >
         <Select
           value={status || ALL_STATUSES}
           onValueChange={(value) =>
@@ -66,7 +69,12 @@ export function OrdersView({ mode = "internal" }: OrdersViewProps) {
           }
         >
           <SelectTrigger className="w-full">
-            <SelectValue placeholder="Todos los estados" />
+            <SelectValue placeholder="Todos los estados">
+              {status
+                ? (ORDER_STATUS_OPTIONS.find((o) => o.value === status)?.label ??
+                  status)
+                : "Todos los estados"}
+            </SelectValue>
           </SelectTrigger>
           <SelectContent>
             {ORDER_STATUS_OPTIONS.map((option) => (
@@ -94,7 +102,7 @@ export function OrdersView({ mode = "internal" }: OrdersViewProps) {
       </div>
 
       {isAdmin ? (
-        <label className="mb-5 flex items-center gap-2 text-sm">
+        <label className="flex items-center gap-2 text-sm">
           <input
             type="checkbox"
             checked={unassignedOnly}
@@ -107,6 +115,7 @@ export function OrdersView({ mode = "internal" }: OrdersViewProps) {
       {query.isLoading ? <p className="text-sm text-[var(--muted)]">Cargando pedidos...</p> : null}
       {query.error ? <p className="text-sm text-destructive">{query.error.message}</p> : null}
       {query.data ? <OrderList orders={query.data} mode={mode} /> : null}
+      </div>
     </section>
   );
 }
