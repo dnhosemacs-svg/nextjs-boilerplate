@@ -12,6 +12,8 @@
     "start": "next start",
     "lint": "eslint",
     "lint:fix": "eslint --fix",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
     "verify:auth": "node scripts/verify-auth.mjs",
     "verify:middleware": "node scripts/verify-middleware.mjs",
     "verify:callback-url": "node scripts/verify-callback-url.mjs",
