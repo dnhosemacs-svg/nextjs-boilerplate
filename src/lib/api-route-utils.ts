@@ -31,5 +31,5 @@ export async function resolveRouteParams<T extends Record<string, string>>(
 }
 
 export type IdRouteContext = {
-  params: { id: string } | Promise<{ id: string }>;
+  params: Promise<{ id: string }>;
 };
