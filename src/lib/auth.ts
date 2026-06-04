@@ -27,7 +27,7 @@ export const authOptions = {
       }
       return true;
     },
-    async jwt({ token, user, trigger }) {
+    async jwt({ token, user }) {
       if (user) {
         token.sub = user.id;
         token.email = user.email;
