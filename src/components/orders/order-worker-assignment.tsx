@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useAssignOrderWorkersMutation } from "@/hooks/orders/use-order-mutations";
 import { useUsersQuery } from "@/hooks/users";
@@ -29,9 +29,13 @@ export function OrderWorkerAssignment({ order, compact = false }: OrderWorkerAss
     order.assignedWorkers.map((worker) => worker.id),
   );
 
-  useEffect(() => {
+  const assignedKey = order.assignedWorkers.map((w) => w.id).join(",");
+  const [prevAssignedKey, setPrevAssignedKey] = useState(assignedKey);
+
+  if (assignedKey !== prevAssignedKey) {
+    setPrevAssignedKey(assignedKey);
     setSelectedIds(order.assignedWorkers.map((worker) => worker.id));
-  }, [order.assignedWorkers, order.id]);
+  }
 
   function toggleWorker(workerId: string) {
     setSelectedIds((current) =>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useSession } from "next-auth/react";
 
 import { Button } from "@/components/ui/button";
@@ -18,9 +18,13 @@ export function OrderLaborAmountEditor({ order }: OrderLaborAmountEditorProps) {
   const mutation = useUpdateOrderMutation();
   const [laborAmount, setLaborAmount] = useState(order.laborAmount ?? "");
 
-  useEffect(() => {
-    setLaborAmount(order.laborAmount ?? "");
-  }, [order.laborAmount]);
+  const laborKey = order.laborAmount ?? "";
+  const [prevLaborKey, setPrevLaborKey] = useState(laborKey);
+
+  if (laborKey !== prevLaborKey) {
+    setPrevLaborKey(laborKey);
+    setLaborAmount(laborKey);
+  }
 
   const role = session?.user?.role;
   const isWorkshop = role === UserRole.ADMIN || role === UserRole.WORKER;

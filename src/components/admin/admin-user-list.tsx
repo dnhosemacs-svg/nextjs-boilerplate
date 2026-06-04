@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useSession } from "next-auth/react";
 import { QueryErrorState } from "@/components/inventory/query-error-state";
 import { Badge } from "@/components/ui/badge";
@@ -36,9 +36,13 @@ function UserNameCell({ user }: { user: AdminUser }) {
   const updateMutation = useUpdateUserMutation();
   const [value, setValue] = useState(user.name ?? "");
 
-  useEffect(() => {
-    setValue(user.name ?? "");
-  }, [user.name]);
+  const nameKey = user.name ?? "";
+  const [prevNameKey, setPrevNameKey] = useState(nameKey);
+
+  if (nameKey !== prevNameKey) {
+    setPrevNameKey(nameKey);
+    setValue(nameKey);
+  }
 
   function save() {
     const trimmed = value.trim();
