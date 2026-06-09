@@ -1,9 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { Prisma } from "@/generated/prisma/client";
-import {
-  getMaterialStock,
-  StockServiceError,
-} from "@/lib/stock-service";
+import { getMaterialStock } from "@/lib/stock-service";
 
 const { findUnique, aggregate } = vi.hoisted(() => ({
   findUnique: vi.fn(),
