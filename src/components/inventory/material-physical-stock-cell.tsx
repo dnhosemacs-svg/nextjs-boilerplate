@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { useUpdateMaterialPhysicalMutation } from "@/hooks/inventory";
 
-const SAVE_DEBOUNCE_MS = 50;
+const SAVE_DEBOUNCE_MS = 1000;
 
 type MaterialPhysicalStockCellProps = {
   materialId: string;
@@ -21,11 +21,15 @@ export function MaterialPhysicalStockCell({
   physical,
 }: MaterialPhysicalStockCellProps) {
   const [value, setValue] = useState(() => toEditableValue(physical));
+  const inputRef = useRef<HTMLInputElement>(null);
+  const valueRef = useRef(value);
   const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const mutation = useUpdateMaterialPhysicalMutation();
 
+  valueRef.current = value;
+
   useEffect(() => {
-    if (!mutation.isPending) {
+    if (!mutation.isPending && document.activeElement !== inputRef.current) {
       setValue(toEditableValue(physical));
     }
   }, [physical, mutation.isPending]);
@@ -46,7 +50,7 @@ export function MaterialPhysicalStockCell({
     clearScheduledSave();
 
     const previousPhysical = Number(toEditableValue(physical));
-    const newPhysical = Number(nextValue ?? value);
+    const newPhysical = Number(nextValue ?? valueRef.current);
 
     if (!Number.isFinite(newPhysical) || newPhysical < 0) {
       setValue(toEditableValue(physical));
@@ -61,29 +65,36 @@ export function MaterialPhysicalStockCell({
     );
   }
 
-  function scheduleCommit(nextValue: string) {
+  function scheduleCommit() {
     clearScheduledSave();
     saveTimerRef.current = setTimeout(() => {
       saveTimerRef.current = null;
-      commit(nextValue);
+      commit(valueRef.current);
     }, SAVE_DEBOUNCE_MS);
   }
 
   return (
     <div className="flex flex-col gap-1">
       <Input
+        ref={inputRef}
         type="number"
         min={0}
         step={1}
         value={value}
         onChange={(event) => {
-          const next = event.target.value;
-          setValue(next);
-          scheduleCommit(next);
+          setValue(event.target.value);
+          scheduleCommit();
         }}
-        onBlur={() => commit()}
+        onBlur={() => {
+          window.setTimeout(() => {
+            if (inputRef.current === document.activeElement) return;
+            scheduleCommit();
+          }, 0);
+        }}
         onKeyDown={(event) => {
           if (event.key === "Enter") {
+            clearScheduledSave();
+            commit(valueRef.current);
             event.currentTarget.blur();
             return;
           }
@@ -94,7 +105,6 @@ export function MaterialPhysicalStockCell({
           }
         }}
         className="h-8 w-20 px-2 tabular-nums"
-        disabled={mutation.isPending}
         aria-label="Stock físico"
       />
       {mutation.isPending ? (
