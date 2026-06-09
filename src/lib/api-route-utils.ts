@@ -1,15 +1,16 @@
 import { NextResponse } from "next/server";
 import type { ZodError } from "zod";
 
+import { API_ERROR_MESSAGES, jsonApiError } from "@/lib/api-error";
+
 export function invalidJsonResponse() {
-  return NextResponse.json({ error: "Cuerpo JSON no válido" }, { status: 400 });
+  return jsonApiError(API_ERROR_MESSAGES.INVALID_JSON, 400);
 }
 
 export function validationErrorResponse(error: ZodError) {
-  return NextResponse.json(
-    { error: "Error de validación", issues: error.issues },
-    { status: 400 },
-  );
+  return jsonApiError(API_ERROR_MESSAGES.VALIDATION, 400, {
+    issues: error.issues,
+  });
 }
 
 export async function parseJsonBody(

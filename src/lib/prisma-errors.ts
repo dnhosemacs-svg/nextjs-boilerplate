@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { Prisma } from "@/generated/prisma/client";
+import { jsonApiError } from "@/lib/api-error";
 
 type PrismaWriteErrorMessages = {
   unique?: string;
@@ -16,11 +17,11 @@ export function handlePrismaWriteError(
   }
 
   if (error.code === "P2002" && messages.unique) {
-    return NextResponse.json({ error: messages.unique }, { status: 409 });
+    return jsonApiError(messages.unique, 409);
   }
 
   if (error.code === "P2003" && messages.foreignKey) {
-    return NextResponse.json({ error: messages.foreignKey }, { status: 400 });
+    return jsonApiError(messages.foreignKey, 400);
   }
 
   return null;

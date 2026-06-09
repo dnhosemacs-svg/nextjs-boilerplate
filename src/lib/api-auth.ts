@@ -2,11 +2,16 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import type { Session } from "next-auth";
 
+import { API_ERROR_MESSAGES, jsonApiError } from "@/lib/api-error";
 import { authOptions } from "@/lib/auth";
 import { isUserRole, type UserRole } from "@/types/user-role";
 
-export const API_UNAUTHORIZED_BODY = { error: "No autenticado" } as const;
-export const API_FORBIDDEN_BODY = { error: "Prohibido" } as const;
+export const API_UNAUTHORIZED_BODY = {
+  error: API_ERROR_MESSAGES.UNAUTHORIZED,
+} as const;
+export const API_FORBIDDEN_BODY = {
+  error: API_ERROR_MESSAGES.FORBIDDEN,
+} as const;
 
 type ApiSessionResult =
   | { ok: true; session: Session }
@@ -21,7 +26,7 @@ export async function requireApiSession(): Promise<ApiSessionResult> {
   if (!session?.user) {
     return {
       ok: false,
-      response: NextResponse.json(API_UNAUTHORIZED_BODY, { status: 401 }),
+      response: jsonApiError(API_ERROR_MESSAGES.UNAUTHORIZED, 401),
     };
   }
   return { ok: true, session };
@@ -40,7 +45,7 @@ export async function requireRole(
   if (!isUserRole(role) || !allowed.includes(role)) {
     return {
       ok: false,
-      response: NextResponse.json(API_FORBIDDEN_BODY, { status: 403 }),
+      response: jsonApiError(API_ERROR_MESSAGES.FORBIDDEN, 403),
     };
   }
 
