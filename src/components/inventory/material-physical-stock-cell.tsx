@@ -4,6 +4,8 @@ import { useEffect, useRef, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { useUpdateMaterialPhysicalMutation } from "@/hooks/inventory";
 
+const SAVE_DEBOUNCE_MS = 50;
+
 type MaterialPhysicalStockCellProps = {
   materialId: string;
   physical: string;
@@ -19,7 +21,7 @@ export function MaterialPhysicalStockCell({
   physical,
 }: MaterialPhysicalStockCellProps) {
   const [value, setValue] = useState(() => toEditableValue(physical));
-  const isTypingRef = useRef(false);
+  const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const mutation = useUpdateMaterialPhysicalMutation();
 
   useEffect(() => {
@@ -28,7 +30,21 @@ export function MaterialPhysicalStockCell({
     }
   }, [physical, mutation.isPending]);
 
+  useEffect(() => {
+    return () => {
+      if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
+    };
+  }, []);
+
+  function clearScheduledSave() {
+    if (!saveTimerRef.current) return;
+    clearTimeout(saveTimerRef.current);
+    saveTimerRef.current = null;
+  }
+
   function commit(nextValue?: string) {
+    clearScheduledSave();
+
     const previousPhysical = Number(toEditableValue(physical));
     const newPhysical = Number(nextValue ?? value);
 
@@ -45,6 +61,14 @@ export function MaterialPhysicalStockCell({
     );
   }
 
+  function scheduleCommit(nextValue: string) {
+    clearScheduledSave();
+    saveTimerRef.current = setTimeout(() => {
+      saveTimerRef.current = null;
+      commit(nextValue);
+    }, SAVE_DEBOUNCE_MS);
+  }
+
   return (
     <div className="flex flex-col gap-1">
       <Input
@@ -55,31 +79,18 @@ export function MaterialPhysicalStockCell({
         onChange={(event) => {
           const next = event.target.value;
           setValue(next);
-          if (!isTypingRef.current) {
-            commit(next);
-          }
+          scheduleCommit(next);
         }}
-        onBlur={() => {
-          isTypingRef.current = false;
-          commit();
-        }}
+        onBlur={() => commit()}
         onKeyDown={(event) => {
           if (event.key === "Enter") {
             event.currentTarget.blur();
             return;
           }
           if (event.key === "Escape") {
-            isTypingRef.current = false;
+            clearScheduledSave();
             setValue(toEditableValue(physical));
             event.currentTarget.blur();
-            return;
-          }
-          if (
-            event.key.length === 1 ||
-            event.key === "Backspace" ||
-            event.key === "Delete"
-          ) {
-            isTypingRef.current = true;
           }
         }}
         className="h-8 w-20 px-2 tabular-nums"
