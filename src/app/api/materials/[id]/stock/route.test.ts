@@ -4,7 +4,7 @@ import {
   authAs,
   authUnauthorized,
   parseResponse,
-  useRequireRoleMock,
+  bindRequireRoleMock,
 } from "@/test/api-auth-mock";
 import { API_ERROR_MESSAGES } from "@/lib/api-error";
 import { StockServiceError } from "@/lib/stock-service";
@@ -13,7 +13,7 @@ import { UserRole } from "@/types/user-role";
 const mockRequireRole = vi.hoisted(() => vi.fn());
 const mockGetMaterialStock = vi.hoisted(() => vi.fn());
 
-useRequireRoleMock(mockRequireRole);
+bindRequireRoleMock(mockRequireRole);
 
 vi.mock("@/lib/db", () => ({
   db: {},

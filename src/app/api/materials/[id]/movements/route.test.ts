@@ -5,7 +5,7 @@ import {
   authAs,
   authForbidden,
   parseResponse,
-  useRequireRoleMock,
+  bindRequireRoleMock,
 } from "@/test/api-auth-mock";
 import { UserRole } from "@/types/user-role";
 
@@ -14,7 +14,7 @@ const findUnique = vi.hoisted(() => vi.fn());
 const findMany = vi.hoisted(() => vi.fn());
 const recordMovement = vi.hoisted(() => vi.fn());
 
-useRequireRoleMock(mockRequireRole);
+bindRequireRoleMock(mockRequireRole);
 
 vi.mock("@/lib/api-auth", () => ({
   API_UNAUTHORIZED_BODY: { error: "No autenticado" },

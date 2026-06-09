@@ -13,7 +13,7 @@ type RequireRoleResult =
 let requireRoleMock: Mock<() => Promise<RequireRoleResult>> | undefined;
 
 /** Enlaza el mock hoisted del archivo de test (obligatorio una vez por suite). */
-export function useRequireRoleMock(
+export function bindRequireRoleMock(
   mock: Mock<() => Promise<RequireRoleResult>>,
 ) {
   requireRoleMock = mock;
@@ -22,7 +22,7 @@ export function useRequireRoleMock(
 function mockRequireRole() {
   if (!requireRoleMock) {
     throw new Error(
-      "useRequireRoleMock() debe llamarse antes de authAs/authUnauthorized/authForbidden",
+      "bindRequireRoleMock() debe llamarse antes de authAs/authUnauthorized/authForbidden",
     );
   }
   return requireRoleMock;

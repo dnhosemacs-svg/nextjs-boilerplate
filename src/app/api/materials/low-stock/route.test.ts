@@ -4,14 +4,14 @@ import {
   authAs,
   authUnauthorized,
   parseResponse,
-  useRequireRoleMock,
+  bindRequireRoleMock,
 } from "@/test/api-auth-mock";
 import { UserRole } from "@/types/user-role";
 
 const mockRequireRole = vi.hoisted(() => vi.fn());
 const listLowStockMaterials = vi.hoisted(() => vi.fn());
 
-useRequireRoleMock(mockRequireRole);
+bindRequireRoleMock(mockRequireRole);
 
 vi.mock("@/lib/api-auth", () => ({
   API_UNAUTHORIZED_BODY: { error: "No autenticado" },
