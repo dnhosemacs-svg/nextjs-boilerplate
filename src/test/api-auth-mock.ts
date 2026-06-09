@@ -1,14 +1,36 @@
 import { NextResponse } from "next/server";
-import { vi } from "vitest";
+import type { Mock } from "vitest";
 
 import type { UserRole } from "@/types/user-role";
 
-/** Mock hoisted: Vitest lo eleva antes de vi.mock */
-export const mockRequireRole = vi.hoisted(() => vi.fn());
+type RequireRoleResult =
+  | {
+      ok: true;
+      session: { user: { id: string; role: UserRole } };
+    }
+  | { ok: false; response: Response };
+
+let requireRoleMock: Mock<() => Promise<RequireRoleResult>> | undefined;
+
+/** Enlaza el mock hoisted del archivo de test (obligatorio una vez por suite). */
+export function useRequireRoleMock(
+  mock: Mock<() => Promise<RequireRoleResult>>,
+) {
+  requireRoleMock = mock;
+}
+
+function mockRequireRole() {
+  if (!requireRoleMock) {
+    throw new Error(
+      "useRequireRoleMock() debe llamarse antes de authAs/authUnauthorized/authForbidden",
+    );
+  }
+  return requireRoleMock;
+}
 
 /** Sesión autenticada con el rol indicado */
 export function authAs(role: UserRole, userId = "user-test-1") {
-  mockRequireRole.mockResolvedValue({
+  mockRequireRole().mockResolvedValue({
     ok: true,
     session: {
       user: { id: userId, role },
@@ -18,7 +40,7 @@ export function authAs(role: UserRole, userId = "user-test-1") {
 
 /** Simula 401 — sin sesión */
 export function authUnauthorized() {
-  mockRequireRole.mockResolvedValue({
+  mockRequireRole().mockResolvedValue({
     ok: false,
     response: NextResponse.json(
       { error: "No autenticado" },
@@ -29,7 +51,7 @@ export function authUnauthorized() {
 
 /** Simula 403 — rol sin permiso */
 export function authForbidden() {
-  mockRequireRole.mockResolvedValue({
+  mockRequireRole().mockResolvedValue({
     ok: false,
     response: NextResponse.json({ error: "Prohibido" }, { status: 403 }),
   });
