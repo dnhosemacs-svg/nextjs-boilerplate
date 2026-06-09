@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 
+import { API_ERROR_MESSAGES, jsonApiError } from "@/lib/api-error";
 import { requireRole } from "@/lib/api-auth";
 import { UserRole } from "@/types/user-role";
 import {
@@ -25,7 +26,7 @@ export async function GET(_request: Request, { params }: IdRouteContext) {
   });
 
   if (!material) {
-    return NextResponse.json({ error: "No encontrado" }, { status: 404 });
+    return jsonApiError(API_ERROR_MESSAGES.NOT_FOUND, 404);
   }
 
   return NextResponse.json(serializeMaterial(material), { status: 200 });
@@ -46,7 +47,7 @@ export async function PATCH(request: Request, { params }: IdRouteContext) {
 
   const existing = await db.material.findUnique({ where: { id } });
   if (!existing) {
-    return NextResponse.json({ error: "No encontrado" }, { status: 404 });
+    return jsonApiError(API_ERROR_MESSAGES.NOT_FOUND, 404);
   }
 
   const data = {
@@ -86,7 +87,7 @@ export async function DELETE(_request: Request, { params }: IdRouteContext) {
 
   const existing = await db.material.findUnique({ where: { id } });
   if (!existing) {
-    return NextResponse.json({ error: "No encontrado" }, { status: 404 });
+    return jsonApiError(API_ERROR_MESSAGES.NOT_FOUND, 404);
   }
 
   const deleted = await db.material.delete({ where: { id } });

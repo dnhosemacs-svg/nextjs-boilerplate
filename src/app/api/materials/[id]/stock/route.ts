@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 
+import { API_ERROR_MESSAGES, jsonApiError } from "@/lib/api-error";
 import { requireRole } from "@/lib/api-auth";
 import {
   type IdRouteContext,
@@ -25,7 +26,7 @@ export async function GET(_request: Request, { params }: IdRouteContext) {
       error instanceof StockServiceError &&
       error.code === "MATERIAL_NOT_FOUND"
     ) {
-      return NextResponse.json({ error: "No encontrado" }, { status: 404 });
+      return jsonApiError(API_ERROR_MESSAGES.NOT_FOUND, 404);
     }
     throw error;
   }

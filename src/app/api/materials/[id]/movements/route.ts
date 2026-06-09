@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 
+import { API_ERROR_MESSAGES, jsonApiError } from "@/lib/api-error";
 import { requireRole } from "@/lib/api-auth";
 import {
   type IdRouteContext,
@@ -33,7 +34,7 @@ export async function GET(_request: Request, { params }: IdRouteContext) {
     select: { id: true },
   });
   if (!material) {
-    return NextResponse.json({ error: "No encontrado" }, { status: 404 });
+    return jsonApiError(API_ERROR_MESSAGES.NOT_FOUND, 404);
   }
 
   const movements = await db.stockMovement.findMany({
@@ -69,7 +70,7 @@ export async function POST(request: Request, { params }: IdRouteContext) {
   const type = payload.type;
 
   if (type !== "IN" && type !== "ADJUST") {
-    return NextResponse.json({ error: "Tipo de movimiento no válido" }, { status: 400 });
+    return jsonApiError("Tipo de movimiento no válido", 400);
   }
 
   const auth =
@@ -112,13 +113,13 @@ export async function POST(request: Request, { params }: IdRouteContext) {
     if (!(error instanceof StockServiceError)) throw error;
 
     if (error.code === "MATERIAL_NOT_FOUND" || error.code === "ORDER_NOT_FOUND") {
-      return NextResponse.json({ error: "No encontrado" }, { status: 404 });
+      return jsonApiError(API_ERROR_MESSAGES.NOT_FOUND, 404);
     }
     if (error.code === "INSUFFICIENT_AVAILABLE") {
-      return NextResponse.json({ error: error.message }, { status: 409 });
+      return jsonApiError(error.message, 409);
     }
     if (error.code === "REASON_REQUIRED" || error.code === "INVALID_MOVEMENT") {
-      return NextResponse.json({ error: error.message }, { status: 400 });
+      return jsonApiError(error.message, 400);
     }
 
     throw error;
