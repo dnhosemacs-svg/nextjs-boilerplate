@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { useUpdateMaterialPhysicalMutation } from "@/hooks/inventory";
 
@@ -19,6 +19,7 @@ export function MaterialPhysicalStockCell({
   physical,
 }: MaterialPhysicalStockCellProps) {
   const [value, setValue] = useState(() => toEditableValue(physical));
+  const isTypingRef = useRef(false);
   const mutation = useUpdateMaterialPhysicalMutation();
 
   useEffect(() => {
@@ -27,9 +28,9 @@ export function MaterialPhysicalStockCell({
     }
   }, [physical, mutation.isPending]);
 
-  function commit() {
+  function commit(nextValue?: string) {
     const previousPhysical = Number(toEditableValue(physical));
-    const newPhysical = Number(value);
+    const newPhysical = Number(nextValue ?? value);
 
     if (!Number.isFinite(newPhysical) || newPhysical < 0) {
       setValue(toEditableValue(physical));
@@ -49,17 +50,36 @@ export function MaterialPhysicalStockCell({
       <Input
         type="number"
         min={0}
-        step="any"
+        step={1}
         value={value}
-        onChange={(event) => setValue(event.target.value)}
-        onBlur={commit}
+        onChange={(event) => {
+          const next = event.target.value;
+          setValue(next);
+          if (!isTypingRef.current) {
+            commit(next);
+          }
+        }}
+        onBlur={() => {
+          isTypingRef.current = false;
+          commit();
+        }}
         onKeyDown={(event) => {
           if (event.key === "Enter") {
             event.currentTarget.blur();
+            return;
           }
           if (event.key === "Escape") {
+            isTypingRef.current = false;
             setValue(toEditableValue(physical));
             event.currentTarget.blur();
+            return;
+          }
+          if (
+            event.key.length === 1 ||
+            event.key === "Backspace" ||
+            event.key === "Delete"
+          ) {
+            isTypingRef.current = true;
           }
         }}
         className="h-8 w-20 px-2 tabular-nums"
