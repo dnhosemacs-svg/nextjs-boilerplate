@@ -158,10 +158,16 @@ export async function getMaterialMovements(id: string): Promise<StockMovementIte
   return parseResponse<StockMovementItem[]>(response);
 }
 
-export type RecordMaterialMovementInput = {
-  type: "IN";
-  quantity: number;
-};
+export type RecordMaterialMovementInput =
+  | {
+      type: "IN";
+      quantity: number;
+    }
+  | {
+      type: "ADJUST";
+      quantity: number;
+      reason: string;
+    };
 
 export type RecordMaterialMovementResult = {
   movement: StockMovementItem;

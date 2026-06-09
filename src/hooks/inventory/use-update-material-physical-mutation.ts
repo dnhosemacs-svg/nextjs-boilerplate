@@ -4,17 +4,37 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { postMaterialMovement } from "@/lib/inventory-api";
 import { queryKeys } from "@/lib/query-keys";
 
-type RecordStockInVariables = {
+type UpdateMaterialPhysicalVariables = {
   materialId: string;
-  quantity: number;
+  previousPhysical: number;
+  newPhysical: number;
 };
 
-export function useRecordStockInMutation() {
+export function useUpdateMaterialPhysicalMutation() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ materialId, quantity }: RecordStockInVariables) =>
-      postMaterialMovement(materialId, { type: "IN", quantity }),
+    mutationFn: async ({
+      materialId,
+      previousPhysical,
+      newPhysical,
+    }: UpdateMaterialPhysicalVariables) => {
+      const delta = newPhysical - previousPhysical;
+
+      if (!Number.isFinite(delta) || delta === 0) {
+        throw new Error("Sin cambios en el stock");
+      }
+
+      if (delta > 0) {
+        return postMaterialMovement(materialId, { type: "IN", quantity: delta });
+      }
+
+      return postMaterialMovement(materialId, {
+        type: "ADJUST",
+        quantity: delta,
+        reason: "Ajuste desde listado",
+      });
+    },
 
     onSuccess: (result, { materialId }) => {
       queryClient.setQueryData(

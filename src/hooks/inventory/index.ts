@@ -17,4 +17,4 @@ export {
   useDeleteCategoryMutation,
 } from "./use-category-mutations";
 export { useUpdateStockMutation } from "./use-update-stock-mutation";
-export { useRecordStockInMutation } from "./use-record-stock-in-mutation";
+export { useUpdateMaterialPhysicalMutation } from "./use-update-material-physical-mutation";
