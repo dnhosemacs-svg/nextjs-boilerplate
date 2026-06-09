@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
+import { Prisma } from "@/generated/prisma/client";
 import {
   authAs,
   authUnauthorized,
@@ -11,6 +12,11 @@ import { UserRole } from "@/types/user-role";
 
 const mockRequireRole = vi.hoisted(() => vi.fn());
 const findMany = vi.hoisted(() => vi.fn());
+const create = vi.hoisted(() => vi.fn());
+
+function decimal(value: string) {
+  return { toString: () => value };
+}
 
 useRequireRoleMock(mockRequireRole);
 
@@ -22,7 +28,7 @@ vi.mock("@/lib/api-auth", () => ({
 
 vi.mock("@/lib/db", () => ({
   db: {
-    material: { findMany },
+    material: { findMany, create },
   },
 }));
 
@@ -77,6 +83,28 @@ describe("GET /api/materials", () => {
     expect(status).toBe(200);
     expect(body).toEqual([]);
   });
+
+  it("aplica filtro search en la consulta", async () => {
+    authAs(UserRole.WORKER);
+    findMany.mockResolvedValue([]);
+
+    await GET(
+      new Request("http://localhost/api/materials?search=tablero&sortBy=stock&sortOrder=desc"),
+    );
+
+    expect(findMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: {
+          OR: [
+            { name: { contains: "tablero", mode: "insensitive" } },
+            { sku: { contains: "tablero", mode: "insensitive" } },
+            { location: { contains: "tablero", mode: "insensitive" } },
+          ],
+        },
+        orderBy: { stock: "desc" },
+      }),
+    );
+  });
 });
 
 describe("POST /api/materials", () => {
@@ -101,5 +129,82 @@ describe("POST /api/materials", () => {
     expect(status).toBe(400);
     expect(body.error).toBe("Error de validación");
     expect(body.issues).toBeDefined();
+  });
+
+  it("devuelve 201 con body válido", async () => {
+    const createdAt = new Date("2024-06-01T10:00:00.000Z");
+    create.mockResolvedValue({
+      id: "mat-new",
+      name: "Tablero roble",
+      sku: null,
+      unit: "UD",
+      unitCost: decimal("25.5"),
+      stock: decimal("0"),
+      minStock: decimal("2"),
+      location: null,
+      categoryId: "cat-1",
+      createdAt,
+      updatedAt: createdAt,
+      category: {
+        id: "cat-1",
+        name: "Madera",
+        createdAt,
+        updatedAt: createdAt,
+      },
+    });
+
+    const res = await POST(
+      new Request("http://localhost/api/materials", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: "Tablero roble",
+          unit: "UD",
+          unitCost: 25.5,
+          minStock: 2,
+          categoryId: "cat-1",
+        }),
+      }),
+    );
+    const { status, body } = await parseResponse<{
+      id: string;
+      unitCost: string;
+      stock: string;
+      minStock: string;
+    }>(res);
+
+    expect(status).toBe(201);
+    expect(body.id).toBe("mat-new");
+    expect(body.unitCost).toBe("25.5");
+    expect(body.stock).toBe("0");
+    expect(body.minStock).toBe("2");
+  });
+
+  it("devuelve 409 si el SKU ya existe", async () => {
+    create.mockRejectedValue(
+      new Prisma.PrismaClientKnownRequestError("Unique constraint", {
+        code: "P2002",
+        clientVersion: "test",
+      }),
+    );
+
+    const res = await POST(
+      new Request("http://localhost/api/materials", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: "Tablero",
+          sku: "SKU-1",
+          unit: "UD",
+          unitCost: 10,
+          minStock: 0,
+          categoryId: "cat-1",
+        }),
+      }),
+    );
+    const { status, body } = await parseResponse<{ error: string }>(res);
+
+    expect(status).toBe(409);
+    expect(body.error).toBe("Ya existe un material con ese SKU");
   });
 });

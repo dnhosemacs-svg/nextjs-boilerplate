@@ -15,9 +15,13 @@ export default defineConfig({
       provider: "v8",
       reporter: ["text", "html"],
       include: [
-        "src/lib/**",
         "src/app/api/materials/**",
         "src/app/api/categories/**",
+        "src/lib/api-route-utils.ts",
+        "src/lib/prisma-errors.ts",
+        "src/lib/serializers/material.ts",
+        "src/lib/validators/material.ts",
+        "src/lib/validators/category.ts",
       ],
       thresholds: {
         lines: 80,

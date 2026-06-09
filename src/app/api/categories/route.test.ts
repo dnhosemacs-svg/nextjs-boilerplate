@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
+import { Prisma } from "@/generated/prisma/client";
 import {
   authAs,
   authUnauthorized,
@@ -141,5 +142,27 @@ describe("POST /api/categories", () => {
     expect(status).toBe(201);
     expect(body).toEqual({ id: "cat-new", name: "Herrajes" });
     expect(create).toHaveBeenCalledWith({ data: { name: "Herrajes" } });
+  });
+
+  it("devuelve 409 si el nombre ya existe", async () => {
+    authAs(UserRole.ADMIN);
+    create.mockRejectedValue(
+      new Prisma.PrismaClientKnownRequestError("Unique constraint", {
+        code: "P2002",
+        clientVersion: "test",
+      }),
+    );
+
+    const res = await POST(
+      new Request("http://localhost/api/categories", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: "Herrajes" }),
+      }),
+    );
+    const { status, body } = await parseResponse<{ error: string }>(res);
+
+    expect(status).toBe(409);
+    expect(body.error).toBe("Ya existe una categoría con ese nombre");
   });
 });
