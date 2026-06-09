@@ -158,6 +158,28 @@ export async function getMaterialMovements(id: string): Promise<StockMovementIte
   return parseResponse<StockMovementItem[]>(response);
 }
 
+export type RecordMaterialMovementInput = {
+  type: "IN";
+  quantity: number;
+};
+
+export type RecordMaterialMovementResult = {
+  movement: StockMovementItem;
+  stock: StockSnapshot;
+};
+
+export async function postMaterialMovement(
+  id: string,
+  input: RecordMaterialMovementInput,
+): Promise<RecordMaterialMovementResult> {
+  const response = await fetch(`/api/materials/${id}/movements`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(input),
+  });
+  return parseResponse<RecordMaterialMovementResult>(response);
+}
+
 export async function getCategories(): Promise<Category[]> {
   const response = await fetch("/api/categories", {
     method: "GET",

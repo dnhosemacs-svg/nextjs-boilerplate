@@ -20,6 +20,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { MaterialStockInControl } from "./material-stock-in-control";
 import { QueryErrorState } from "./query-error-state";
 
 function MaterialListSkeleton() {
@@ -114,7 +115,7 @@ export function MaterialList() {
       <div className="space-y-2">
       {isFetching ? <p className="text-xs text-muted-foreground">Actualizando...</p> : null}
       <div className="overflow-x-auto rounded-xl border">
-        <table className="w-full min-w-[1080px] text-sm">
+        <table className="w-full min-w-[1180px] text-sm">
           <thead className="bg-muted/40">
             <tr>
               <th className="px-3 py-2 text-left font-medium">Material</th>
@@ -126,6 +127,7 @@ export function MaterialList() {
               <th className="px-3 py-2 text-left font-medium">Fisico</th>
               <th className="px-3 py-2 text-left font-medium">Minimo</th>
               <th className="px-3 py-2 text-left font-medium">Ubicacion</th>
+              <th className="px-3 py-2 text-left font-medium">Entrada</th>
               <th className="px-3 py-2 text-left font-medium">Movimientos</th>
             </tr>
           </thead>
@@ -158,6 +160,9 @@ export function MaterialList() {
                   <td className="px-3 py-2 align-middle tabular-nums">{formatDecimal(minStock)}</td>
                   <td className="px-3 py-2 align-middle">
                     {material.location?.trim() || "Sin ubicacion"}
+                  </td>
+                  <td className="px-3 py-2 align-middle">
+                    <MaterialStockInControl materialId={material.id} />
                   </td>
                   <td className="px-3 py-2 align-middle">
                     <Button
