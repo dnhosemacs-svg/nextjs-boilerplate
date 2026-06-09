@@ -6,6 +6,7 @@ import {
   parseResponse,
   useRequireRoleMock,
 } from "@/test/api-auth-mock";
+import { API_ERROR_MESSAGES } from "@/lib/api-error";
 import { StockServiceError } from "@/lib/stock-service";
 import { UserRole } from "@/types/user-role";
 
@@ -90,6 +91,6 @@ describe("GET /api/materials/[id]/stock", () => {
     const { status, body } = await parseResponse(res);
 
     expect(status).toBe(404);
-    expect(body).toEqual({ error: "No encontrado" });
+    expect(body).toEqual({ error: API_ERROR_MESSAGES.NOT_FOUND });
   });
 });
