@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 
+import { API_ERROR_MESSAGES, jsonApiError } from "@/lib/api-error";
 import { requireRole } from "@/lib/api-auth";
 import { UserRole } from "@/types/user-role";
 import {
@@ -27,7 +28,7 @@ export async function PATCH(request: Request, { params }: IdRouteContext) {
 
   const existing = await db.category.findUnique({ where: { id } });
   if (!existing) {
-    return NextResponse.json({ error: "No encontrado" }, { status: 404 });
+    return jsonApiError(API_ERROR_MESSAGES.NOT_FOUND, 404);
   }
 
   try {
@@ -57,16 +58,13 @@ export async function DELETE(_request: Request, { params }: IdRouteContext) {
   });
 
   if (!category) {
-    return NextResponse.json({ error: "No encontrado" }, { status: 404 });
+    return jsonApiError(API_ERROR_MESSAGES.NOT_FOUND, 404);
   }
 
   if (category._count.materials > 0) {
-    return NextResponse.json(
-      {
-        error:
-          "No se puede eliminar la categoría porque tiene materiales asociados",
-      },
-      { status: 409 },
+    return jsonApiError(
+      "No se puede eliminar la categoría porque tiene materiales asociados",
+      409,
     );
   }
 
