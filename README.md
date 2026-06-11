@@ -1,5 +1,7 @@
 # TaskFlow Carpintería
 
+[![CI](https://github.com/dnhosemacs-svg/nextjs-boilerplate/actions/workflows/ci.yml/badge.svg)](https://github.com/dnhosemacs-svg/nextjs-boilerplate/actions/workflows/ci.yml)
+
 > Panel interno para gestionar pedidos del taller.
 
 Aplicación web de gestión para el taller de carpintería construida con Next.js App Router. Incluye **inventario** (categorías y productos en PostgreSQL/Neon), CRUD de pedidos, autenticación con NextAuth (Firebase + GitHub OAuth opcional), protección de rutas con middleware y panel de estadísticas.
