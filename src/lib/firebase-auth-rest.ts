@@ -1,3 +1,4 @@
+import { logServerError, logServerWarning } from "@/lib/observability";
 import { getFirebaseApiKey } from "@/lib/server-env";
 
 const FIREBASE_SIGN_IN_URL =
@@ -73,7 +74,9 @@ export async function signInWithPassword(
 ): Promise<FirebaseSignInResult> {
   const apiKey = getFirebaseApiKey();
   if (!apiKey) {
-    console.error("[firebase-auth] FIREBASE_API_KEY no configurada");
+    logServerError(new Error("FIREBASE_API_KEY no configurada"), {
+      module: "firebase-auth",
+    });
     return { ok: false, reason: "config" };
   }
 
@@ -94,7 +97,7 @@ export async function signInWithPassword(
 
     if (!response.ok) {
       const firebaseCode = parseFirebaseErrorMessage(body);
-      console.warn("[firebase-auth] signIn failed", {
+      logServerWarning("[firebase-auth] signIn failed", {
         status: response.status,
         code: firebaseCode ?? "unknown",
       });
@@ -103,14 +106,18 @@ export async function signInWithPassword(
 
     const user = parseFirebaseSuccess(body);
     if (!user) {
-      console.error("[firebase-auth] respuesta inesperada sin campos obligatorios");
+      logServerError(
+        new Error("Respuesta Firebase sin campos obligatorios"),
+        { module: "firebase-auth" },
+      );
       return { ok: false, reason: "unknown" };
     }
 
     return { ok: true, user };
   } catch (error) {
-    console.error("[firebase-auth] error de red", {
-      name: error instanceof Error ? error.name : "fetch_failed",
+    logServerError(error, {
+      module: "firebase-auth",
+      phase: "network",
     });
     return { ok: false, reason: "network" };
   }

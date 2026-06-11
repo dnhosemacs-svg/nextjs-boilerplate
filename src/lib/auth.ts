@@ -3,6 +3,7 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import GitHubProvider from "next-auth/providers/github";
 import { CREDENTIALS_SIGN_IN_ERROR_CODES } from "@/lib/credentials-sign-in-errors";
 import { signInWithPassword } from "@/lib/firebase-auth-rest";
+import { logServerError } from "@/lib/observability";
 import { getUserProfileById, getUserRoleById, upsertUserFromAuth } from "@/lib/users";
 import { getAuthSecret } from "@/lib/server-env";
 import { UserRole } from "@/types/user-role";
@@ -84,8 +85,9 @@ export const authOptions = {
 
         if (!result.ok) {
           if (result.reason === "config") {
-            console.error(
-              "[auth] CredentialsProvider: revisa FIREBASE_API_KEY en el entorno",
+            logServerError(
+              new Error("CredentialsProvider: FIREBASE_API_KEY no configurada"),
+              { module: "auth" },
             );
             throw new Error(CREDENTIALS_SIGN_IN_ERROR_CODES.CONFIG_ERROR);
           }

@@ -1,5 +1,6 @@
 import { Prisma } from "@/generated/prisma/client";
 import { db } from "@/lib/db";
+import { logServerWarning } from "@/lib/observability";
 
 type OrderShortageItem = {
   materialId: string;
@@ -321,7 +322,7 @@ export async function consumeRealMaterialsInProduction(
           actualQty: actualQty.toFixed(3),
           excessQty: excessQty.toFixed(3),
         });
-        console.warn("[orders.consume-real.overrun]", {
+        logServerWarning("[orders.consume-real.overrun]", {
           orderId,
           materialId: line.materialId,
           plannedQty: plannedQty.toFixed(3),
