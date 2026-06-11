@@ -156,7 +156,11 @@ export function MaterialList() {
                   <td className="px-3 py-2 align-middle tabular-nums">{formatDecimal(available)}</td>
                   <td className="px-3 py-2 align-middle tabular-nums">{formatDecimal(reserved)}</td>
                   <td className="px-3 py-2 align-middle">
-                    <MaterialPhysicalStockCell materialId={material.id} physical={physical} />
+                    <MaterialPhysicalStockCell
+                      key={`${material.id}-${physical}`}
+                      materialId={material.id}
+                      physical={physical}
+                    />
                   </td>
                   <td className="px-3 py-2 align-middle tabular-nums">{formatDecimal(minStock)}</td>
                   <td className="px-3 py-2 align-middle">

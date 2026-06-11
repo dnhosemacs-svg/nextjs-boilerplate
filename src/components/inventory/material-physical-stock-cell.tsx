@@ -22,17 +22,8 @@ export function MaterialPhysicalStockCell({
 }: MaterialPhysicalStockCellProps) {
   const [value, setValue] = useState(() => toEditableValue(physical));
   const inputRef = useRef<HTMLInputElement>(null);
-  const valueRef = useRef(value);
   const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const mutation = useUpdateMaterialPhysicalMutation();
-
-  valueRef.current = value;
-
-  useEffect(() => {
-    if (!mutation.isPending && document.activeElement !== inputRef.current) {
-      setValue(toEditableValue(physical));
-    }
-  }, [physical, mutation.isPending]);
 
   useEffect(() => {
     return () => {
@@ -50,7 +41,7 @@ export function MaterialPhysicalStockCell({
     clearScheduledSave();
 
     const previousPhysical = Number(toEditableValue(physical));
-    const newPhysical = Number(nextValue ?? valueRef.current);
+    const newPhysical = Number(nextValue ?? value);
 
     if (!Number.isFinite(newPhysical) || newPhysical < 0) {
       setValue(toEditableValue(physical));
@@ -65,11 +56,11 @@ export function MaterialPhysicalStockCell({
     );
   }
 
-  function scheduleCommit() {
+  function scheduleCommit(nextValue: string) {
     clearScheduledSave();
     saveTimerRef.current = setTimeout(() => {
       saveTimerRef.current = null;
-      commit(valueRef.current);
+      commit(nextValue);
     }, SAVE_DEBOUNCE_MS);
   }
 
@@ -82,19 +73,20 @@ export function MaterialPhysicalStockCell({
         step={1}
         value={value}
         onChange={(event) => {
-          setValue(event.target.value);
-          scheduleCommit();
+          const nextValue = event.target.value;
+          setValue(nextValue);
+          scheduleCommit(nextValue);
         }}
         onBlur={() => {
           window.setTimeout(() => {
             if (inputRef.current === document.activeElement) return;
-            scheduleCommit();
+            scheduleCommit(inputRef.current?.value ?? value);
           }, 0);
         }}
         onKeyDown={(event) => {
           if (event.key === "Enter") {
             clearScheduledSave();
-            commit(valueRef.current);
+            commit(event.currentTarget.value);
             event.currentTarget.blur();
             return;
           }
