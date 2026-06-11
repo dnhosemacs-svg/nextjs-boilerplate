@@ -8,6 +8,7 @@ import {
   resolveRouteParams,
   validationErrorResponse,
 } from "@/lib/api-route-utils";
+import { captureServerError } from "@/lib/capture-server-error";
 import { db } from "@/lib/db";
 import { recordMovement, StockServiceError } from "@/lib/stock-service";
 import {
@@ -110,7 +111,14 @@ export async function POST(request: Request, { params }: IdRouteContext) {
     });
     return NextResponse.json(result, { status: 201 });
   } catch (error) {
-    if (!(error instanceof StockServiceError)) throw error;
+    if (!(error instanceof StockServiceError)) {
+      captureServerError(error, {
+        route: "POST /api/materials/:id/movements",
+        tags: { module: "inventory" },
+        extra: { materialId: id, movementType: type },
+      });
+      throw error;
+    }
 
     if (error.code === "MATERIAL_NOT_FOUND" || error.code === "ORDER_NOT_FOUND") {
       return jsonApiError(API_ERROR_MESSAGES.NOT_FOUND, 404);
@@ -122,6 +130,11 @@ export async function POST(request: Request, { params }: IdRouteContext) {
       return jsonApiError(error.message, 400);
     }
 
+    captureServerError(error, {
+      route: "POST /api/materials/:id/movements",
+      tags: { module: "inventory", stockErrorCode: error.code },
+      extra: { materialId: id, movementType: type },
+    });
     throw error;
   }
 }

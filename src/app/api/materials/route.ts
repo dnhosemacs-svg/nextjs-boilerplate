@@ -5,6 +5,7 @@ import { requireRole } from "@/lib/api-auth";
 import { UserRole } from "@/types/user-role";
 import { parseJsonBody, validationErrorResponse } from "@/lib/api-route-utils";
 import { db } from "@/lib/db";
+import { captureServerError } from "@/lib/capture-server-error";
 import { handlePrismaWriteError } from "@/lib/prisma-errors";
 import { serializeMaterial } from "@/lib/serializers/material";
 import {
@@ -110,6 +111,11 @@ export async function POST(request: Request) {
       foreignKey: "La categoria indicada no existe",
     });
     if (prismaError) return prismaError;
+
+    captureServerError(error, {
+      route: "POST /api/materials",
+      tags: { module: "inventory" },
+    });
     throw error;
   }
 }

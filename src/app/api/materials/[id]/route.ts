@@ -9,6 +9,7 @@ import {
   resolveRouteParams,
   validationErrorResponse,
 } from "@/lib/api-route-utils";
+import { captureServerError } from "@/lib/capture-server-error";
 import { db } from "@/lib/db";
 import { handlePrismaWriteError } from "@/lib/prisma-errors";
 import { serializeMaterial } from "@/lib/serializers/material";
@@ -75,6 +76,11 @@ export async function PATCH(request: Request, { params }: IdRouteContext) {
       foreignKey: "La categoria indicada no existe",
     });
     if (prismaError) return prismaError;
+
+    captureServerError(error, {
+      route: "PATCH /api/materials/:id",
+      tags: { module: "inventory" },
+    });
     throw error;
   }
 }

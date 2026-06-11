@@ -6,6 +6,7 @@ import {
   type IdRouteContext,
   resolveRouteParams,
 } from "@/lib/api-route-utils";
+import { captureServerError } from "@/lib/capture-server-error";
 import {
   getMaterialStock,
   StockServiceError,
@@ -28,6 +29,12 @@ export async function GET(_request: Request, { params }: IdRouteContext) {
     ) {
       return jsonApiError(API_ERROR_MESSAGES.NOT_FOUND, 404);
     }
+
+    captureServerError(error, {
+      route: "GET /api/materials/:id/stock",
+      tags: { module: "inventory" },
+      extra: { materialId: id },
+    });
     throw error;
   }
 }
