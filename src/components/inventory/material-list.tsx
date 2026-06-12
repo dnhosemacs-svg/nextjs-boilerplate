@@ -87,6 +87,9 @@ export function MaterialList() {
     })),
   });
 
+  const stockLoadFailed = stockQueries.some((query) => query.isError);
+  const firstStockError = stockQueries.find((query) => query.isError)?.error;
+
   const stockByMaterialId = useMemo(() => {
     return new Map(
       materials.map((material, index) => [material.id, stockQueries[index]?.data]),
@@ -114,6 +117,18 @@ export function MaterialList() {
     <>
       <div className="space-y-2">
       {isFetching ? <p className="text-xs text-muted-foreground">Actualizando...</p> : null}
+      {stockLoadFailed ? (
+        <QueryErrorState
+          error={firstStockError}
+          fallbackMessage="Error al cargar stock de materiales"
+          onRetry={() => {
+            stockQueries.forEach((query) => {
+              if (query.isError) void query.refetch();
+            });
+          }}
+          className="rounded-xl border border-destructive/30 bg-destructive/10 p-4"
+        />
+      ) : null}
       <div className="overflow-x-auto rounded-xl border">
         <table className="w-full min-w-[1080px] text-sm">
           <thead className="bg-muted/40">
