@@ -1,7 +1,7 @@
 # TaskFlow Carpintería
 
 [![CI](https://github.com/dnhosemacs-svg/nextjs-boilerplate/actions/workflows/ci.yml/badge.svg)](https://github.com/dnhosemacs-svg/nextjs-boilerplate/actions/workflows/ci.yml)
-[![Coverage](https://img.shields.io/badge/coverage-86%25%20lines-brightgreen)](https://github.com/dnhosemacs-svg/nextjs-boilerplate/actions/workflows/ci.yml#:~:text=Test%20with%20coverage)
+[![codecov](https://codecov.io/gh/dnhosemacs-svg/nextjs-boilerplate/graph/badge.svg?branch=main)](https://codecov.io/gh/dnhosemacs-svg/nextjs-boilerplate)
 [![Next.js](https://img.shields.io/badge/Next.js-16-black)](https://nextjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-blue)](https://www.typescriptlang.org/)
 
@@ -25,7 +25,7 @@ La API vive en Route Handlers (`src/app/api/**`); no hay servidor Express aparte
 
 > **Nota:** El vídeo Loom cubre **solo el módulo de inventario** (`/products`, categorías y stock). Pedidos, panel por rol y administración están en este README y en la app desplegada, pero no forman parte de la grabación.
 
-**Badges:** CI enlaza al workflow real en GitHub Actions. Cobertura medida en CI con Vitest (v8) sobre `src/lib` + APIs de inventario; umbral ≥ 80 % en líneas y funciones ([`vitest.config.ts`](vitest.config.ts)). Codecov es opcional (tarjeta 4.6); el badge de cobertura apunta al job *Test with coverage* del mismo workflow.
+**Badges:** CI enlaza al workflow de GitHub Actions. Cobertura con Vitest (v8) sobre `src/lib` + APIs de inventario; umbral ≥ 80 % en líneas y funciones ([`vitest.config.ts`](vitest.config.ts)); reporte subido a [Codecov](https://codecov.io/gh/dnhosemacs-svg/nextjs-boilerplate) en cada push/PR.
 
 ---
 
@@ -494,4 +494,4 @@ Después: `npm run lint` y `npm run build`.
 - **Tasks legacy:** `/api/tasks` en cookie; la operativa del taller usa `/api/orders`.
 - **IA / BOM automático:** no desplegado (v1 = plantillas manuales; roadmap en [fase-2-ia](docs/pedidos/fase-2-ia.md)).
 - Panel de usuarios en `/admin/users` requiere Firebase Admin configurado en servidor.
-- **Codecov:** cobertura en CI vía Vitest; badge estático en README hasta conectar Codecov (tarjeta 4.6 opcional).
+- **Codecov:** reporte LCOV desde CI; badge dinámico en README (tarjeta 4.6).
