@@ -119,6 +119,7 @@ Documentación del módulo inventario:
 
 - [Referencia API REST](./api.md)
 - [Gestión de estado](./state-management.md)
+- [ADRs](./adr/) — decisiones formales (Neon, estado cliente, auth)
 
 Documentación de auth y navegación:
 
