@@ -12,6 +12,7 @@ const mockRequireRole = vi.hoisted(() => vi.fn());
 const findUnique = vi.hoisted(() => vi.fn());
 const update = vi.hoisted(() => vi.fn());
 const deleteMaterial = vi.hoisted(() => vi.fn());
+const captureServerError = vi.hoisted(() => vi.fn());
 
 function decimal(value: string) {
   return { toString: () => value };
@@ -29,6 +30,10 @@ vi.mock("@/lib/db", () => ({
   db: {
     material: { findUnique, update, delete: deleteMaterial },
   },
+}));
+
+vi.mock("@/lib/capture-server-error", () => ({
+  captureServerError,
 }));
 
 import { GET, PATCH, DELETE } from "./route";
@@ -128,6 +133,29 @@ describe("PATCH /api/materials/[id]", () => {
 
     expect(status).toBe(200);
     expect(body.name).toBe("Tablero roble");
+  });
+
+  it("relanza y reporta errores de base de datos no mapeados", async () => {
+    authAs(UserRole.ADMIN);
+    findUnique.mockResolvedValue(rawMaterial);
+    const dbError = new Error("db down");
+    update.mockRejectedValue(dbError);
+
+    await expect(
+      PATCH(
+        new Request(`http://localhost/api/materials/${MATERIAL_ID}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ name: "Tablero roble" }),
+        }),
+        routeContext,
+      ),
+    ).rejects.toThrow("db down");
+
+    expect(captureServerError).toHaveBeenCalledWith(dbError, {
+      route: "PATCH /api/materials/:id",
+      tags: { module: "inventory" },
+    });
   });
 });
 

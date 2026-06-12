@@ -13,6 +13,7 @@ import { UserRole } from "@/types/user-role";
 const mockRequireRole = vi.hoisted(() => vi.fn());
 const findMany = vi.hoisted(() => vi.fn());
 const create = vi.hoisted(() => vi.fn());
+const captureServerError = vi.hoisted(() => vi.fn());
 
 function decimal(value: string) {
   return { toString: () => value };
@@ -30,6 +31,10 @@ vi.mock("@/lib/db", () => ({
   db: {
     material: { findMany, create },
   },
+}));
+
+vi.mock("@/lib/capture-server-error", () => ({
+  captureServerError,
 }));
 
 import { GET, POST } from "./route";
@@ -206,5 +211,31 @@ describe("POST /api/materials", () => {
 
     expect(status).toBe(409);
     expect(body.error).toBe("Ya existe un material con ese SKU");
+  });
+
+  it("relanza y reporta errores de base de datos no mapeados", async () => {
+    const dbError = new Error("db down");
+    create.mockRejectedValue(dbError);
+
+    await expect(
+      POST(
+        new Request("http://localhost/api/materials", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            name: "Tablero",
+            unit: "UD",
+            unitCost: 10,
+            minStock: 0,
+            categoryId: "cat-1",
+          }),
+        }),
+      ),
+    ).rejects.toThrow("db down");
+
+    expect(captureServerError).toHaveBeenCalledWith(dbError, {
+      route: "POST /api/materials",
+      tags: { module: "inventory" },
+    });
   });
 });

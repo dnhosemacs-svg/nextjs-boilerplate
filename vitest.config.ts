@@ -23,6 +23,7 @@ export default defineConfig({
         "src/lib/validators/material.ts",
         "src/lib/validators/category.ts",
       ],
+      exclude: ["src/app/api/materials/**/__debug__/**"],
       thresholds: {
         lines: 80,
         functions: 80,

@@ -12,6 +12,7 @@ import { UserRole } from "@/types/user-role";
 
 const mockRequireRole = vi.hoisted(() => vi.fn());
 const mockGetMaterialStock = vi.hoisted(() => vi.fn());
+const captureServerError = vi.hoisted(() => vi.fn());
 
 bindRequireRoleMock(mockRequireRole);
 
@@ -32,6 +33,10 @@ vi.mock("@/lib/stock-service", async (importOriginal) => {
     getMaterialStock: mockGetMaterialStock,
   };
 });
+
+vi.mock("@/lib/capture-server-error", () => ({
+  captureServerError,
+}));
 
 import { GET } from "./route";
 
@@ -92,5 +97,23 @@ describe("GET /api/materials/[id]/stock", () => {
 
     expect(status).toBe(404);
     expect(body).toEqual({ error: API_ERROR_MESSAGES.NOT_FOUND });
+  });
+
+  it("relanza y reporta errores inesperados del servicio de stock", async () => {
+    const stockError = new Error("stock service down");
+    mockGetMaterialStock.mockRejectedValue(stockError);
+
+    await expect(
+      GET(
+        new Request(`http://localhost/api/materials/${MATERIAL_ID}/stock`),
+        { params: Promise.resolve({ id: MATERIAL_ID }) },
+      ),
+    ).rejects.toThrow("stock service down");
+
+    expect(captureServerError).toHaveBeenCalledWith(stockError, {
+      route: "GET /api/materials/:id/stock",
+      tags: { module: "inventory" },
+      extra: { materialId: MATERIAL_ID },
+    });
   });
 });

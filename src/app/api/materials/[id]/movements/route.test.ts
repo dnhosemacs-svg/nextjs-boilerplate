@@ -7,12 +7,14 @@ import {
   parseResponse,
   bindRequireRoleMock,
 } from "@/test/api-auth-mock";
+import { StockServiceError } from "@/lib/stock-service";
 import { UserRole } from "@/types/user-role";
 
 const mockRequireRole = vi.hoisted(() => vi.fn());
 const findUnique = vi.hoisted(() => vi.fn());
 const findMany = vi.hoisted(() => vi.fn());
 const recordMovement = vi.hoisted(() => vi.fn());
+const captureServerError = vi.hoisted(() => vi.fn());
 
 bindRequireRoleMock(mockRequireRole);
 
@@ -36,6 +38,10 @@ vi.mock("@/lib/stock-service", async (importOriginal) => {
     recordMovement,
   };
 });
+
+vi.mock("@/lib/capture-server-error", () => ({
+  captureServerError,
+}));
 
 import { GET, POST } from "./route";
 
@@ -153,5 +159,50 @@ describe("POST /api/materials/[id]/movements", () => {
         userId: "user-test-1",
       }),
     );
+  });
+
+  it("relanza y reporta errores inesperados al registrar movimiento", async () => {
+    const movementError = new Error("movement failed");
+    recordMovement.mockRejectedValue(movementError);
+
+    await expect(
+      POST(
+        new Request(`http://localhost/api/materials/${MATERIAL_ID}/movements`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ type: "IN", quantity: 3 }),
+        }),
+        routeContext,
+      ),
+    ).rejects.toThrow("movement failed");
+
+    expect(captureServerError).toHaveBeenCalledWith(movementError, {
+      route: "POST /api/materials/:id/movements",
+      tags: { module: "inventory" },
+      extra: { materialId: MATERIAL_ID, movementType: "IN" },
+    });
+  });
+
+  it("relanza y reporta códigos StockServiceError no mapeados", async () => {
+    const stockError = new StockServiceError("MATERIAL_NOT_FOUND", "Error interno");
+    Object.defineProperty(stockError, "code", { value: "UNKNOWN" });
+    recordMovement.mockRejectedValue(stockError);
+
+    await expect(
+      POST(
+        new Request(`http://localhost/api/materials/${MATERIAL_ID}/movements`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ type: "IN", quantity: 3 }),
+        }),
+        routeContext,
+      ),
+    ).rejects.toThrow("Error interno");
+
+    expect(captureServerError).toHaveBeenCalledWith(stockError, {
+      route: "POST /api/materials/:id/movements",
+      tags: { module: "inventory", stockErrorCode: "UNKNOWN" },
+      extra: { materialId: MATERIAL_ID, movementType: "IN" },
+    });
   });
 });
