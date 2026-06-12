@@ -13,7 +13,7 @@ export default defineConfig({
     passWithNoTests: true,
     coverage: {
       provider: "v8",
-      reporter: ["text", "html"],
+      reporter: ["text", "html", "lcov"],
       include: [
         "src/app/api/materials/**",
         "src/app/api/categories/**",
