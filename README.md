@@ -54,16 +54,18 @@ La API vive en Route Handlers (`src/app/api/**`); no hay servidor Express aparte
 
 ## Decisiones técnicas
 
-| Decisión | Elección | Alternativa | Motivo |
-| -------- | -------- | ----------- | ------ |
-| Arquitectura API | Next.js Route Handlers en el mismo repo | Express + SPA aparte | Un deploy en Vercel, tipos y Zod compartidos, middleware unificado ([`docs/arquitectura.md`](docs/arquitectura.md), [diagrama](docs/arquitectura/diagrama.png)) |
-| Base de datos | Neon PostgreSQL + Prisma 7 | SQLite / ORM distinto | Relaciones pedidos–stock; pooler para serverless (`DATABASE_URL` vs `DIRECT_URL`) |
-| Estado en cliente (inventario) | TanStack Query + Zustand | Solo `useState` / Redux | Query = datos del servidor; Zustand = filtros sin duplicar listas ([`docs/state-management.md`](docs/state-management.md)) |
-| Autenticación | NextAuth JWT + Firebase + Postgres | Solo Firebase en cliente | Sesión en SSR y APIs; rol de negocio en tabla `users` |
-| Stock | Libro mayor (`StockMovement`) + reservas | Campo `stock` único | Trazabilidad y pedidos que reservan material sin doble conteo |
-| Tiempo real | **No implementado** | Pusher / WebSockets | Flujo request–response; otra pestaña ve cambios tras refetch (F5). Pusher figura solo como **roadmap** en diagramas, no en dependencias ni env |
-| Duplicado `/api/products` | Mantener ambas rutas (deuda) | Borrar legacy ya | UI activa usa `/api/materials`; consolidación aplazada ([`docs/auditoria/deuda-tecnica.md`](docs/auditoria/deuda-tecnica.md)) |
-| Demo en vídeo | Solo inventario | Grabar pedidos y admin | Alcance del Loom ≤ 5 min; plataforma completa documentada aquí |
+Decisiones formales en [docs/adr/](docs/adr/) (ADR-001 a ADR-003).
+
+| Decisión | Elección | Alternativa | Motivo | ADR |
+| -------- | -------- | ----------- | ------ | --- |
+| Arquitectura API | Next.js Route Handlers en el mismo repo | Express + SPA aparte | Un deploy en Vercel, tipos y Zod compartidos, middleware unificado ([`docs/arquitectura.md`](docs/arquitectura.md), [diagrama](docs/arquitectura/diagrama.png)) | — |
+| Base de datos | Neon PostgreSQL + Prisma 7 | SQLite / ORM distinto | Relaciones pedidos–stock; pooler para serverless (`DATABASE_URL` vs `DIRECT_URL`) | [ADR-001](docs/adr/001-neon-prisma-serverless.md) |
+| Estado en cliente (inventario) | TanStack Query + Zustand | Solo `useState` / Redux | Query = datos del servidor; Zustand = filtros sin duplicar listas ([`docs/state-management.md`](docs/state-management.md)) | [ADR-002](docs/adr/002-tanstack-query-zustand-inventario.md) |
+| Autenticación | NextAuth JWT + Firebase + Postgres | Solo Firebase en cliente | Sesión en SSR y APIs; rol de negocio en tabla `users` | [ADR-003](docs/adr/003-auth-serverless-proxy-nextauth-firebase.md) |
+| Stock | Libro mayor (`StockMovement`) + reservas | Campo `stock` único | Trazabilidad y pedidos que reservan material sin doble conteo | — |
+| Tiempo real | **No implementado** | Pusher / WebSockets | Flujo request–response; otra pestaña ve cambios tras refetch (F5). Pusher figura solo como **roadmap** en diagramas, no en dependencias ni env | — |
+| Duplicado `/api/products` | Mantener ambas rutas (deuda) | Borrar legacy ya | UI activa usa `/api/materials`; consolidación aplazada ([`docs/auditoria/deuda-tecnica.md`](docs/auditoria/deuda-tecnica.md)) | — |
+| Demo en vídeo | Solo inventario | Grabar pedidos y admin | Alcance del Loom ≤ 5 min; plataforma completa documentada aquí | — |
 
 ---
 
@@ -92,6 +94,7 @@ Documentación técnica:
 
 - [Arquitectura](docs/arquitectura.md) — [diagrama PNG](docs/arquitectura/diagrama.png)
 - [API REST inventario](docs/api.md)
+- [ADRs — decisiones de arquitectura](docs/adr/)
 
 ---
 
@@ -135,6 +138,11 @@ nextjs-boilerplate/
 │   ├── schema.prisma
 │   └── seed.ts
 ├── docs/
+│   ├── adr/
+│   │   ├── README.md
+│   │   ├── 001-neon-prisma-serverless.md
+│   │   ├── 002-tanstack-query-zustand-inventario.md
+│   │   └── 003-auth-serverless-proxy-nextauth-firebase.md
 │   ├── arquitectura/
 │   │   ├── diagrama.png
 │   │   └── diagrama.mmd
@@ -173,6 +181,7 @@ Copia `.env.example` a `.env.local` y rellena las variables antes de desarrollar
 
 Documentación:
 
+- [Architecture Decision Records (ADR)](docs/adr/) — Neon/Prisma, Query+Zustand, Auth serverless
 - [Arquitectura del inventario (v1)](docs/arquitectura.md) — [diagrama de capas](docs/arquitectura/diagrama.png)
 - [Gestión de estado (Query + Zustand)](docs/state-management.md)
 - [Referencia API REST](docs/api.md)
