@@ -110,6 +110,47 @@ describe("GET /api/materials", () => {
       }),
     );
   });
+
+  it("devuelve 400 con query inválida", async () => {
+    authAs(UserRole.WORKER);
+
+    const res = await GET(
+      new Request("http://localhost/api/materials?sortBy=invalido"),
+    );
+    const { status, body } = await parseResponse<{ error: string }>(res);
+
+    expect(status).toBe(400);
+    expect(body.error).toBe("Error de validación");
+    expect(findMany).not.toHaveBeenCalled();
+  });
+
+  it("filtra por categoryId", async () => {
+    authAs(UserRole.WORKER);
+    findMany.mockResolvedValue([]);
+
+    await GET(new Request("http://localhost/api/materials?categoryId=cat-1"));
+
+    expect(findMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: { categoryId: "cat-1" },
+      }),
+    );
+  });
+
+  it("ordena por unitCost cuando se solicita", async () => {
+    authAs(UserRole.WORKER);
+    findMany.mockResolvedValue([]);
+
+    await GET(
+      new Request("http://localhost/api/materials?sortBy=unitCost&sortOrder=asc"),
+    );
+
+    expect(findMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        orderBy: { unitCost: "asc" },
+      }),
+    );
+  });
 });
 
 describe("POST /api/materials", () => {
