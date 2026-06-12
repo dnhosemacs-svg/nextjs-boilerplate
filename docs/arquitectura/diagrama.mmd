@@ -1,0 +1,59 @@
+%% Tarjeta 4.4 — Diagrama de arquitectura (fuente Mermaid / draw.io equivalente)
+%% Exportar: npx @mermaid-js/mermaid-cli -i docs/arquitectura/diagrama.mmd -o docs/arquitectura/diagrama.png -b white
+
+flowchart TB
+  subgraph Browser["Navegador (React)"]
+    direction TB
+    UI_INV["/products · /categories<br/>TanStack Query + Zustand"]
+    UI_ORD["/orders · /my-orders · /dashboard"]
+  end
+
+  subgraph Vercel["Vercel — Next.js serverless"]
+    direction TB
+    MW["middleware.ts · sesión y roles"]
+
+    subgraph Row[" "]
+      direction LR
+      subgraph INV["Inventario (núcleo)"]
+        direction TB
+        API_M["Route Handlers<br/>/api/materials · /api/categories"]
+        SS["stock-service · movimientos"]
+      end
+      subgraph ORD["Pedidos (módulo lateral)"]
+        direction TB
+        API_O["/api/orders<br/>estados · consumo"]
+        RES["OrderReservation → stock"]
+      end
+    end
+
+    subgraph AUTH["Autenticación"]
+      direction LR
+      NA["NextAuth JWT"]
+      FB["Firebase REST"]
+      GH["GitHub OAuth"]
+    end
+
+    PRISMA["Prisma Client · src/lib/db.ts"]
+  end
+
+  subgraph Neon["Neon — PostgreSQL"]
+    DB[("categories · materials<br/>stock_movements<br/>orders · order_reservations · users")]
+  end
+
+  UI_INV -->|"HTTPS + cookie sesión"| MW
+  UI_ORD -->|"HTTPS + cookie sesión"| MW
+  MW --> API_M
+  MW --> API_O
+  API_M --> AUTH
+  API_O --> AUTH
+  API_O -.->|"reserva / consumo"| SS
+  API_M --> SS
+  SS --> PRISMA
+  API_O --> PRISMA
+  API_M --> PRISMA
+  PRISMA -->|"DATABASE_URL pooled"| DB
+
+  style INV fill:#e8f4fd,stroke:#1a73e8,stroke-width:3px
+  style ORD fill:#fef7e0,stroke:#f9ab00,stroke-width:2px
+  style AUTH fill:#e6f4ea,stroke:#34a853,stroke-width:2px
+  style Row fill:none,stroke:none

@@ -56,7 +56,7 @@ La API vive en Route Handlers (`src/app/api/**`); no hay servidor Express aparte
 
 | Decisión | Elección | Alternativa | Motivo |
 | -------- | -------- | ----------- | ------ |
-| Arquitectura API | Next.js Route Handlers en el mismo repo | Express + SPA aparte | Un deploy en Vercel, tipos y Zod compartidos, middleware unificado ([`docs/arquitectura.md`](docs/arquitectura.md)) |
+| Arquitectura API | Next.js Route Handlers en el mismo repo | Express + SPA aparte | Un deploy en Vercel, tipos y Zod compartidos, middleware unificado ([`docs/arquitectura.md`](docs/arquitectura.md), [diagrama](docs/arquitectura/diagrama.png)) |
 | Base de datos | Neon PostgreSQL + Prisma 7 | SQLite / ORM distinto | Relaciones pedidos–stock; pooler para serverless (`DATABASE_URL` vs `DIRECT_URL`) |
 | Estado en cliente (inventario) | TanStack Query + Zustand | Solo `useState` / Redux | Query = datos del servidor; Zustand = filtros sin duplicar listas ([`docs/state-management.md`](docs/state-management.md)) |
 | Autenticación | NextAuth JWT + Firebase + Postgres | Solo Firebase en cliente | Sesión en SSR y APIs; rol de negocio en tabla `users` |
@@ -90,7 +90,7 @@ Módulo de categorías y productos persistidos en **PostgreSQL** (recomendado **
 
 Documentación técnica:
 
-- [Arquitectura](docs/arquitectura.md)
+- [Arquitectura](docs/arquitectura.md) — [diagrama PNG](docs/arquitectura/diagrama.png)
 - [API REST inventario](docs/api.md)
 
 ---
@@ -135,6 +135,9 @@ nextjs-boilerplate/
 │   ├── schema.prisma
 │   └── seed.ts
 ├── docs/
+│   ├── arquitectura/
+│   │   ├── diagrama.png
+│   │   └── diagrama.mmd
 │   ├── arquitectura.md
 │   ├── api.md
 │   └── state-management.md
@@ -170,7 +173,7 @@ Copia `.env.example` a `.env.local` y rellena las variables antes de desarrollar
 
 Documentación:
 
-- [Arquitectura del inventario (v1)](docs/arquitectura.md)
+- [Arquitectura del inventario (v1)](docs/arquitectura.md) — [diagrama de capas](docs/arquitectura/diagrama.png)
 - [Gestión de estado (Query + Zustand)](docs/state-management.md)
 - [Referencia API REST](docs/api.md)
 - [OAuth 2.0 / GitHub](docs/seguridad/oauth.md)

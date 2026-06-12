@@ -10,6 +10,30 @@ Sistema de inventario para el taller de carpintería. Tres capas:
 2. **Next.js** — App Router, Server Components (RSC), Route Handlers (`/api/*`) y middleware.
 3. **PostgreSQL** — Persistencia relacional (Neon en la nube), accedida desde el servidor vía Prisma.
 
+## Diagrama de arquitectura (tarjeta 4.4)
+
+![Diagrama de arquitectura — inventario en el núcleo, pedidos lateral](./arquitectura/diagrama.png)
+
+| Bloque | Contenido |
+|--------|-----------|
+| **Navegador** | React: inventario (`/products`, Query + Zustand) y pedidos (`/orders`, `/my-orders`) |
+| **Vercel / Next.js** | Middleware, Route Handlers; **inventario** como núcleo (`/api/materials`, `stock-service`); **pedidos** en caja lateral (`/api/orders`, reservas) |
+| **Autenticación** | NextAuth (JWT), Firebase REST (credenciales), GitHub OAuth opcional |
+| **Neon** | PostgreSQL: materiales, movimientos, pedidos, reservas y usuarios |
+
+Fuente editable: [`docs/arquitectura/diagrama.mmd`](./arquitectura/diagrama.mmd) (Mermaid; equivalente a Excalidraw/draw.io). Regenerar PNG:
+
+```bash
+npx @mermaid-js/mermaid-cli -i docs/arquitectura/diagrama.mmd -o docs/arquitectura/diagrama.png -b white -w 1400
+```
+
+### Checklist tarjeta 4.4 — diagrama
+
+- [x] Navegador, Vercel, Neon y auth (NextAuth + Firebase) en el diagrama
+- [x] Inventario centrado; pedidos como módulo lateral
+- [x] Exportado en `docs/arquitectura/diagrama.png`
+- [x] Enlazado desde este documento y `README.md`
+
 ## Diagrama de capas (ASCII)
 
 ```
@@ -241,3 +265,4 @@ Marcar cuando todo pase:
 - **v1.1** — Modelo de datos en docs: diagrama Category–Product, precios Decimal, `DATABASE_URL` vs `DIRECT_URL`.
 - **v1.2** — Entrega: estado del repo alineado con inventario implementado; checklists 4.6 y gate de entrega.
 - **v1.3** — Migración UI de inventario a almacén: Product → Material, stock derivado y movimientos por material.
+- **v1.4** — Tarjeta 4.4: diagrama PNG (`docs/arquitectura/diagrama.png`), inventario en núcleo y pedidos lateral.
