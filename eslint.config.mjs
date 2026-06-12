@@ -17,6 +17,12 @@ const eslintConfig = defineConfig([
       ],
     },
   },
+  {
+    files: ["src/**/*.{ts,tsx}"],
+    rules: {
+      "no-console": ["error", { allow: ["warn", "error", "debug"] }],
+    },
+  },
   // Override default ignores of eslint-config-next.
   globalIgnores([
     // Default ignores of eslint-config-next:
