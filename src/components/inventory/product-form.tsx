@@ -153,7 +153,9 @@ function ProductFormEdit({
       price: Number(product.price),
       categoryId: product.categoryId,
     });
-  }, [product, form]);
+    // Solo resetear al cambiar de producto en edición
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [product?.id]);
 
   function onSubmit(values: EditProductFormValues) {
     if (!product) return;

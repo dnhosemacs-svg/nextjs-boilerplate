@@ -37,10 +37,11 @@ export function CategoryForm({ mode, category, onDone }: CategoryFormProps) {
   });
 
   useEffect(() => {
-    if (category) {
-      form.reset({ name: category.name });
-    }
-  }, [category, form]);
+    if (!category) return;
+    form.reset({ name: category.name });
+    // Solo resetear al cambiar de categoría en edición
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [category?.id]);
 
   function onSubmit(values: CreateCategoryInput) {
     if (mode === "create") {

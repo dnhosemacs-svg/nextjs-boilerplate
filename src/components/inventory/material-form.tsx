@@ -152,7 +152,9 @@ function MaterialFormEdit({
       location: material.location ?? "",
       categoryId: material.categoryId,
     });
-  }, [material, form]);
+    // Solo resetear al cambiar de material en edición
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [material?.id]);
 
   function onSubmit(values: MaterialFormValues) {
     if (!material) return;

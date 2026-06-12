@@ -31,6 +31,10 @@ export function MaterialPhysicalStockCell({
     };
   }, []);
 
+  useEffect(() => {
+    setValue(toEditableValue(physical));
+  }, [physical]);
+
   function clearScheduledSave() {
     if (!saveTimerRef.current) return;
     clearTimeout(saveTimerRef.current);
