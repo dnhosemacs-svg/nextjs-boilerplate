@@ -1,16 +1,69 @@
 # TaskFlow Carpintería
 
 [![CI](https://github.com/dnhosemacs-svg/nextjs-boilerplate/actions/workflows/ci.yml/badge.svg)](https://github.com/dnhosemacs-svg/nextjs-boilerplate/actions/workflows/ci.yml)
+[![Coverage](https://img.shields.io/badge/coverage-86%25%20lines-brightgreen)](https://github.com/dnhosemacs-svg/nextjs-boilerplate/actions/workflows/ci.yml#:~:text=Test%20with%20coverage)
+[![Next.js](https://img.shields.io/badge/Next.js-16-black)](https://nextjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5-blue)](https://www.typescriptlang.org/)
 
-> Panel interno para gestionar pedidos del taller.
+**Panel interno full-stack para un taller de carpintería.** Un solo despliegue en Vercel con tres módulos conectados:
 
-Aplicación web de gestión para el taller de carpintería construida con Next.js App Router. Incluye **inventario** (categorías y productos en PostgreSQL/Neon), CRUD de pedidos, autenticación con NextAuth (Firebase + GitHub OAuth opcional), protección de rutas con middleware y panel de estadísticas.
+- **Inventario** — categorías, materiales, stock físico/reservado/disponible y movimientos en PostgreSQL (Neon).
+- **Pedidos** — flujo de estados (`DRAFT` → `DELIVERED`), reservas de material al aprobar y consumo en producción.
+- **Auth** — sesión JWT (NextAuth), login correo/contraseña vía Firebase REST, GitHub OAuth opcional y roles `CLIENT` / `WORKER` / `ADMIN`.
 
+La API vive en Route Handlers (`src/app/api/**`); no hay servidor Express aparte. Middleware y `requireRole` protegen páginas y endpoints.
 
-| Despliegue | URL                                                     |
-| ---------- | ------------------------------------------------------- |
-| Vercel     | `https://nextjs-boilerplate-sigma-eosin-30.vercel.app/` |
+---
 
+## Demo
+
+| Recurso | Enlace |
+| ------- | ------ |
+| **App (Vercel)** | [nextjs-boilerplate-sigma-eosin-30.vercel.app](https://nextjs-boilerplate-sigma-eosin-30.vercel.app/) |
+| **Inventario en vivo** | [/products](https://nextjs-boilerplate-sigma-eosin-30.vercel.app/products) |
+| **Vídeo demo (Loom)** | [Walkthrough inventario (~5 min)](https://www.loom.com/share/b66ecf642eba49c6afab4dc28ffa308d) |
+
+> **Nota:** El vídeo Loom cubre **solo el módulo de inventario** (`/products`, categorías y stock). Pedidos, panel por rol y administración están en este README y en la app desplegada, pero no forman parte de la grabación.
+
+**Badges:** CI enlaza al workflow real en GitHub Actions. Cobertura medida en CI con Vitest (v8) sobre `src/lib` + APIs de inventario; umbral ≥ 80 % en líneas y funciones ([`vitest.config.ts`](vitest.config.ts)). Codecov es opcional (tarjeta 4.6); el badge de cobertura apunta al job *Test with coverage* del mismo workflow.
+
+---
+
+## Tecnologías por módulo
+
+| Módulo | Capa | Tecnología | Uso en el proyecto |
+| ------ | ---- | ---------- | ------------------- |
+| **Inventario** | Datos | Prisma + PostgreSQL (Neon) | Modelos `Category`, `Material`, `StockMovement`; `DATABASE_URL` (pooler) + `DIRECT_URL` (migraciones) |
+| | API | Next.js Route Handlers + Zod | `/api/categories`, `/api/materials`, stock y movimientos |
+| | Cliente | TanStack Query + Zustand | Caché de materiales; filtros y UI en `ui-store` |
+| | UI | shadcn / React 19 | `/products`, `/categories` |
+| **Pedidos** | Datos | Prisma | `Order`, `OrderMaterialLine`, `OrderReservation`, `OrderStatusEvent` |
+| | API | Route Handlers + Zod | `/api/orders`, transiciones de estado, consumo y movimientos por pedido |
+| | Dominio | `stock-service`, reservas | Físico / reservado / disponible; aprobar pedido reserva stock |
+| | UI | React (panel taller) | `/orders`, `/my-orders`, `/dashboard` por rol |
+| **Auth** | Sesión | NextAuth (Auth.js) | JWT en cookie; `src/lib/auth.ts` |
+| | Credenciales | Firebase Auth REST | Login servidor (`firebase-auth-rest.ts`); registro en cliente (`/register`) |
+| | Social | GitHub OAuth | Opcional (`GITHUB_ID` / `GITHUB_SECRET`) |
+| | Protección | `middleware.ts`, `requireRole` | Redirect a `/login`; `401`/`403` en APIs |
+| | Roles | Postgres `users.role` | `CLIENT`, `WORKER`, `ADMIN` en sesión |
+| **Plataforma** | Runtime | Next.js 16 App Router | RSC + Client Components, despliegue serverless en Vercel |
+| | Calidad | ESLint, TypeScript, Vitest | CI: lint → `tsc` → `test:coverage` → `build` |
+| | Observabilidad | Sentry (`@sentry/nextjs`) | Errores en producción (cuando está configurado) |
+
+---
+
+## Decisiones técnicas
+
+| Decisión | Elección | Alternativa | Motivo |
+| -------- | -------- | ----------- | ------ |
+| Arquitectura API | Next.js Route Handlers en el mismo repo | Express + SPA aparte | Un deploy en Vercel, tipos y Zod compartidos, middleware unificado ([`docs/arquitectura.md`](docs/arquitectura.md)) |
+| Base de datos | Neon PostgreSQL + Prisma 7 | SQLite / ORM distinto | Relaciones pedidos–stock; pooler para serverless (`DATABASE_URL` vs `DIRECT_URL`) |
+| Estado en cliente (inventario) | TanStack Query + Zustand | Solo `useState` / Redux | Query = datos del servidor; Zustand = filtros sin duplicar listas ([`docs/state-management.md`](docs/state-management.md)) |
+| Autenticación | NextAuth JWT + Firebase + Postgres | Solo Firebase en cliente | Sesión en SSR y APIs; rol de negocio en tabla `users` |
+| Stock | Libro mayor (`StockMovement`) + reservas | Campo `stock` único | Trazabilidad y pedidos que reservan material sin doble conteo |
+| Tiempo real | **No implementado** | Pusher / WebSockets | Flujo request–response; otra pestaña ve cambios tras refetch (F5). Pusher figura solo como **roadmap** en diagramas, no en dependencias ni env |
+| Duplicado `/api/products` | Mantener ambas rutas (deuda) | Borrar legacy ya | UI activa usa `/api/materials`; consolidación aplazada ([`docs/auditoria/deuda-tecnica.md`](docs/auditoria/deuda-tecnica.md)) |
+| Demo en vídeo | Solo inventario | Grabar pedidos y admin | Alcance del Loom ≤ 5 min; plataforma completa documentada aquí |
 
 ---
 
@@ -73,25 +126,6 @@ Documentación:
 
 ---
 
-## Tecnologías
-
-
-| Capa                 | Uso                                                  |
-| -------------------- | ---------------------------------------------------- |
-| Next.js (App Router) | Rutas, renderizado servidor/cliente y Route Handlers |
-| NextAuth             | Sesión JWT, proveedores credentials y GitHub         |
-| Firebase Auth        | Registro en cliente; login correo/contraseña en servidor |
-| TypeScript           | Tipado estático                                      |
-| React                | Componentes y estado de UI                           |
-| Zod                  | Validación de payloads en API                        |
-| Prisma + PostgreSQL  | Inventario (Neon en producción)                      |
-| TanStack Query       | Caché y mutaciones del inventario en cliente         |
-| Zustand              | Filtros y UI del panel privado                       |
-| CSS global           | Estilos de aplicación                                |
-
-
----
-
 ## Estructura del proyecto
 
 ```text
@@ -148,17 +182,57 @@ Documentación:
 
 ---
 
-## Descargar y ejecutar
+## Instalación local (clone limpio)
+
+Guía verificada en **Windows** con Node **22**, tras `git clone` en carpeta nueva (mismos pasos que ejecuta CI salvo base de datos real).
+
+### Requisitos
+
+- **Node.js 22** (la CI usa `node-version: 22`)
+- Cuenta **Neon** (PostgreSQL) — `DATABASE_URL` + `DIRECT_URL`
+- Proyecto **Firebase** — `FIREBASE_API_KEY` y `NEXT_PUBLIC_FIREBASE_*` si usas `/register`
+- `NEXTAUTH_SECRET` — p. ej. `openssl rand -base64 32`
+
+### Pasos
 
 ```bash
-git clone https://github.com/dnhosemacs-svg/nextjs-boilerplate
+git clone https://github.com/dnhosemacs-svg/nextjs-boilerplate.git
 cd nextjs-boilerplate
-npm install
-cp .env.example .env.local   # edita .env.local con tus valores
+npm ci
+cp .env.example .env.local
+```
+
+Edita `.env.local` con tus valores (mínimo: `NEXTAUTH_SECRET`, `NEXTAUTH_URL=http://localhost:3000`, `FIREBASE_API_KEY`, `DATABASE_URL`, `DIRECT_URL`). Detalle en [Configuración](#configuración).
+
+Primera vez con base de datos vacía:
+
+```bash
+npx prisma migrate deploy
+npx prisma db seed   # opcional: datos de demo
 npm run dev
 ```
 
-Aplicación disponible en [http://localhost:3000](http://localhost:3000).
+Aplicación en [http://localhost:3000](http://localhost:3000). Inicia sesión en `/login` (usuario existente en Firebase/Postgres o registro en `/register` si está habilitado).
+
+### Verificación (misma batería que CI)
+
+Con `.env.local` completo:
+
+```bash
+npm run lint
+npx tsc --noEmit
+npm run test:coverage
+npm run build
+```
+
+| Comando | Resultado esperado (jun 2026) |
+| ------- | ------------------------------ |
+| `npm run lint` | 0 errores |
+| `npx tsc --noEmit` | 0 errores |
+| `npm run test:coverage` | 58 tests OK; ≥ 80 % líneas/funciones en paths de inventario |
+| `npm run build` | Build de producción OK (`assertServerEnv` exige secretos en `NODE_ENV=production`) |
+
+Sin base de datos ni Firebase configurados, `npm run dev` fallará al acceder a rutas que usan Prisma; los cuatro comandos de verificación sí pasan con variables dummy como en [`.github/workflows/ci.yml`](.github/workflows/ci.yml).
 
 ---
 
@@ -233,7 +307,8 @@ npx prisma db seed   # opcional: datos de demo
 - `npm run dev`: servidor de desarrollo.
 - `npm run build`: build de producción.
 - `npm run start`: ejecutar build de producción.
-- `npm run lint`: análisis estático con ESLint.
+- `npm run lint` / `npm run lint:fix`: análisis estático con ESLint.
+- `npm run test` / `npm run test:coverage`: tests Vitest (cobertura en APIs y `src/lib` de inventario).
 
 ---
 
@@ -403,6 +478,8 @@ Después: `npm run lint` y `npm run build`.
 ## Limitaciones conocidas
 
 - **Inventario y pedidos:** PostgreSQL (Neon); requiere `DATABASE_URL` y `DIRECT_URL`.
+- **Sin tiempo real:** no hay Pusher ni WebSockets; los clientes sincronizan con refetch manual (p. ej. F5). Los datos en Neon son consistentes; falta push a otras pestañas.
 - **Tasks legacy:** `/api/tasks` en cookie; la operativa del taller usa `/api/orders`.
 - **IA / BOM automático:** no desplegado (v1 = plantillas manuales; roadmap en [fase-2-ia](docs/pedidos/fase-2-ia.md)).
 - Panel de usuarios en `/admin/users` requiere Firebase Admin configurado en servidor.
+- **Codecov:** cobertura en CI vía Vitest; badge estático en README hasta conectar Codecov (tarjeta 4.6 opcional).
