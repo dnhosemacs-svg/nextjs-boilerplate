@@ -211,10 +211,12 @@ Guía verificada en **Windows** con Node **22**, tras `git clone` en carpeta nue
 git clone https://github.com/dnhosemacs-svg/nextjs-boilerplate.git
 cd nextjs-boilerplate
 npm ci
-cp .env.example .env.local
+cp .env.example .env.local   # Windows (PowerShell): Copy-Item .env.example .env.local
 ```
 
 Edita `.env.local` con tus valores (mínimo: `NEXTAUTH_SECRET`, `NEXTAUTH_URL=http://localhost:3000`, `FIREBASE_API_KEY`, `DATABASE_URL`, `DIRECT_URL`). Detalle en [Configuración](#configuración).
+
+Para **solo comprobar lint/tipos/tests/build** (como CI) sin Neon ni Firebase reales, basta con las variables dummy de [`.github/workflows/ci.yml`](.github/workflows/ci.yml) en `.env.local` o en la sesión de terminal; ver tabla de [Verificación](#verificación-misma-batería-que-ci) más abajo.
 
 Primera vez con base de datos vacía:
 
@@ -241,7 +243,7 @@ npm run build
 | ------- | ------------------------------ |
 | `npm run lint` | 0 errores |
 | `npx tsc --noEmit` | 0 errores |
-| `npm run test:coverage` | 58 tests OK; ≥ 80 % líneas/funciones en paths de inventario |
+| `npm run test:coverage` | 71 tests OK; ≥ 80 % líneas/funciones en paths de inventario |
 | `npm run build` | Build de producción OK (`assertServerEnv` exige secretos en `NODE_ENV=production`) |
 
 Sin base de datos ni Firebase configurados, `npm run dev` fallará al acceder a rutas que usan Prisma; los cuatro comandos de verificación sí pasan con variables dummy como en [`.github/workflows/ci.yml`](.github/workflows/ci.yml).
